@@ -1,0 +1,23 @@
+# Architecture (condensed)
+
+Services: Web (landing, scan, result, checkout, dashboard) · Facts store (Supabase/Postgres) · Scanner · Fixer · Publisher · Reporter · job queue (Postgres table) + cron in worker.
+
+Workflow A (acquisition): name+place → resolve business (Google Places + KvK; confirmation step prevents name collisions) → provisional facts scraped (site, GBP, KvK) → free scan: 6 prompts × 3 engines (chatgpt, google_ai, copilot) × 3 samples → extract/compare → provisional findings → result page (progress state shows prompts being asked) → email capture only to send report → Stripe Checkout (Instellen €149 one-off; Instellen+Bewaking €149 + €49/mo; iDEAL+card; btw-nummer) → webhook sets status trial, enqueues publish. No purchase: follow-ups day 7, day 21, then stop; result pages for non-customers deleted after 90 days.
+
+Workflow B (setup, goal: live within 48h; owner does 4 things): confirm facts (facts v1, verified_at) → generate ~20 prompts → domain choice (A: CNAME feiten.{domain} → Maicro, verified by polling DNS every 10 min; B: Maicro registers {name}-{place}.nl; C later: WordPress plugin) → publish facts page (plain dated HTML, canonical, sitemap, JSON-LD LocalBusiness, llms.txt; IndexNow ping) → Google OAuth for GBP: read, diff, apply (hours, phone, website) → Bing Places + Apple Business Connect sync (approve diff) → directory sweep (~12 NL directories: API→sync, form→browser agent, email-only→templated request) → KvK mismatch → owner instructions → first full (baseline) scan → fix round 1.
+
+Workflow C (monthly scan): cron on anniversary day, runs spread 02:00–06:00 CET; 20 prompts × 5 engines × 10 samples (~€6–9). Engines: chatgpt (OpenAI Responses API + web_search, citations from annotations), gemini (grounding metadata), perplexity (sonar, citations), google_ai (SERP provider for AI Overviews / AI Mode, nl-NL), copilot (headless browser, lowest priority, skip on failure). Extract atomic claims keyed to fact fields (+ other_entity tag). Compare: wrong when ≥30% samples disagree; unstable 10–30%; phone wrong once is a finding. Attribute: fetch cited URLs, first one containing the wrong value = source_url; classify owned/directory/third_party/none. Persist findings with frequency ("7 van 10 keer") and diff vs last month (new/persisting/resolved). Drift alert if an engine's wrong-rate across customers jumps >20 points.
+
+Workflow D (fix) — one path per source_type:
+- owned_facts_page: republish + IndexNow; recheck 7d.
+- owned_website: email owner exact page/text to change (WordPress plugin: patch); recheck 14d; reminders 14/28d.
+- directory_api (GBP/Bing/Apple): resync; recheck 7d; operator if rejected.
+- directory_form: browser agent submits; screenshot evidence; recheck 14d; operator queue on failure.
+- third_party / email-only: templated correction email in owner's name (from maicro.nl, reply-to owner), follow-up 14d; recheck 30d; unfixable after 45d with note.
+- other_entity: strengthen disambiguation on facts page ("niet te verwarren met"), sync place everywhere; recheck 30d.
+- none (model memory): nothing; recheck after major model release; shown honestly.
+Sequence: finding → fix task → auto action within 1h, evidence stored → recheck = mini-scan of affected prompt/engine, 10 samples → resolved (proof card: before/after samples, dates, source) or next step/escalation. Owner notified only at resolution or unfixable.
+
+Workflow E: monthly report email (status line, proof cards, open findings with source + next step), dashboard (facts edit → republish + resync + mini-scan after 7d; channels; findings timeline; proof cards; invoices; raw samples on request), Stripe billing €49/mo, dunning 14d → paused (scans stop, facts page stays 60d) → churned (facts page redirects to main site), cancel asks "Klopte alles al?" and offers quarterly check €29, re-engagement free re-scan after 90d, annual facts re-confirmation.
+
+Cost per customer ≈ €11–14/month vs €49. Free scan ≈ €0.40.

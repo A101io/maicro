@@ -1,0 +1,83 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+:root {
+  --paper: #f6f4ee;
+  --ink: #15202b;
+  --secondary: #5b6672;
+  --rule: #d9d4c7;
+  --accent: #1f4fd8;
+  --wrong: #b42318;
+  --wrong-bg: #fdecea;
+  --doubt: #a15c07;
+  --doubt-bg: #fff3dd;
+  --ok: #1b6b3a;
+  --ok-bg: #e6f3ea;
+  color-scheme: light only;
+}
+
+@layer base {
+  html {
+    background: var(--paper);
+    color: var(--ink);
+    font-family: "IBM Plex Sans", system-ui, sans-serif;
+    font-size: 17px;
+    line-height: 1.55;
+    -webkit-text-size-adjust: 100%;
+    text-rendering: optimizeLegibility;
+  }
+  body {
+    background: var(--paper);
+    min-height: 100dvh;
+  }
+  h1, h2, .serif {
+    font-family: "Instrument Serif", Georgia, serif;
+    font-weight: 400;
+    letter-spacing: -0.5px;
+    line-height: 1.05;
+  }
+  h3, h4 { font-weight: 600; line-height: 1.25; }
+  a { color: var(--accent); text-underline-offset: 3px; }
+  a:hover { text-decoration: underline; }
+  :focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; border-radius: 2px; }
+  ::selection { background: #dfe6fb; }
+  summary { cursor: pointer; list-style: none; }
+  summary::-webkit-details-marker { display: none; }
+  input, select, textarea, button { font: inherit; color: inherit; }
+  @media (prefers-reduced-motion: reduce) {
+    *, *::before, *::after { animation-duration: 0.01ms !important; transition-duration: 0.01ms !important; }
+  }
+}
+
+@layer components {
+  .h1 { @apply font-serif text-[40px] leading-[1.05] sm:text-[56px] lg:text-[64px]; letter-spacing: -0.5px; font-weight: 400; }
+  .h2 { @apply font-serif text-[32px] leading-[1.08] sm:text-[44px]; letter-spacing: -0.5px; font-weight: 400; }
+  .eyebrow { @apply font-mono text-[13px] uppercase tracking-[0.04em]; color: rgba(21, 32, 43, 0.6); }
+  .mono { @apply font-mono text-[13px] leading-[1.5] text-secondary; }
+  .card { @apply rounded-card border border-rule bg-white; }
+  .btn { @apply inline-flex h-[52px] items-center justify-center whitespace-nowrap rounded-btn px-5 text-[15px] font-semibold transition-colors; }
+  .btn-primary { @apply btn bg-ink text-paper hover:bg-[#223040]; }
+  .btn-secondary { @apply btn border border-ink bg-white text-ink hover:bg-paper; }
+  .btn-small { @apply inline-flex h-10 items-center justify-center rounded-btn border border-ink bg-white px-4 text-[14px] font-semibold text-ink hover:bg-paper; }
+  .field { @apply h-[52px] w-full rounded-btn border border-ink bg-white px-4 text-[17px] placeholder:text-secondary/70; }
+  .field-sm { @apply h-11 w-full rounded-btn border border-rule bg-white px-3 text-[15px] placeholder:text-secondary/70 focus:border-ink; }
+  .label { @apply mb-1.5 block text-[14px] font-medium; }
+  .chip { @apply inline-flex items-center gap-1 rounded-[4px] px-2 py-0.5 font-mono text-[12px] leading-5; }
+  .chip-neutral { @apply chip border border-rule bg-paper text-ink; }
+  .chip-wrong { @apply chip bg-wrong-bg text-wrong; }
+  .chip-doubt { @apply chip bg-doubt-bg text-doubt; }
+  .chip-ok { @apply chip bg-ok-bg text-ok; }
+  .mark-wrong { background: var(--wrong-bg); box-shadow: inset 0 -2px 0 var(--wrong); padding: 0 2px; border-radius: 2px; }
+  .section { @apply py-14 sm:py-20; }
+  .rule-top { @apply border-t border-rule; }
+  .prose-measure { max-width: 46ch; }
+}
+
+@keyframes rise {
+  from { opacity: 0; transform: translateY(4px); }
+  to { opacity: 1; transform: none; }
+}
+.rise { animation: rise 300ms ease-out both; }
+.rise-2 { animation-delay: 300ms; }
+.rise-3 { animation-delay: 600ms; }

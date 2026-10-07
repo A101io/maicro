@@ -1,0 +1,102 @@
+/**
+ * The fix-path table from docs/ARCHITECTURE.md (workflow D) as data.
+ * One path per SourceType: what we do, when we recheck, where it escalates.
+ */
+import type { FixAction, SourceType } from "../types.js";
+
+export type Escalation = "none" | "reminder" | "followup_email" | "operator" | "model_release";
+
+export interface FixPath {
+  sourceType: SourceType;
+  action: FixAction;
+  /** days until the mini-scan that checks whether the wrong answer is gone */
+  recheckDays: number;
+  /** what happens when the recheck still shows the wrong value */
+  escalation: Escalation;
+  /** days after the first action for a reminder / follow-up email (owned_website, third_party) */
+  followUpDays?: number[];
+  /** after this many days without resolution we stop and tell the owner honestly */
+  unfixableAfterDays?: number;
+  /** Dutch one-liner for the dashboard / report: "Wat we doen" */
+  labelNl: string;
+  /** Dutch note shown when a finding is marked unfixable */
+  unfixableNoteNl?: string;
+}
+
+export const FIX_PATHS: Record<SourceType, FixPath> = {
+  owned_facts_page: {
+    sourceType: "owned_facts_page",
+    action: "republish",
+    recheckDays: 7,
+    escalation: "operator",
+    labelNl: "We publiceren je feitenpagina opnieuw en melden de wijziging bij de zoekmachines.",
+  },
+  owned_website: {
+    sourceType: "owned_website",
+    action: "manual",
+    recheckDays: 14,
+    escalation: "reminder",
+    followUpDays: [14, 28],
+    unfixableAfterDays: 60,
+    labelNl: "We mailen je welke tekst op je website moet veranderen.",
+    unfixableNoteNl: "De tekst op je eigen website is nog niet aangepast.",
+  },
+  directory_api: {
+    sourceType: "directory_api",
+    action: "sync",
+    recheckDays: 7,
+    escalation: "operator",
+    unfixableAfterDays: 45,
+    labelNl: "We zetten de juiste gegevens opnieuw in het profiel.",
+  },
+  directory_form: {
+    sourceType: "directory_form",
+    action: "form",
+    recheckDays: 14,
+    escalation: "operator",
+    unfixableAfterDays: 45,
+    labelNl: "We dienen een correctie in bij de gids.",
+  },
+  third_party: {
+    sourceType: "third_party",
+    action: "email",
+    recheckDays: 30,
+    escalation: "followup_email",
+    followUpDays: [14],
+    unfixableAfterDays: 45,
+    labelNl: "We vragen de bron uit jouw naam om de gegevens te corrigeren.",
+    unfixableNoteNl: "De bron heeft niet gereageerd op ons verzoek.",
+  },
+  other_entity: {
+    sourceType: "other_entity",
+    action: "republish",
+    recheckDays: 30,
+    escalation: "operator",
+    unfixableAfterDays: 90,
+    labelNl: "We maken op je feitenpagina en in je profielen duidelijker welk bedrijf jij bent.",
+    unfixableNoteNl: "De AI verwart je nog met een ander bedrijf met dezelfde naam.",
+  },
+  none: {
+    sourceType: "none",
+    action: "none",
+    recheckDays: 30,
+    escalation: "model_release",
+    unfixableAfterDays: 45,
+    labelNl: "Dit antwoord komt uit het geheugen van het model. Dat verandert pas bij een nieuwe versie; we blijven controleren.",
+    unfixableNoteNl: "Dit antwoord komt uit het geheugen van het model, niet van een bron die wij kunnen aanpassen.",
+  },
+};
+
+export function fixPathFor(sourceType: SourceType): FixPath {
+  return FIX_PATHS[sourceType] ?? FIX_PATHS.none;
+}
+
+export function addDays(from: Date | string, days: number): Date {
+  const d = new Date(from);
+  d.setUTCDate(d.getUTCDate() + days);
+  return d;
+}
+
+export function daysBetween(a: Date | string, b: Date | string): number {
+  return Math.floor((new Date(b).getTime() - new Date(a).getTime()) / 86_400_000);
+}

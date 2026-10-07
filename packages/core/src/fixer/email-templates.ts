@@ -1,0 +1,164 @@
+/**
+ * Dutch e-mails the fixer sends.
+ *
+ * 1. Correction request to a third party (directory, news site, wiki) in the
+ *    owner's name: factual, polite, the exact wrong value, the correct value,
+ *    the facts page as reference, one sentence why. No marketing.
+ * 2. Owner instruction for owned_website: "Op pagina X staat Y; dit moet Z zijn."
+ * 3. Follow-up to a third party after 14 days without change.
+ *
+ * Tone: calm, "u" towards third parties (business-to-business, unknown person),
+ * "je" towards the owner. No exclamation marks.
+ */
+import type { Business, Finding } from "../types.js";
+import { findingWordsNl, hostOfUrl } from "../shared/facts-nl.js";
+import type { ChannelDiffEntry } from "../publisher/channels/types.js";
+
+export interface Mail {
+  subject: string;
+  text: string;
+  html?: string;
+}
+
+export interface CorrectionContext {
+  business: Pick<Business, "name" | "place" | "ownerEmail"> & { kvk?: string | null };
+  factsPageUrl: string;
+  /** the person signing; defaults to "de eigenaar van {name}" */
+  signer?: string;
+}
+
+function signature(ctx: CorrectionContext): string {
+  const who = ctx.signer ?? `de eigenaar van ${ctx.business.name}`;
+  const lines = [who, `${ctx.business.name}, ${ctx.business.place}`];
+  if (ctx.business.ownerEmail) lines.push(ctx.business.ownerEmail);
+  if (ctx.business.kvk) lines.push(`KvK ${ctx.business.kvk}`);
+  return lines.join("\n");
+}
+
+/** Correction request for one finding, to the site that carries the wrong value. */
+export function correctionRequestEmail(finding: Finding, ctx: CorrectionContext): Mail {
+  const w = findingWordsNl(finding);
+  const site = hostOfUrl(finding.sourceUrl) ?? "uw website";
+  const subject = `Correctie gegevens ${ctx.business.name}, ${ctx.business.place}`;
+  const text = `Geachte heer/mevrouw,
+
+Op ${site} staat een onjuist gegeven over ${ctx.business.name} in ${ctx.business.place}.${finding.sourceUrl ? `
+
+Pagina: ${finding.sourceUrl}` : ""}
+
+Wat er staat (${w.what}): ${w.wrong}
+Wat het moet zijn: ${w.correct}
+
+Wilt u dit aanpassen? AI-assistenten zoals ChatGPT nemen dit gegeven van uw pagina over, waardoor klanten nu een verkeerd antwoord krijgen.
+
+De actuele gegevens staan op onze feitenpagina, bevestigd door de eigenaar:
+${ctx.factsPageUrl}
+
+Alvast bedankt.
+
+Met vriendelijke groet,
+${signature(ctx)}
+`;
+  return { subject, text };
+}
+
+/** Follow-up when the third party has not changed the value after the first request. */
+export function correctionFollowUpEmail(finding: Finding, ctx: CorrectionContext, firstSentAt: string): Mail {
+  const w = findingWordsNl(finding);
+  const site = hostOfUrl(finding.sourceUrl) ?? "uw website";
+  const date = new Date(firstSentAt).toLocaleDateString("nl-NL", { day: "numeric", month: "long", timeZone: "Europe/Amsterdam" });
+  const subject = `Herinnering: correctie gegevens ${ctx.business.name}, ${ctx.business.place}`;
+  const text = `Geachte heer/mevrouw,
+
+Op ${date} vroegen wij u een gegeven over ${ctx.business.name} op ${site} aan te passen. Het staat er nog steeds.${finding.sourceUrl ? `
+
+Pagina: ${finding.sourceUrl}` : ""}
+
+Wat er staat (${w.what}): ${w.wrong}
+Wat het moet zijn: ${w.correct}
+
+Bron: ${ctx.factsPageUrl}
+
+Kunt u dit alsnog corrigeren, of ons laten weten als dat niet kan?
+
+Met vriendelijke groet,
+${signature(ctx)}
+`;
+  return { subject, text };
+}
+
+/** Correction request built from a channel diff (directory sync, no single finding). */
+export function directoryCorrectionEmail(directoryName: string, listingUrl: string | null, diff: ChannelDiffEntry[], ctx: CorrectionContext): Mail {
+  const rows = diff
+    .map((d) => `- ${fieldNl(d.field)}: ${d.current ? `staat nu "${d.current}", ` : ""}moet zijn "${d.expected}"`)
+    .join("\n");
+  const subject = `Correctie vermelding ${ctx.business.name}, ${ctx.business.place}`;
+  const text = `Geachte heer/mevrouw,
+
+De vermelding van ${ctx.business.name} in ${ctx.business.place} op ${directoryName} bevat gegevens die niet meer kloppen.${listingUrl ? `
+
+Vermelding: ${listingUrl}` : ""}
+
+${rows || "- Zie de feitenpagina voor de actuele gegevens."}
+
+Wilt u de vermelding aanpassen? AI-assistenten nemen deze gegevens over, waardoor klanten een verkeerd antwoord krijgen.
+
+Actuele gegevens, bevestigd door de eigenaar: ${ctx.factsPageUrl}
+
+Met vriendelijke groet,
+${signature(ctx)}
+`;
+  return { subject, text };
+}
+
+function fieldNl(field: string): string {
+  const days = ["maandag", "dinsdag", "woensdag", "donderdag", "vrijdag", "zaterdag", "zondag"];
+  if (field.startsWith("hours.")) return `Openingstijden ${days[Number(field.slice(6))] ?? ""}`.trim();
+  return { phone: "Telefoon", website: "Website", address: "Adres" }[field] ?? field;
+}
+
+/** To the owner: what to change on their own website. */
+export function ownerWebsiteInstructionEmail(finding: Finding, business: Pick<Business, "name">, dashboardUrl: string): Mail {
+  const w = findingWordsNl(finding);
+  const page = finding.sourceUrl ?? "je website";
+  const subject = `Eén aanpassing op je website voor ${business.name}`;
+  const text = `Hoi,
+
+AI-assistenten halen ${w.what} van ${business.name} van je eigen website, en daar staat iets anders dan je bij ons hebt bevestigd.
+
+Op pagina ${page} staat: ${w.wrong}
+Dit moet zijn: ${w.correct}
+
+Pas je dit aan? Daarna controleren wij over 14 dagen opnieuw of het antwoord klopt. Je hoeft ons niets te laten weten.
+
+Lukt het niet of heb je hulp nodig van je websitebouwer? Stuur deze mail door, dit is alles wat er moet gebeuren.
+
+Je overzicht: ${dashboardUrl}
+
+Groet,
+Maicro
+`;
+  return { subject, text };
+}
+
+/** Reminder to the owner after 14 / 28 days when the website text is still wrong. */
+export function ownerWebsiteReminderEmail(finding: Finding, business: Pick<Business, "name">, dashboardUrl: string, daysAgo: number): Mail {
+  const w = findingWordsNl(finding);
+  const page = finding.sourceUrl ?? "je website";
+  const subject = `Nog steeds "${w.wrong}" op je website`;
+  const text = `Hoi,
+
+${daysAgo} dagen geleden mailden we je over ${w.what} op ${page}. Bij onze controle van vandaag staat het er nog.
+
+Op pagina ${page} staat: ${w.wrong}
+Dit moet zijn: ${w.correct}
+
+Zolang dit op je website staat, blijft AI het overnemen. Het is één tekstwijziging.
+
+Je overzicht: ${dashboardUrl}
+
+Groet,
+Maicro
+`;
+  return { subject, text };
+}

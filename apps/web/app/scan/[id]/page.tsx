@@ -1,0 +1,29 @@
+import { notFound, redirect } from "next/navigation";
+import { copy } from "@maicro/core/copy";
+import { SiteHeader } from "@/components/SiteHeader";
+import { SiteFooter } from "@/components/SiteFooter";
+import { ready } from "@/lib/db";
+import { getScanState } from "@/lib/core";
+import { ScanProgress } from "./ScanProgress";
+
+export const dynamic = "force-dynamic";
+
+export default async function ScanWaitingPage({ params }: { params: Promise<{ id: string }> }) {
+  const { id } = await params;
+  const db = await ready();
+  const state = await getScanState(id);
+  if (!state) notFound();
+  if (state.status === "done" && state.scanRunId) redirect(`/r/${state.scanRunId}`);
+  const business = await db.getBusiness(state.businessId);
+  return (
+    <>
+      <SiteHeader minimal />
+      <main className="container max-w-[720px] py-12 sm:py-16">
+        <p className="eyebrow">{business ? `${business.name}, ${business.place}` : ""}</p>
+        <h1 className="h2 mt-3">{copy.scan.title}</h1>
+        <ScanProgress scanRunId={state.token} initialSteps={state.steps} initialStatus={state.status} />
+      </main>
+      <SiteFooter />
+    </>
+  );
+}

@@ -1,0 +1,36 @@
+{
+  "name": "@maicro/core",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "exports": {
+    ".": "./src/index.ts",
+    "./types": "./src/types.ts",
+    "./db": "./src/db/index.ts",
+    "./scanner": "./src/scanner/index.ts",
+    "./publisher": "./src/publisher/index.ts",
+    "./fixer": "./src/fixer/index.ts",
+    "./reporter": "./src/reporter/index.ts",
+    "./prompts": "./src/prompts/index.ts",
+    "./copy": "./src/copy/index.ts",
+    "./shared": "./src/shared/index.ts"
+  },
+  "scripts": {
+    "typecheck": "tsc --noEmit",
+    "test": "vitest run",
+    "scan": "tsx src/cli/scan.ts"
+  },
+  "dependencies": {
+    "postgres": "^3.4.5",
+    "zod": "^3.23.8",
+    "openai": "^4.73.0",
+    "@google/generative-ai": "^0.21.0",
+    "nanoid": "^5.0.9"
+  },
+  "devDependencies": {
+    "tsx": "^4.19.2",
+    "typescript": "^5.6.3",
+    "vitest": "^2.1.8",
+    "@types/node": "^22.10.1"
+  }
+}

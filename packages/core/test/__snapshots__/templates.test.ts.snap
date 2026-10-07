@@ -1,0 +1,312 @@
+// Vitest Snapshot v1, https://vitest.dev/guide/snapshot.html
+
+exports[`email templates > snapshots > baseline 1`] = `
+"Eerste controle van Bakkerij Jansen: 1 antwoord klopt niet
+
+Hoi,
+
+Op 2 oktober 2026 stelden we 100 vragen over Bakkerij Jansen aan ChatGPT, Gemini, Perplexity, Google AI, Copilot. 1 antwoord klopte niet. Dit is wat we vonden en wat we eraan doen.
+
+Over: de openingstijden op zondag
+ChatGPT zei: 10:00 tot 14:00 (7 van de 10 keer)
+Klopt niet. Het is: gesloten
+Waar het vandaan komt: openingstijden.nl
+Wat we doen: We vragen de bron uit jouw naam om de gegevens te corrigeren.
+
+Elke fout controleren we opnieuw zodra de bron is aangepast. Je hoort van ons als een antwoord is hersteld, met het antwoord van voor en na.
+
+Je overzicht: https://maicro.nl/dashboard
+
+Groet,
+Maicro
+"
+`;
+
+exports[`email templates > snapshots > baselineClean 1`] = `
+"Eerste controle van Bakkerij Jansen: alle 100 antwoorden kloppen
+
+Hoi,
+
+Op 2 oktober 2026 stelden we 100 vragen over Bakkerij Jansen aan ChatGPT. Alle antwoorden klopten. We controleren volgende maand opnieuw.
+
+Elke fout controleren we opnieuw zodra de bron is aangepast. Je hoort van ons als een antwoord is hersteld, met het antwoord van voor en na.
+
+Je overzicht: https://maicro.nl/dashboard
+
+Groet,
+Maicro
+"
+`;
+
+exports[`email templates > snapshots > correction 1`] = `
+"Correctie gegevens Bakkerij Jansen, Haarlem
+
+Geachte heer/mevrouw,
+
+Op openingstijden.nl staat een onjuist gegeven over Bakkerij Jansen in Haarlem.
+
+Pagina: https://www.openingstijden.nl/bakkerij-jansen-haarlem
+
+Wat er staat (de openingstijden op zondag): 10:00 tot 14:00
+Wat het moet zijn: gesloten
+
+Wilt u dit aanpassen? AI-assistenten zoals ChatGPT nemen dit gegeven van uw pagina over, waardoor klanten nu een verkeerd antwoord krijgen.
+
+De actuele gegevens staan op onze feitenpagina, bevestigd door de eigenaar:
+https://feiten.bakkerijjansen.nl/
+
+Alvast bedankt.
+
+Met vriendelijke groet,
+de eigenaar van Bakkerij Jansen
+Bakkerij Jansen, Haarlem
+eigenaar@bakkerijjansen.nl
+KvK 12345678
+"
+`;
+
+exports[`email templates > snapshots > correctionFollowUp 1`] = `
+"Herinnering: correctie gegevens Bakkerij Jansen, Haarlem
+
+Geachte heer/mevrouw,
+
+Op 2 oktober vroegen wij u een gegeven over Bakkerij Jansen op openingstijden.nl aan te passen. Het staat er nog steeds.
+
+Pagina: https://www.openingstijden.nl/bakkerij-jansen-haarlem
+
+Wat er staat (de openingstijden op zondag): 10:00 tot 14:00
+Wat het moet zijn: gesloten
+
+Bron: https://feiten.bakkerijjansen.nl/
+
+Kunt u dit alsnog corrigeren, of ons laten weten als dat niet kan?
+
+Met vriendelijke groet,
+de eigenaar van Bakkerij Jansen
+Bakkerij Jansen, Haarlem
+eigenaar@bakkerijjansen.nl
+KvK 12345678
+"
+`;
+
+exports[`email templates > snapshots > directoryCorrection 1`] = `
+"Correctie vermelding Bakkerij Jansen, Haarlem
+
+Geachte heer/mevrouw,
+
+De vermelding van Bakkerij Jansen in Haarlem op openingstijden.nl bevat gegevens die niet meer kloppen.
+
+Vermelding: https://www.openingstijden.nl/bakkerij-jansen
+
+- Openingstijden zondag: staat nu "10:00-14:00", moet zijn "gesloten"
+- Telefoon: moet zijn "023 123 45 67"
+
+Wilt u de vermelding aanpassen? AI-assistenten nemen deze gegevens over, waardoor klanten een verkeerd antwoord krijgen.
+
+Actuele gegevens, bevestigd door de eigenaar: https://feiten.bakkerijjansen.nl/
+
+Met vriendelijke groet,
+de eigenaar van Bakkerij Jansen
+Bakkerij Jansen, Haarlem
+eigenaar@bakkerijjansen.nl
+KvK 12345678
+"
+`;
+
+exports[`email templates > snapshots > followup7 1`] = `
+"3 antwoorden over Bakkerij Jansen kloppen niet
+
+Hoi,
+
+Een week geleden controleerden we wat AI over Bakkerij Jansen zegt. Van de 12 antwoorden klopten er 3 niet. ChatGPT zei bijvoorbeeld "10:00 tot 14:00" over de openingstijden op zondag; het is gesloten.
+
+Een klant die dit vraagt, krijgt dit antwoord. Niet één keer, elke keer, tot de bron verandert.
+
+Het volledige resultaat, met de bron van elke fout: https://maicro.nl/scan/bakkerij-jansen-haarlem
+
+Zelf oplossen kan: de bronnen staan erbij. Liever dat wij het doen? Instellen kost 149 euro eenmalig, bewaking 49 euro per maand, maandelijks opzegbaar. Prijzen excl. btw.
+
+Groet,
+Maicro
+"
+`;
+
+exports[`email templates > snapshots > followup21 1`] = `
+"Nog steeds "10:00 tot 14:00"
+
+Hoi,
+
+Drie weken geleden zagen we dat ChatGPT "10:00 tot 14:00" zegt over de openingstijden op zondag van Bakkerij Jansen. We hebben het vandaag opnieuw gecontroleerd. Het staat er nog.
+
+Resultaat: https://maicro.nl/scan/bakkerij-jansen-haarlem
+
+Dit is de laatste mail hierover. Wil je dat wij de bronnen herstellen, dan regel je dat via de link. Zo niet, dan laten we je met rust.
+
+Groet,
+Maicro
+"
+`;
+
+exports[`email templates > snapshots > ownerInstruction 1`] = `
+"Eén aanpassing op je website voor Bakkerij Jansen
+
+Hoi,
+
+AI-assistenten halen de openingstijden op zondag van Bakkerij Jansen van je eigen website, en daar staat iets anders dan je bij ons hebt bevestigd.
+
+Op pagina https://www.bakkerijjansen.nl/contact staat: 10:00 tot 14:00
+Dit moet zijn: gesloten
+
+Pas je dit aan? Daarna controleren wij over 14 dagen opnieuw of het antwoord klopt. Je hoeft ons niets te laten weten.
+
+Lukt het niet of heb je hulp nodig van je websitebouwer? Stuur deze mail door, dit is alles wat er moet gebeuren.
+
+Je overzicht: https://maicro.nl/dashboard
+
+Groet,
+Maicro
+"
+`;
+
+exports[`email templates > snapshots > ownerReminder 1`] = `
+"Nog steeds "10:00 tot 14:00" op je website
+
+Hoi,
+
+14 dagen geleden mailden we je over de openingstijden op zondag op https://www.bakkerijjansen.nl/contact. Bij onze controle van vandaag staat het er nog.
+
+Op pagina https://www.bakkerijjansen.nl/contact staat: 10:00 tot 14:00
+Dit moet zijn: gesloten
+
+Zolang dit op je website staat, blijft AI het overnemen. Het is één tekstwijziging.
+
+Je overzicht: https://maicro.nl/dashboard
+
+Groet,
+Maicro
+"
+`;
+
+exports[`email templates > snapshots > report 1`] = `
+"Bakkerij Jansen in oktober 2026: 2 fouten gevonden, 1 hersteld, 1 in behandeling
+
+Hoi,
+
+Controle van 7 oktober 2026: 2 fouten gevonden, 1 hersteld, 1 in behandeling.
+
+We stelden 100 vragen over Bakkerij Jansen aan ChatGPT, Gemini, Perplexity, Google AI, Copilot.
+
+Hersteld deze maand
+
+ChatGPT zei: "gesloten op maandag"
+Nu: "open 9–18"
+Bron: openingstijden.nl, hersteld in 12 dagen.
+
+Nog open
+
+Over: de openingstijden op zondag
+ChatGPT zei: 10:00 tot 14:00 (7 van de 10 keer)
+Klopt niet. Het is: gesloten
+Waar het vandaan komt: openingstijden.nl
+Wat we doen: We vragen de bron uit jouw naam om de gegevens te corrigeren.
+
+Alle antwoorden, met datum en bron: https://maicro.nl/dashboard
+
+Groet,
+Maicro
+"
+`;
+
+exports[`email templates > snapshots > reportClean 1`] = `
+"Bakkerij Jansen in oktober 2026: 12 van 12 antwoorden kloppen
+
+Hoi,
+
+Controle van 7 oktober 2026: 12 van 12 antwoorden kloppen.
+
+We stelden 12 vragen over Bakkerij Jansen aan ChatGPT.
+
+Er is niets te herstellen. Fijn.
+
+Alle antwoorden, met datum en bron: https://maicro.nl/dashboard
+
+Groet,
+Maicro
+"
+`;
+
+exports[`email templates > snapshots > resolution 1`] = `
+"Hersteld: ChatGPT zegt nu "gesloten" over Bakkerij Jansen
+
+Hoi,
+
+ChatGPT gaf een verkeerd antwoord over de openingstijden op zondag van Bakkerij Jansen. Dat is hersteld.
+
+Voor (2 oktober 2026):
+"Op zondag open van 10:00 tot 14:00."
+
+Na (14 oktober 2026):
+"Op zondag gesloten."
+
+Bron: openingstijden.nl, hersteld in 12 dagen.
+
+We blijven dit antwoord elke maand controleren.
+
+Je overzicht: https://maicro.nl/dashboard
+
+Groet,
+Maicro
+"
+`;
+
+exports[`email templates > snapshots > unfixable 1`] = `
+"Niet hersteld: ChatGPT over de openingstijden op zondag van Bakkerij Jansen
+
+Hoi,
+
+ChatGPT zegt nog steeds "10:00 tot 14:00" over de openingstijden op zondag van Bakkerij Jansen. Het is gesloten. We hebben dit 45 dagen geprobeerd te herstellen.
+
+Waarom het niet lukte: Dit antwoord komt uit het geheugen van het model, niet van een bron die wij kunnen aanpassen.
+
+Wat we deden: Dit antwoord komt uit het geheugen van het model. Dat verandert pas bij een nieuwe versie; we blijven controleren.
+
+Wat nu: we laten dit antwoord in je overzicht staan en controleren het elke maand opnieuw. Antwoorden uit het geheugen van het model veranderen pas bij een nieuwe versie van dat model. Zodra dat gebeurt, zie je het in je rapport.
+
+Je overzicht: https://maicro.nl/dashboard
+
+Groet,
+Maicro
+"
+`;
+
+exports[`email templates > snapshots > welcome 1`] = `
+"Welkom bij Maicro: 4 stappen voor Bakkerij Jansen
+
+Hoi,
+
+Bedankt voor je bestelling. Vanaf nu controleren we wat AI over Bakkerij Jansen zegt en herstellen we fouten bij de bron. Om te starten vragen we 4 dingen van je. Samen ongeveer 5 minuten.
+
+1. Bevestig je gegevens
+   Adres, telefoon, openingstijden, wat je wel en niet doet. We hebben ze alvast ingevuld, jij kijkt ze na.
+   https://maicro.nl/dashboard/feiten
+
+2. Eén DNS-regel
+   Maak bij je domeinbeheerder een CNAME aan:
+   feiten.bakkerijjansen.nl  →  feiten.maicro.nl
+   Wij controleren elke 10 minuten of hij er staat. Lukt het niet, dan zetten we de pagina op ons eigen adres.
+
+3. Log één keer in bij Google
+   Daarmee mogen we je Google Bedrijfsprofiel lezen en de openingstijden, het telefoonnummer en de website gelijk zetten.
+   https://maicro.nl/dashboard/google
+
+4. Wij doen de rest
+   Binnen 48 uur staat je feitenpagina live, zijn Google, Bing en Apple gelijkgezet en draait de eerste volledige controle. Het resultaat krijg je per mail.
+
+Je overzicht: https://maicro.nl/dashboard
+
+Vragen? Antwoord op deze mail.
+
+Groet,
+Maicro
+"
+`;

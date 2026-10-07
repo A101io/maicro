@@ -1,0 +1,62 @@
+"use server";
+
+import { revalidatePath } from "next/cache";
+import { redirect } from "next/navigation";
+import type { Facts, Hours, PriceItem } from "@maicro/core/types";
+import { ready } from "@/lib/db";
+import { requireOwner } from "@/lib/owner";
+
+const str = (form: FormData, k: string): string | null => {
+  const v = String(form.get(k) ?? "").trim();
+  return v === "" ? null : v;
+};
+
+function parseFacts(form: FormData, businessId: string): Omit<Facts, "businessId" | "version" | "provisional" | "verifiedAt"> {
+  const hours: Hours[] = ([0, 1, 2, 3, 4, 5, 6] as const).map((day) => {
+    const closed = form.get(`hours.${day}.closed`) === "on";
+    return { day, closed, open: closed ? null : str(form, `hours.${day}.open`), close: closed ? null : str(form, `hours.${day}.close`) };
+  });
+  const prices: PriceItem[] = [];
+  for (let i = 0; i < 50; i++) {
+    const label = str(form, `price.${i}.label`);
+    if (label == null && form.get(`price.${i}.amount`) == null) break;
+    const amount = Number(form.get(`price.${i}.amount`) ?? 0);
+    if (label && Number.isFinite(amount)) prices.push({ label, amount, unit: str(form, `price.${i}.unit`) ?? undefined });
+  }
+  const list = (k: string) => form.getAll(k).map((v) => String(v).trim()).filter(Boolean);
+  const openStatus = str(form, "openStatus");
+  return {
+    name: str(form, "name") ?? "",
+    place: str(form, "place") ?? "",
+    address: str(form, "address"),
+    postcode: str(form, "postcode"),
+    phone: str(form, "phone"),
+    email: str(form, "email"),
+    website: str(form, "website"),
+    openStatus: openStatus === "temporarily_closed" || openStatus === "permanently_closed" ? openStatus : "open",
+    hours,
+    servicesYes: list("servicesYes"),
+    servicesNo: list("servicesNo"),
+    prices,
+    policies: list("policies"),
+    paymentMethods: list("paymentMethods"),
+    notConfusedWith: list("notConfusedWith"),
+  };
+}
+
+/** Confirm facts: new version, provisional=false, verified_at=now; then publish + sync jobs. */
+export async function saveFacts(form: FormData) {
+  const { business } = await requireOwner("/app/gegevens");
+  const db = await ready();
+  const data = parseFacts(form, business.id);
+  if (!data.name || !data.place) redirect("/app/gegevens?fout=1");
+  const now = new Date().toISOString();
+  const facts = await db.insertFacts(business.id, data, { provisional: false, verifiedAt: now });
+  await db.upsertBusiness({ id: business.id, slug: business.slug, name: data.name, place: data.place, domain: business.domain ?? (data.website ? data.website.replace(/^https?:\/\//, "").replace(/^www\./, "").split("/")[0]! : null) });
+  await db.enqueueJob("publish", { businessId: business.id, reason: `facts v${facts.version} confirmed` });
+  await db.enqueueJob("sync", { businessId: business.id }, new Date(Date.now() + 1000));
+  await db.logEvent(business.id, "facts.confirmed", { version: facts.version });
+  revalidatePath("/app");
+  revalidatePath("/app/gegevens");
+  redirect("/app/gegevens?opgeslagen=1");
+}

@@ -1,0 +1,127 @@
+import { describe, expect, it } from "vitest";
+import {
+  baselineSummaryEmail,
+  followUpEmail,
+  monthlyReportEmail,
+  resolutionNoticeEmail,
+  statusLine,
+  unfixableNoticeEmail,
+  welcomeEmail,
+  type Mail,
+} from "../src/reporter/templates";
+import { correctionRequestEmail, correctionFollowUpEmail, directoryCorrectionEmail, ownerWebsiteInstructionEmail, ownerWebsiteReminderEmail } from "../src/fixer/email-templates";
+import { business, finding } from "./worker-fixtures";
+
+const BANNED = /\b(GEO|AEO|LLM|LLMs|prompt|prompts|credits|garantie|gegarandeerd|zichtbaarheid|ranking|optimaliseren)\b/i;
+
+const links = { dashboardUrl: "https://maicro.nl/dashboard", factsPageUrl: "https://feiten.bakkerijjansen.nl/", resultUrl: "https://maicro.nl/scan/bakkerij-jansen-haarlem" };
+const ctx = { business: { name: business.name, place: business.place, ownerEmail: business.ownerEmail, kvk: business.kvk }, factsPageUrl: "https://feiten.bakkerijjansen.nl/" };
+
+const all: Record<string, Mail | { subject: string; text: string }> = {
+  welcome: welcomeEmail({
+    business,
+    cname: { host: "feiten.bakkerijjansen.nl", target: "feiten.maicro.nl" },
+    links: { ...links, confirmFactsUrl: "https://maicro.nl/dashboard/feiten", googleConnectUrl: "https://maicro.nl/dashboard/google" },
+  }),
+  baseline: baselineSummaryEmail({ business, checkedAt: "2026-10-02T03:00:00Z", totalAnswers: 100, wrongAnswers: 1, findings: [finding], engines: ["chatgpt", "gemini", "perplexity", "google_ai", "copilot"], links }),
+  baselineClean: baselineSummaryEmail({ business, checkedAt: "2026-10-02T03:00:00Z", totalAnswers: 100, wrongAnswers: 0, findings: [], engines: ["chatgpt"], links }),
+  resolution: resolutionNoticeEmail({
+    business,
+    finding: { ...finding, status: "resolved", resolvedAt: "2026-10-14T03:00:00Z" },
+    before: { quote: "Op zondag open van 10:00 tot 14:00.", at: "2026-10-02T03:00:00Z" },
+    after: { quote: "Op zondag gesloten.", at: "2026-10-14T03:00:00Z" },
+    days: 12,
+    links,
+  }),
+  report: monthlyReportEmail({
+    business,
+    month: "oktober 2026",
+    checkedAt: "2026-10-07T03:00:00Z",
+    totalAnswers: 100,
+    wrongAnswers: 1,
+    resolved: 1,
+    inProgress: 1,
+    unfixable: 0,
+    proofCards: [{ findingId: "f0", engine: "chatgpt", what: "de openingstijden op zondag", before: "gesloten op maandag", after: "open 9–18", source: "openingstijden.nl", days: 12, resolvedAt: "2026-10-01T00:00:00Z" }],
+    openFindings: [{ finding, nextStep: "We vragen de bron uit jouw naam om de gegevens te corrigeren.", since: finding.firstSeenAt }],
+    engines: ["chatgpt", "gemini", "perplexity", "google_ai", "copilot"],
+    links,
+  }),
+  reportClean: monthlyReportEmail({ business, month: "oktober 2026", checkedAt: "2026-10-07T03:00:00Z", totalAnswers: 12, wrongAnswers: 0, resolved: 0, inProgress: 0, unfixable: 0, proofCards: [], openFindings: [], engines: ["chatgpt"], links }),
+  followup7: followUpEmail({ business, wrongAnswers: 3, totalAnswers: 12, example: finding, links, priceSetupEur: 149, priceMonitorEur: 49 }, 7),
+  followup21: followUpEmail({ business, wrongAnswers: 3, totalAnswers: 12, example: finding, links, priceSetupEur: 149, priceMonitorEur: 49 }, 21),
+  unfixable: unfixableNoticeEmail({ business, finding: { ...finding, sourceType: "none", sourceUrl: null }, note: "Dit antwoord komt uit het geheugen van het model, niet van een bron die wij kunnen aanpassen.", triedDays: 45, links }),
+  correction: correctionRequestEmail(finding, ctx),
+  correctionFollowUp: correctionFollowUpEmail(finding, ctx, "2026-10-02T10:00:00Z"),
+  directoryCorrection: directoryCorrectionEmail("openingstijden.nl", "https://www.openingstijden.nl/bakkerij-jansen", [{ field: "hours.6", current: "10:00-14:00", expected: "gesloten" }, { field: "phone", current: null, expected: "023 123 45 67" }], ctx),
+  ownerInstruction: ownerWebsiteInstructionEmail({ ...finding, sourceType: "owned_website", sourceUrl: "https://www.bakkerijjansen.nl/contact" }, business, links.dashboardUrl),
+  ownerReminder: ownerWebsiteReminderEmail({ ...finding, sourceType: "owned_website", sourceUrl: "https://www.bakkerijjansen.nl/contact" }, business, links.dashboardUrl, 14),
+};
+
+describe("email templates", () => {
+  for (const [name, m] of Object.entries(all)) {
+    it(`${name}: Dutch, no jargon, no exclamation marks`, () => {
+      expect(m.subject.length).toBeGreaterThan(5);
+      expect(m.subject + "\n" + m.text).not.toMatch(BANNED);
+      expect(m.subject).not.toContain("!");
+      expect(m.text).not.toContain("!");
+      expect(m.text).not.toContain("undefined");
+      expect(m.text).not.toContain("null");
+      expect(m.text).not.toMatch(/\bcontrol\b/i);
+    });
+  }
+
+  it("snapshots", () => {
+    for (const [name, m] of Object.entries(all)) {
+      expect(`${m.subject}\n\n${m.text}`).toMatchSnapshot(name);
+    }
+  });
+
+  it("welcome lists 4 steps and the CNAME", () => {
+    const t = all.welcome!.text;
+    expect(t).toMatch(/1\. Bevestig je gegevens/);
+    expect(t).toMatch(/2\. Eén DNS-regel/);
+    expect(t).toMatch(/3\. Log één keer in bij Google/);
+    expect(t).toMatch(/4\. Wij doen de rest/);
+    expect(t).toContain("feiten.bakkerijjansen.nl  →  feiten.maicro.nl");
+  });
+
+  it("status line follows the messaging brief", () => {
+    expect(statusLine({ totalAnswers: 12, wrongAnswers: 0, resolved: 0, inProgress: 0 })).toBe("12 van 12 antwoorden kloppen");
+    expect(statusLine({ totalAnswers: 12, wrongAnswers: 1, resolved: 1, inProgress: 1 })).toBe("2 fouten gevonden, 1 hersteld, 1 in behandeling");
+  });
+
+  it("resolution shows before and after with dates", () => {
+    const t = all.resolution!.text;
+    expect(t).toContain("Voor (2 oktober 2026)");
+    expect(t).toContain("Na (14 oktober 2026)");
+    expect(t).toContain("hersteld in 12 dagen");
+    expect(all.resolution!.subject).toBe('Hersteld: ChatGPT zegt nu "gesloten" over Bakkerij Jansen');
+  });
+
+  it("follow-ups use the brief's subjects", () => {
+    expect(all.followup7!.subject).toBe("3 antwoorden over Bakkerij Jansen kloppen niet");
+    expect(all.followup21!.subject).toBe('Nog steeds "10:00 tot 14:00"');
+    expect(all.followup7!.text).toContain("149 euro eenmalig");
+  });
+
+  it("correction request carries wrong value, correct value, reference and one reason", () => {
+    const t = all.correction!.text;
+    expect(t).toContain("Wat er staat (de openingstijden op zondag): 10:00 tot 14:00");
+    expect(t).toContain("Wat het moet zijn: gesloten");
+    expect(t).toContain("https://feiten.bakkerijjansen.nl/");
+    expect(t).toContain("Pagina: https://www.openingstijden.nl/bakkerij-jansen-haarlem");
+    expect(t).toContain("de eigenaar van Bakkerij Jansen");
+    expect(t).toContain("eigenaar@bakkerijjansen.nl");
+  });
+
+  it("owner instruction says page X / staat Y / moet Z", () => {
+    const t = all.ownerInstruction!.text;
+    expect(t).toContain("Op pagina https://www.bakkerijjansen.nl/contact staat: 10:00 tot 14:00");
+    expect(t).toContain("Dit moet zijn: gesloten");
+  });
+
+  it("html version exists for customer mails", () => {
+    expect((all.report as Mail).html).toContain("<a href=\"https://maicro.nl/dashboard\">");
+  });
+});
