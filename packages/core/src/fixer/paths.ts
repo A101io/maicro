@@ -2,12 +2,14 @@
  * The fix-path table from docs/ARCHITECTURE.md (workflow D) as data.
  * One path per SourceType: what we do, when we recheck, where it escalates.
  */
-import type { FixAction, SourceType } from "../types.js";
+import type { Finding, FixAction, SourceType } from "../types.js";
 
-export type Escalation = "none" | "reminder" | "followup_email" | "operator" | "model_release";
+export type Escalation = "none" | "reminder" | "followup_email" | "operator" | "model_release" | "resync";
 
 export interface FixPath {
   sourceType: SourceType;
+  /** Set on the not_found path only: the finding's verdict, not its source, picks this path. */
+  verdict?: "not_found";
   action: FixAction;
   /** days until the mini-scan that checks whether the wrong answer is gone */
   recheckDays: number;
@@ -87,8 +89,31 @@ export const FIX_PATHS: Record<SourceType, FixPath> = {
   },
 };
 
-export function fixPathFor(sourceType: SourceType): FixPath {
+/**
+ * Not found: the AI has never heard of the business. There is no wrong source
+ * to correct, so we make the business findable: publish the facts page, sync
+ * every channel, discover the directory listings. Recheck after 21 days, a
+ * follow-up recheck (with another sync) at 45 days, never unfixable before 60.
+ */
+export const NOT_FOUND_PATH: FixPath = {
+  sourceType: "none",
+  verdict: "not_found",
+  action: "republish",
+  recheckDays: 21,
+  escalation: "resync",
+  followUpDays: [45],
+  unfixableAfterDays: 60,
+  labelNl: "Niet gevonden: we maken je vindbaar",
+  unfixableNoteNl: "AI noemt je na 60 dagen nog steeds niet. Je feitenpagina en profielen staan goed; we blijven elke maand controleren.",
+};
+
+export function fixPathFor(sourceType: SourceType, verdict?: Finding["verdict"]): FixPath {
+  if (verdict === "not_found") return NOT_FOUND_PATH;
   return FIX_PATHS[sourceType] ?? FIX_PATHS.none;
+}
+
+export function fixPathForFinding(finding: Pick<Finding, "sourceType" | "verdict">): FixPath {
+  return fixPathFor(finding.sourceType, finding.verdict);
 }
 
 export function addDays(from: Date | string, days: number): Date {

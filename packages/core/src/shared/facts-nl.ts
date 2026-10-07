@@ -2,7 +2,7 @@
  * Dutch, human wording for fact keys and normalised claim values.
  * Used by the correction emails, the reports and the proof cards.
  */
-import type { FactKey, Finding } from "../types.js";
+import { NOT_FOUND_LABEL, NOT_FOUND_VALUE, type FactKey, type Finding } from "../types.js";
 
 const DAYS = ["maandag", "dinsdag", "woensdag", "donderdag", "vrijdag", "zaterdag", "zondag"];
 
@@ -65,6 +65,7 @@ export function factFieldNl(factKey: FactKey, subject: string | null): string {
 /** Normalised value → Dutch wording. "closed" → "gesloten", "yes" → "ja", "09:00-17:00" → "09:00 tot 17:00". */
 export function valueNl(factKey: FactKey, value: string): string {
   const v = value.trim();
+  if (v === NOT_FOUND_LABEL || v === NOT_FOUND_VALUE) return NOT_FOUND_LABEL;
   const lower = v.toLowerCase();
   if (factKey === "existence") {
     if (["closed", "permanently_closed", "permanent gesloten", "permanently closed"].includes(lower)) return "definitief gesloten";
@@ -83,19 +84,44 @@ export function valueNl(factKey: FactKey, value: string): string {
 export interface FindingWordsNl {
   what: string; // "de openingstijden op zondag"
   field: string; // "Zondag"
-  wrong: string; // "gesloten"
+  wrong: string; // "gesloten", or "niet gevonden" for a not_found finding
   correct: string; // "10:00 tot 16:00"
   frequency: string; // "7 van de 10 keer"
+  /** true when the engine said it has no information (verdict not_found) */
+  notFound: boolean;
+  /** "ChatGPT vond niets over de openingstijden op zondag" style line for not_found; empty otherwise */
+  notFoundLine: string;
 }
 
-export function findingWordsNl(f: Pick<Finding, "factKey" | "subject" | "wrongValue" | "correctValue" | "frequency" | "sampleCount">): FindingWordsNl {
+export function findingWordsNl(f: Pick<Finding, "factKey" | "subject" | "wrongValue" | "correctValue" | "frequency" | "sampleCount"> & Partial<Pick<Finding, "verdict">>): FindingWordsNl {
+  const notFound = f.verdict === "not_found" || f.wrongValue === NOT_FOUND_LABEL || f.wrongValue === NOT_FOUND_VALUE;
+  const what = factLabelNl(f.factKey, f.subject);
   return {
-    what: factLabelNl(f.factKey, f.subject),
+    what,
     field: factFieldNl(f.factKey, f.subject),
-    wrong: valueNl(f.factKey, f.wrongValue),
+    wrong: notFound ? NOT_FOUND_LABEL : valueNl(f.factKey, f.wrongValue),
     correct: valueNl(f.factKey, f.correctValue),
     frequency: `${f.frequency} van de ${f.sampleCount} keer`,
+    notFound,
+    notFoundLine: notFound ? `vond niets over ${what}` : "",
   };
+}
+
+/** "AI vindt niets over je" style count line for reports: "3 vragen: AI vindt niets over je". */
+export function notFoundCountNl(n: number): string {
+  return `${n} ${n === 1 ? "vraag" : "vragen"}: AI vindt niets over je`;
+}
+
+/** One calm sentence per visibility state for e-mails. */
+export function visibilityLineNl(visibility: "found" | "partial" | "unknown", name: string): string {
+  switch (visibility) {
+    case "unknown":
+      return `AI vindt (bijna) niets over ${name}. Je bestaat niet in het antwoord.`;
+    case "partial":
+      return `AI kent ${name} maar half: een deel van de antwoorden is leeg.`;
+    default:
+      return "";
+  }
 }
 
 export function hostOfUrl(url: string | null): string | null {

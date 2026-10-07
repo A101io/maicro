@@ -19,12 +19,12 @@ MAICRO_MOCK=1 pnpm scan --name "X" --place Y --kind free
 ```
 
 ## State (v0.1)
-Done and verified in mock mode: scanner core (5 engines, extraction, compare, attribute, CLI), web (landing, free scan, result, Stripe checkout, auth, dashboard, facts form, CNAME, Google OAuth), workers (publisher, 13 NL directories, GBP sync, fixer paths + rechecks, Dutch emails, queue + cron). `PgDb` has not been run against a real Postgres yet.
+Done and verified in mock mode: scanner core (5 engines, extraction, compare, attribute, CLI), web (landing, free scan, result, Stripe checkout, auth, dashboard, facts form, CNAME, Google OAuth), workers (publisher, 13 NL directories, GBP sync, fixer paths + rechecks, Dutch emails, queue + cron), "niet gevonden" state (finding `verdict: not_found`, report `notFoundAnswers` + `visibility`, own fix path, grey result-page hero; migration `0002_not_found.sql`). `PgDb` has not been run against a real Postgres yet.
 
 Not built: Bing/Apple/form-directory adapters (fall to operator queue), Copilot browser adapter (`setCopilotAdapter`), WordPress plugin, quarterly plan.
 
 ## Next steps, in order
-1. Real database: create Supabase project, apply `supabase/migrations/0001_init.sql`, set `DATABASE_URL`, `MAICRO_MOCK=0`, run `pnpm e2e:mock` against it, fix `PgDb` issues.
+1. Real database: create Supabase project, apply `supabase/migrations/0001_init.sql` and `0002_not_found.sql`, set `DATABASE_URL`, `MAICRO_MOCK=0`, run `pnpm e2e:mock` against it, fix `PgDb` issues.
 2. First real engine: `OPENAI_API_KEY` (ChatGPT sampling + extraction). Run `pnpm scan --list <20 businesses in one town>` and read `out/scans/*.md`. This validates the idea before anything else.
 3. `GOOGLE_PLACES_API_KEY` so business resolution and the `/scan/kies` step work.
 4. Stripe test keys + prices; Resend; deploy web (Vercel) and worker (Fly/Railway); Cloudflare for SaaS for facts hosts.

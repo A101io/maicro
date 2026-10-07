@@ -244,6 +244,7 @@ export class MemDb implements Db {
           x.factKey === f.factKey &&
           (x.subject ?? null) === (f.subject ?? null) &&
           x.engine === f.engine &&
+          x.verdict === (f.verdict ?? "wrong") &&
           OPEN_STATUSES.includes(x.status),
       );
       if (existing) {
@@ -263,6 +264,7 @@ export class MemDb implements Db {
       const row: Finding = {
         id: randomUUID(),
         ...f,
+        verdict: f.verdict ?? "wrong",
         status: f.status ?? "open",
         firstSeenAt: nowIso(),
         resolvedAt: null,

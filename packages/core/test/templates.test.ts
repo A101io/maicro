@@ -17,6 +17,8 @@ const BANNED = /\b(GEO|AEO|LLM|LLMs|prompt|prompts|credits|garantie|gegarandeerd
 const links = { dashboardUrl: "https://maicro.nl/dashboard", factsPageUrl: "https://feiten.bakkerijjansen.nl/", resultUrl: "https://maicro.nl/scan/bakkerij-jansen-haarlem" };
 const ctx = { business: { name: business.name, place: business.place, ownerEmail: business.ownerEmail, kvk: business.kvk }, factsPageUrl: "https://feiten.bakkerijjansen.nl/" };
 
+const notFoundFinding = { ...finding, id: "f2", verdict: "not_found" as const, wrongValue: "niet gevonden", sourceType: "none" as const, sourceUrl: null, frequency: 8 };
+
 const all: Record<string, Mail | { subject: string; text: string }> = {
   welcome: welcomeEmail({
     business,
@@ -25,6 +27,17 @@ const all: Record<string, Mail | { subject: string; text: string }> = {
   }),
   baseline: baselineSummaryEmail({ business, checkedAt: "2026-10-02T03:00:00Z", totalAnswers: 100, wrongAnswers: 1, findings: [finding], engines: ["chatgpt", "gemini", "perplexity", "google_ai", "copilot"], links }),
   baselineClean: baselineSummaryEmail({ business, checkedAt: "2026-10-02T03:00:00Z", totalAnswers: 100, wrongAnswers: 0, findings: [], engines: ["chatgpt"], links }),
+  baselineNotFound: baselineSummaryEmail({
+    business,
+    checkedAt: "2026-10-02T03:00:00Z",
+    totalAnswers: 100,
+    wrongAnswers: 1,
+    notFoundAnswers: 70,
+    visibility: "unknown",
+    findings: [finding, notFoundFinding, { ...notFoundFinding, id: "f3", factKey: "phone", subject: null }, { ...notFoundFinding, id: "f4", factKey: "address", subject: null }],
+    engines: ["chatgpt", "gemini", "perplexity", "google_ai", "copilot"],
+    links,
+  }),
   resolution: resolutionNoticeEmail({
     business,
     finding: { ...finding, status: "resolved", resolvedAt: "2026-10-14T03:00:00Z" },
@@ -47,6 +60,24 @@ const all: Record<string, Mail | { subject: string; text: string }> = {
     engines: ["chatgpt", "gemini", "perplexity", "google_ai", "copilot"],
     links,
   }),
+  reportNotFound: monthlyReportEmail({
+    business,
+    month: "oktober 2026",
+    checkedAt: "2026-10-07T03:00:00Z",
+    totalAnswers: 100,
+    wrongAnswers: 0,
+    notFound: 3,
+    notFoundAnswers: 40,
+    visibility: "partial",
+    resolved: 0,
+    inProgress: 3,
+    unfixable: 0,
+    proofCards: [],
+    openFindings: [{ finding: notFoundFinding, nextStep: "Niet gevonden: we maken je vindbaar", since: notFoundFinding.firstSeenAt }],
+    engines: ["chatgpt", "gemini", "perplexity", "google_ai", "copilot"],
+    links,
+  }),
+  unfixableNotFound: unfixableNoticeEmail({ business, finding: notFoundFinding, note: "AI noemt je na 60 dagen nog steeds niet. Je feitenpagina en profielen staan goed; we blijven elke maand controleren.", triedDays: 61, links }),
   reportClean: monthlyReportEmail({ business, month: "oktober 2026", checkedAt: "2026-10-07T03:00:00Z", totalAnswers: 12, wrongAnswers: 0, resolved: 0, inProgress: 0, unfixable: 0, proofCards: [], openFindings: [], engines: ["chatgpt"], links }),
   followup7: followUpEmail({ business, wrongAnswers: 3, totalAnswers: 12, example: finding, links, priceSetupEur: 149, priceMonitorEur: 49 }, 7),
   followup21: followUpEmail({ business, wrongAnswers: 3, totalAnswers: 12, example: finding, links, priceSetupEur: 149, priceMonitorEur: 49 }, 21),
@@ -89,6 +120,23 @@ describe("email templates", () => {
   it("status line follows the messaging brief", () => {
     expect(statusLine({ totalAnswers: 12, wrongAnswers: 0, resolved: 0, inProgress: 0 })).toBe("12 van 12 antwoorden kloppen");
     expect(statusLine({ totalAnswers: 12, wrongAnswers: 1, resolved: 1, inProgress: 1 })).toBe("2 fouten gevonden, 1 hersteld, 1 in behandeling");
+    expect(statusLine({ totalAnswers: 12, wrongAnswers: 0, resolved: 0, inProgress: 3, notFound: 3 })).toBe("3 in behandeling, 3 vragen: AI vindt niets over je");
+    expect(statusLine({ totalAnswers: 12, wrongAnswers: 1, resolved: 0, inProgress: 1, notFound: 1 })).toBe("1 fout gevonden, 1 in behandeling, 1 vraag: AI vindt niets over je");
+  });
+
+  it("not found is named as such, never as a wrong value or a source", () => {
+    const b = all.baselineNotFound!;
+    expect(b.subject).toBe("Eerste controle van Bakkerij Jansen: AI vindt (bijna) niets over je");
+    expect(b.text).toContain("3 vragen: AI vindt niets over je");
+    expect(b.text).toContain("70 antwoorden waren leeg");
+    expect(b.text).toContain("AI vindt (bijna) niets over Bakkerij Jansen. Je bestaat niet in het antwoord.");
+    expect(b.text).toContain("ChatGPT vond niets over de openingstijden op zondag (8 van de 10 keer)");
+    expect(b.text).toContain("Wat we doen: Niet gevonden: we maken je vindbaar");
+    expect(b.text).not.toContain('zei: niet gevonden');
+    const r = all.reportNotFound!;
+    expect(r.subject).toContain("3 vragen: AI vindt niets over je");
+    expect(r.text).toContain("AI kent Bakkerij Jansen maar half");
+    expect(r.text).not.toContain("Waar het vandaan komt: uit het geheugen van het model");
   });
 
   it("resolution shows before and after with dates", () => {

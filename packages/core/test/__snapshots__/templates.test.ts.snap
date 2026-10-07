@@ -38,6 +38,45 @@ Maicro
 "
 `;
 
+exports[`email templates > snapshots > baselineNotFound 1`] = `
+"Eerste controle van Bakkerij Jansen: AI vindt (bijna) niets over je
+
+Hoi,
+
+Op 2 oktober 2026 stelden we 100 vragen over Bakkerij Jansen aan ChatGPT, Gemini, Perplexity, Google AI, Copilot. 1 antwoord klopte niet. Dit is wat we vonden en wat we eraan doen.
+
+3 vragen: AI vindt niets over je. 70 antwoorden waren leeg: de AI zei dat het geen informatie over je heeft. AI vindt (bijna) niets over Bakkerij Jansen. Je bestaat niet in het antwoord. Dat tellen we niet als fout, maar het betekent wel dat een klant die het vraagt, geen antwoord krijgt. We maken je feitenpagina, zetten je in Google, Bing, Apple en de Nederlandse gidsen, en controleren na 3 weken of je genoemd wordt.
+
+Over: de openingstijden op zondag
+ChatGPT zei: 10:00 tot 14:00 (7 van de 10 keer)
+Klopt niet. Het is: gesloten
+Waar het vandaan komt: openingstijden.nl
+Wat we doen: We vragen de bron uit jouw naam om de gegevens te corrigeren.
+
+Over: de openingstijden op zondag
+ChatGPT vond niets over de openingstijden op zondag (8 van de 10 keer)
+Niet gevonden. Jouw gegeven is: gesloten
+Wat we doen: Niet gevonden: we maken je vindbaar
+
+Over: het telefoonnummer
+ChatGPT vond niets over het telefoonnummer (8 van de 10 keer)
+Niet gevonden. Jouw gegeven is: gesloten
+Wat we doen: Niet gevonden: we maken je vindbaar
+
+Over: het adres
+ChatGPT vond niets over het adres (8 van de 10 keer)
+Niet gevonden. Jouw gegeven is: gesloten
+Wat we doen: Niet gevonden: we maken je vindbaar
+
+Elke fout controleren we opnieuw zodra de bron is aangepast. Je hoort van ons als een antwoord is hersteld, met het antwoord van voor en na.
+
+Je overzicht: https://maicro.nl/dashboard
+
+Groet,
+Maicro
+"
+`;
+
 exports[`email templates > snapshots > correction 1`] = `
 "Correctie gegevens Bakkerij Jansen, Haarlem
 
@@ -235,6 +274,31 @@ Maicro
 "
 `;
 
+exports[`email templates > snapshots > reportNotFound 1`] = `
+"Bakkerij Jansen in oktober 2026: 3 in behandeling, 3 vragen: AI vindt niets over je
+
+Hoi,
+
+Controle van 7 oktober 2026: 3 in behandeling, 3 vragen: AI vindt niets over je.
+
+We stelden 100 vragen over Bakkerij Jansen aan ChatGPT, Gemini, Perplexity, Google AI, Copilot.
+
+3 vragen: AI vindt niets over je. 40 antwoorden waren leeg: de AI zei dat het geen informatie over je heeft. AI kent Bakkerij Jansen maar half: een deel van de antwoorden is leeg. Dat tellen we niet als fout, maar het betekent wel dat een klant die het vraagt, geen antwoord krijgt. We maken je feitenpagina, zetten je in Google, Bing, Apple en de Nederlandse gidsen, en controleren na 3 weken of je genoemd wordt.
+
+Nog open
+
+Over: de openingstijden op zondag
+ChatGPT vond niets over de openingstijden op zondag (8 van de 10 keer)
+Niet gevonden. Jouw gegeven is: gesloten
+Wat we doen: Niet gevonden: we maken je vindbaar
+
+Alle antwoorden, met datum en bron: https://maicro.nl/dashboard
+
+Groet,
+Maicro
+"
+`;
+
 exports[`email templates > snapshots > resolution 1`] = `
 "Hersteld: ChatGPT zegt nu "gesloten" over Bakkerij Jansen
 
@@ -271,6 +335,26 @@ Waarom het niet lukte: Dit antwoord komt uit het geheugen van het model, niet va
 Wat we deden: Dit antwoord komt uit het geheugen van het model. Dat verandert pas bij een nieuwe versie; we blijven controleren.
 
 Wat nu: we laten dit antwoord in je overzicht staan en controleren het elke maand opnieuw. Antwoorden uit het geheugen van het model veranderen pas bij een nieuwe versie van dat model. Zodra dat gebeurt, zie je het in je rapport.
+
+Je overzicht: https://maicro.nl/dashboard
+
+Groet,
+Maicro
+"
+`;
+
+exports[`email templates > snapshots > unfixableNotFound 1`] = `
+"Niet hersteld: ChatGPT over de openingstijden op zondag van Bakkerij Jansen
+
+Hoi,
+
+ChatGPT vindt nog steeds niets over de openingstijden op zondag van Bakkerij Jansen. Het is gesloten. We hebben 61 dagen geprobeerd je vindbaar te maken.
+
+Waarom het niet lukte: AI noemt je na 60 dagen nog steeds niet. Je feitenpagina en profielen staan goed; we blijven elke maand controleren.
+
+Wat we deden: Niet gevonden: we maken je vindbaar
+
+Wat nu: we laten dit antwoord in je overzicht staan en controleren het elke maand opnieuw. Je feitenpagina en je profielen blijven staan. Zodra AI je wel noemt, zie je het in je rapport.
 
 Je overzicht: https://maicro.nl/dashboard
 

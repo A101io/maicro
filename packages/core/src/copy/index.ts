@@ -192,6 +192,16 @@ export const copy = {
     summaryIntro: (total: number) => `We stelden ChatGPT, Google AI en Copilot dezelfde vragen, meerdere keren: ${total} antwoorden.`,
     summaryAllOk: "Alle antwoorden klopten.",
     summaryCount: (wrong: number) => `${wrong} ${wrong === 1 ? "antwoord klopte" : "antwoorden klopten"} niet.`,
+    /** Headline when AI barely knows the business (visibility "unknown"). */
+    summaryUnknown: (name: string) => `AI vindt (bijna) niets over ${name}. Je bestaat niet in het antwoord.`,
+    /** Headline when a good share of the answers came back empty (visibility "partial"). */
+    summaryPartial: (name: string) => `AI kent ${name} maar half. Een deel van de antwoorden is leeg.`,
+    notFoundCount: (n: number) => `${n} ${n === 1 ? "antwoord" : "antwoorden"}: niet gevonden.`,
+    visibility: {
+      found: "Gevonden",
+      partial: "Deels gevonden",
+      unknown: "Niet gevonden",
+    },
     card: {
       question: "Vraag",
       said: (engine: string) => `${engine} zei`,
@@ -201,11 +211,14 @@ export const copy = {
       foundSource: "Gevonden bron",
       frequency: (n: number, of: number) => `${n} van ${of} keer`,
       noSource: "Geen bron gevonden: dit komt uit het geheugen van het model.",
+      saidNotFound: "AI zei: niets gevonden",
+      notFoundAnswer: "niets gevonden",
     },
     correctCollapsed: (n: number) => `${n} ${n === 1 ? "antwoord klopte" : "antwoorden klopten"}. Toon`,
     showAll: (n: number) => `Toon alle ${n} fouten`,
     enginesRow: "Per AI",
     engineSkipped: "overgeslagen",
+    engineNotFound: "niet gevonden",
     consequence: "Een klant die dit vraagt, krijgt dit antwoord. Niet één keer: elke keer, tot de bron verandert.",
     cta: {
       h3: "Laat Maicro de bronnen herstellen",
@@ -245,6 +258,9 @@ export const copy = {
     none: "geheugen van het model",
   },
 
+  /** Fix path for a not_found finding (there is no wrong source; we make the business findable). */
+  fixPathNotFound: "We maken een feitenpagina die AI kan lezen, zetten je in Google, Bing, Apple en de Nederlandse gidsen, en controleren na 3 weken of je genoemd wordt.",
+
   fixPath: {
     owned_facts_page: "We publiceren je feitenpagina opnieuw en melden de wijziging aan. Hercontrole na 7 dagen.",
     owned_website: "We sturen je precies welke pagina en welke tekst op je website moet veranderen. Hercontrole na 14 dagen.",
@@ -265,6 +281,11 @@ export const copy = {
     price: "Prijzen",
     policy: "Afspraken",
     payment: "Betalen",
+  },
+
+  findingVerdict: {
+    wrong: "Klopt niet",
+    not_found: "Niet gevonden",
   },
 
   findingStatus: {

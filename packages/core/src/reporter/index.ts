@@ -1,13 +1,13 @@
 /**
  * Reporter: turns db state into Dutch e-mails and proof-card data.
  */
-import type { Engine, Finding, Sample } from "../types.js";
+import type { Engine, Finding, Sample, ScanReport } from "../types.js";
 import { ENGINES } from "../types.js";
 import type { BusinessRecord } from "../db/types.js";
 import { getDb } from "../shared/db.js";
 import { log } from "../shared/log.js";
 import { findingWordsNl, hostOfUrl } from "../shared/facts-nl.js";
-import { fixPathFor, daysBetween } from "../fixer/paths.js";
+import { fixPathForFinding, daysBetween } from "../fixer/paths.js";
 import { cnameTarget, isFallbackHost } from "../publisher/host.js";
 import { confirmFactsUrl, dashboardUrl, factsPageUrl, googleConnectUrl, resultUrl } from "./links.js";
 import { sendMail, type MailResult } from "./mail.js";
@@ -52,6 +52,19 @@ function sourceLabel(f: Finding): string {
   if (f.sourceType === "owned_website") return hostOfUrl(f.sourceUrl) ?? "je website";
   if (f.sourceType === "other_entity") return "naamgenoot";
   return hostOfUrl(f.sourceUrl) ?? "onbekende bron";
+}
+
+/** Not-found answer count + visibility for a scan run, rebuilt from stored samples and claims. */
+async function notFoundStats(scanRunId: string | null | undefined): Promise<{ notFoundAnswers: number; visibility: ScanReport["visibility"] } | null> {
+  if (!scanRunId) return null;
+  try {
+    const { buildReport } = await import("../scanner/index.js");
+    const r = await buildReport(scanRunId);
+    return { notFoundAnswers: r.notFoundAnswers, visibility: r.visibility };
+  } catch (err) {
+    log.warn("reporter.not_found_stats_failed", { scanRunId, error: String((err as Error)?.message ?? err) });
+    return null;
+  }
 }
 
 async function sampleQuote(scanRunId: string | null, sampleId: string | null): Promise<Sample | null> {
@@ -133,11 +146,14 @@ export async function sendBaselineSummary(scanRunId: string): Promise<MailResult
   const prompts = await db.listPrompts(business.id, { activeOnly: true });
   const samples = await db.listSamples(scanRunId);
   const totalAnswers = samples.length || prompts.length * run.engines.length;
+  const nf = await notFoundStats(scanRunId);
   const m = baselineSummaryEmail({
     business,
     checkedAt: run.finishedAt ?? run.startedAt,
     totalAnswers,
-    wrongAnswers: findings.length,
+    wrongAnswers: findings.filter((f) => f.verdict !== "not_found").length,
+    notFoundAnswers: nf?.notFoundAnswers,
+    visibility: nf?.visibility,
     findings,
     engines: run.engines,
     links: { dashboardUrl: dashboardUrl(business), factsPageUrl: factsPageUrl(business) },
@@ -207,14 +223,19 @@ export async function sendMonthlyReport(businessId: string, opts: MonthlyReportO
   const unfixable = all.filter((f) => f.status === "unfixable");
   const cards = (await proofCards(business.id)).filter((c) => resolvedThisMonth.some((f) => f.id === c.findingId));
 
-  const open: OpenFindingLine[] = openFindings.map((f) => ({ finding: f, nextStep: fixPathFor(f.sourceType).labelNl, since: f.firstSeenAt }));
+  const open: OpenFindingLine[] = openFindings.map((f) => ({ finding: f, nextStep: fixPathForFinding(f).labelNl, since: f.firstSeenAt }));
+  const isNotFound = (f: Finding) => f.verdict === "not_found";
+  const nf = await notFoundStats(run?.id);
 
   const m = monthlyReportEmail({
     business,
     month: opts.monthLabel ?? monthLabelNl(),
     checkedAt: run?.finishedAt ?? run?.startedAt ?? new Date().toISOString(),
     totalAnswers,
-    wrongAnswers: openFindings.length + unfixable.length,
+    wrongAnswers: openFindings.filter((f) => !isNotFound(f)).length + unfixable.filter((f) => !isNotFound(f)).length,
+    notFound: openFindings.filter(isNotFound).length + unfixable.filter(isNotFound).length,
+    notFoundAnswers: nf?.notFoundAnswers,
+    visibility: nf?.visibility,
     resolved: resolvedThisMonth.length,
     inProgress: openFindings.length,
     unfixable: unfixable.length,

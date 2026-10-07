@@ -14,7 +14,7 @@ export const DEMO_OWNER_EMAIL = "eigenaar@bakkerijdevries.nl";
 export const DEMO_SLUG = "bakkerij-de-vries-haarlem";
 
 const checkedAt = new Date().toISOString();
-const base = { businessId: "demo", scanRunId: "demo", sampleCount: 3, resolvedAt: null, evidenceBefore: null, evidenceAfter: null, status: "open" as const, firstSeenAt: checkedAt };
+const base = { businessId: "demo", scanRunId: "demo", sampleCount: 3, verdict: "wrong" as const, resolvedAt: null, evidenceBefore: null, evidenceAfter: null, status: "open" as const, firstSeenAt: checkedAt };
 
 export const demoFindings: Finding[] = [
   { ...base, id: "f-demo-1", factKey: "hours", subject: "6", engine: "chatgpt", wrongValue: "zondag geopend van 9:00 tot 17:00", correctValue: "zondag gesloten", frequency: 3, sourceUrl: "https://openingstijden.nl/haarlem/bakkerij-de-vries", sourceType: "directory_form" },
@@ -43,7 +43,9 @@ export function demoReport(): ScanReport {
     checkedAt,
     totalAnswers: demoFindings.length + demoCorrect.length,
     wrongAnswers: demoFindings.length,
-    engines: engines.map((engine) => ({ engine, correct: demoCorrect.filter((c) => c.engine === engine).length, wrong: demoFindings.filter((f) => f.engine === engine).length, skipped: false })),
+    notFoundAnswers: 0,
+    visibility: "found",
+    engines: engines.map((engine) => ({ engine, correct: demoCorrect.filter((c) => c.engine === engine).length, wrong: demoFindings.filter((f) => f.engine === engine).length, notFound: 0, skipped: false })),
     findings: demoFindings,
     correct: demoCorrect,
   };

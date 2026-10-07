@@ -17,6 +17,7 @@ const recheckDays: Record<Finding["sourceType"], number> = { owned_facts_page: 7
 
 function nextStep(f: Finding): string {
   if (f.status === "resolved") return "";
+  if (f.verdict === "not_found") return [copy.fixPathNotFound, f.status === "unfixable" ? "" : `Hercontrole ${dateShort(addDays(f.firstSeenAt, 21))}`].filter(Boolean).join(" ");
   if (f.status === "unfixable") return copy.fixPath.none;
   const days = recheckDays[f.sourceType];
   const when = days ? `Hercontrole ${dateShort(addDays(f.firstSeenAt, days))}` : "";
@@ -48,7 +49,8 @@ export default async function DashboardPage({ searchParams }: { searchParams: Pr
           <p className="mt-2 text-[17px]">
             {lastRun ? (
               <>
-                <strong className="font-semibold">{d.statusLine(report ? report.totalAnswers - report.wrongAnswers : 0, report?.totalAnswers ?? 0)}</strong>
+                <strong className="font-semibold">{d.statusLine(report ? report.totalAnswers - report.wrongAnswers - (report.notFoundAnswers ?? 0) : 0, report?.totalAnswers ?? 0)}</strong>
+                {report && (report.notFoundAnswers ?? 0) > 0 && <span className="ml-2 text-secondary">{copy.result.notFoundCount(report.notFoundAnswers)}</span>}
                 <span className="mono ml-3">{d.lastScan(dateShort(lastRun.finishedAt ?? lastRun.startedAt))}</span>
               </>
             ) : (
@@ -109,10 +111,14 @@ export default async function DashboardPage({ searchParams }: { searchParams: Pr
                 <div className="text-[15px]">
                   <p className="italic text-secondary">{questionFor(f.factKey, f.subject, business.name, business.place)}</p>
                   <p className="mt-1">
-                    {ENGINE_LABEL[f.engine]}: <span className="mark-wrong">{wrongText(f)}</span> <span className="text-secondary">→</span> {correctText(f)}
+                    {ENGINE_LABEL[f.engine]}:{" "}
+                    {f.verdict === "not_found" ? <span className="text-secondary">{copy.result.card.notFoundAnswer}</span> : <span className="mark-wrong">{wrongText(f)}</span>}{" "}
+                    <span className="text-secondary">→</span> {correctText(f)}
                   </p>
                   <p className="mono mt-2">
-                    {f.sourceUrl ? (
+                    {f.verdict === "not_found" ? (
+                      copy.findingVerdict.not_found
+                    ) : f.sourceUrl ? (
                       <a href={f.sourceUrl} target="_blank" rel="nofollow noopener">
                         {hostOf(f.sourceUrl)}
                       </a>

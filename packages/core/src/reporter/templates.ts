@@ -5,10 +5,10 @@
  * zien), one number per claim, no exclamation marks, no countdowns, no jargon
  * (no GEO/AEO/LLM/prompt/credits/garantie). Every mail is pure data in → text out.
  */
-import type { Business, Engine, Finding } from "../types.js";
+import type { Business, Engine, Finding, Visibility } from "../types.js";
 import { ENGINE_LABEL } from "../types.js";
-import { findingWordsNl, hostOfUrl } from "../shared/facts-nl.js";
-import { fixPathFor } from "../fixer/paths.js";
+import { findingWordsNl, hostOfUrl, notFoundCountNl, visibilityLineNl } from "../shared/facts-nl.js";
+import { fixPathForFinding } from "../fixer/paths.js";
 import { formatDateNl } from "../publisher/render.js";
 
 export interface Mail {
@@ -51,14 +51,21 @@ export function engineName(engine: Engine): string {
   return ENGINE_LABEL[engine] ?? engine;
 }
 
-/** "12 van 12 antwoorden kloppen" / "2 fouten gevonden, 1 hersteld, 1 in behandeling". */
-export function statusLine(stats: { totalAnswers: number; wrongAnswers: number; resolved: number; inProgress: number; unfixable?: number }): string {
-  if (stats.wrongAnswers === 0 && stats.resolved === 0) return `${stats.totalAnswers} van ${stats.totalAnswers} antwoorden kloppen`;
+/**
+ * "12 van 12 antwoorden kloppen" / "2 fouten gevonden, 1 hersteld, 1 in behandeling".
+ * Not-found answers are reported next to the wrong ones, never as wrong:
+ * "2 fouten gevonden, 3 vragen: AI vindt niets over je".
+ */
+export function statusLine(stats: { totalAnswers: number; wrongAnswers: number; resolved: number; inProgress: number; unfixable?: number; notFound?: number }): string {
+  const notFound = stats.notFound ?? 0;
+  if (stats.wrongAnswers === 0 && stats.resolved === 0 && notFound === 0) return `${stats.totalAnswers} van ${stats.totalAnswers} antwoorden kloppen`;
+  const parts: string[] = [];
   const found = stats.wrongAnswers + stats.resolved;
-  const parts = [`${found} ${found === 1 ? "fout" : "fouten"} gevonden`];
+  if (found || !notFound) parts.push(`${found} ${found === 1 ? "fout" : "fouten"} gevonden`);
   if (stats.resolved) parts.push(`${stats.resolved} hersteld`);
   if (stats.inProgress) parts.push(`${stats.inProgress} in behandeling`);
   if (stats.unfixable) parts.push(`${stats.unfixable} niet te herstellen`);
+  if (notFound) parts.push(notFoundCountNl(notFound));
   return parts.join(", ");
 }
 
@@ -81,7 +88,17 @@ function sourceLine(f: Finding): string {
 /** One finding as a short block: Vraag / Engine zei / Klopt niet / Bron / Wat we doen. */
 export function findingBlock(f: Finding, opts: { promptText?: string | null; nextStep?: string } = {}): string {
   const w = findingWordsNl(f);
-  const next = opts.nextStep ?? fixPathFor(f.sourceType).labelNl;
+  const next = opts.nextStep ?? fixPathForFinding(f).labelNl;
+  if (w.notFound) {
+    // No wrong value and no source: the engine knows nothing about the business.
+    const lines = [
+      opts.promptText ? `Vraag: ${opts.promptText}` : `Over: ${w.what}`,
+      `${engineName(f.engine)} ${w.notFoundLine} (${w.frequency})`,
+      `Niet gevonden. Jouw gegeven is: ${w.correct}`,
+      `Wat we doen: ${next}`,
+    ];
+    return lines.join("\n");
+  }
   const other = f.sourceType === "other_entity";
   const lines = [
     opts.promptText ? `Vraag: ${opts.promptText}` : `Over: ${w.what}`,
@@ -91,6 +108,20 @@ export function findingBlock(f: Finding, opts: { promptText?: string | null; nex
     `Wat we doen: ${next}`,
   ];
   return lines.join("\n");
+}
+
+/** Paragraph for the baseline / monthly mails when answers came back empty; empty string otherwise. */
+export function notFoundParagraph(d: { business: Pick<Business, "name">; notFoundAnswers?: number; visibility?: Visibility; notFoundFindings?: number }): string {
+  const n = d.notFoundAnswers ?? 0;
+  const v = d.visibility ?? "found";
+  if (!n && v === "found") return "";
+  const parts: string[] = [];
+  if (d.notFoundFindings) parts.push(`${notFoundCountNl(d.notFoundFindings)}.`);
+  if (n) parts.push(`${n} ${n === 1 ? "antwoord was" : "antwoorden waren"} leeg: de AI zei dat het geen informatie over je heeft.`);
+  const line = visibilityLineNl(v, d.business.name);
+  if (line) parts.push(line);
+  if (v !== "found") parts.push("Dat tellen we niet als fout, maar het betekent wel dat een klant die het vraagt, geen antwoord krijgt. We maken je feitenpagina, zetten je in Google, Bing, Apple en de Nederlandse gidsen, en controleren na 3 weken of je genoemd wordt.");
+  return parts.join(" ");
 }
 
 // ---------------------------------------------------------------------------
@@ -149,6 +180,9 @@ export interface BaselineData {
   checkedAt: string;
   totalAnswers: number;
   wrongAnswers: number;
+  /** answers in which the engine said it has no information */
+  notFoundAnswers?: number;
+  visibility?: Visibility;
   findings: Finding[];
   promptsById?: Record<string, string>;
   links: Links;
@@ -157,18 +191,28 @@ export interface BaselineData {
 
 export function baselineSummaryEmail(d: BaselineData): Mail {
   const engines = d.engines.map(engineName).join(", ");
-  const subject = d.wrongAnswers === 0
-    ? `Eerste controle van ${d.business.name}: alle ${d.totalAnswers} antwoorden kloppen`
-    : `Eerste controle van ${d.business.name}: ${d.wrongAnswers} ${d.wrongAnswers === 1 ? "antwoord klopt" : "antwoorden kloppen"} niet`;
+  const notFoundFindings = d.findings.filter((f) => f.verdict === "not_found").length;
+  const visibility = d.visibility ?? "found";
+  const subject =
+    visibility === "unknown"
+      ? `Eerste controle van ${d.business.name}: AI vindt (bijna) niets over je`
+      : d.wrongAnswers === 0 && !(d.notFoundAnswers ?? 0)
+        ? `Eerste controle van ${d.business.name}: alle ${d.totalAnswers} antwoorden kloppen`
+        : d.wrongAnswers === 0
+          ? `Eerste controle van ${d.business.name}: ${notFoundCountNl(notFoundFindings || d.notFoundAnswers || 0)}`
+          : `Eerste controle van ${d.business.name}: ${d.wrongAnswers} ${d.wrongAnswers === 1 ? "antwoord klopt" : "antwoorden kloppen"} niet`;
   const blocks = d.findings.slice(0, 8).map((f) => findingBlock(f)).join("\n\n");
+  const nf = notFoundParagraph({ business: d.business, notFoundAnswers: d.notFoundAnswers, visibility, notFoundFindings });
   const text = `Hoi,
 
 Op ${formatDateNl(d.checkedAt)} stelden we ${d.totalAnswers} vragen over ${d.business.name} aan ${engines}. ${
-    d.wrongAnswers === 0
+    d.wrongAnswers === 0 && !nf
       ? "Alle antwoorden klopten. We controleren volgende maand opnieuw."
-      : `${d.wrongAnswers} ${d.wrongAnswers === 1 ? "antwoord klopte" : "antwoorden klopten"} niet. Dit is wat we vonden en wat we eraan doen.`
+      : d.wrongAnswers === 0
+        ? "Geen verkeerde antwoorden."
+        : `${d.wrongAnswers} ${d.wrongAnswers === 1 ? "antwoord klopte" : "antwoorden klopten"} niet. Dit is wat we vonden en wat we eraan doen.`
   }
-${blocks ? `\n${blocks}\n` : ""}${d.findings.length > 8 ? `\nEn nog ${d.findings.length - 8} ${d.findings.length - 8 === 1 ? "fout" : "fouten"}, zie je overzicht.\n` : ""}
+${nf ? `\n${nf}\n` : ""}${blocks ? `\n${blocks}\n` : ""}${d.findings.length > 8 ? `\nEn nog ${d.findings.length - 8} ${d.findings.length - 8 === 1 ? "fout" : "fouten"}, zie je overzicht.\n` : ""}
 Elke fout controleren we opnieuw zodra de bron is aangepast. Je hoort van ons als een antwoord is hersteld, met het antwoord van voor en na.
 
 Je overzicht: ${d.links.dashboardUrl}
@@ -245,6 +289,11 @@ export interface MonthlyReportData {
   checkedAt: string;
   totalAnswers: number;
   wrongAnswers: number;
+  /** open not_found findings ("3 vragen: AI vindt niets over je") */
+  notFound?: number;
+  /** answers in which the engine said it has no information */
+  notFoundAnswers?: number;
+  visibility?: Visibility;
   resolved: number;
   inProgress: number;
   unfixable: number;
@@ -261,12 +310,13 @@ export function monthlyReportEmail(d: MonthlyReportData): Mail {
     .map((p) => `${engineName(p.engine)} zei: "${p.before}"\nNu: "${p.after}"\nBron: ${p.source}, hersteld in ${p.days} ${p.days === 1 ? "dag" : "dagen"}.`)
     .join("\n\n");
   const open = d.openFindings.map((o) => findingBlock(o.finding, { nextStep: o.nextStep })).join("\n\n");
+  const nf = notFoundParagraph({ business: d.business, notFoundAnswers: d.notFoundAnswers, visibility: d.visibility, notFoundFindings: d.notFound });
   const text = `Hoi,
 
 Controle van ${formatDateNl(d.checkedAt)}: ${line}.
 
 We stelden ${d.totalAnswers} vragen over ${d.business.name} aan ${d.engines.map(engineName).join(", ")}.
-${proofs ? `\nHersteld deze maand\n\n${proofs}\n` : ""}${open ? `\nNog open\n\n${open}\n` : ""}${
+${nf ? `\n${nf}\n` : ""}${proofs ? `\nHersteld deze maand\n\n${proofs}\n` : ""}${open ? `\nNog open\n\n${open}\n` : ""}${
     !proofs && !open ? "\nEr is niets te herstellen. Fijn.\n" : ""
   }
 Alle antwoorden, met datum en bron: ${d.links.dashboardUrl}
@@ -345,19 +395,21 @@ export function unfixableNoticeEmail(d: UnfixableData): Mail {
   const w = findingWordsNl(d.finding);
   const engine = engineName(d.finding.engine);
   const subject = `Niet hersteld: ${engine} over ${w.what} van ${d.business.name}`;
-  const path = fixPathFor(d.finding.sourceType);
+  const path = fixPathForFinding(d.finding);
   const text = `Hoi,
 
-${engine} zegt nog steeds "${w.wrong}" over ${w.what} van ${d.business.name}. Het is ${w.correct}. We hebben dit ${d.triedDays} dagen geprobeerd te herstellen.
+${w.notFound ? `${engine} vindt nog steeds niets over ${w.what} van ${d.business.name}. Het is ${w.correct}. We hebben ${d.triedDays} dagen geprobeerd je vindbaar te maken.` : `${engine} zegt nog steeds "${w.wrong}" over ${w.what} van ${d.business.name}. Het is ${w.correct}. We hebben dit ${d.triedDays} dagen geprobeerd te herstellen.`}
 
 Waarom het niet lukte: ${d.note}
 
 Wat we deden: ${path.labelNl}
 
 Wat nu: we laten dit antwoord in je overzicht staan en controleren het elke maand opnieuw. ${
-    d.finding.sourceType === "none"
-      ? "Antwoorden uit het geheugen van het model veranderen pas bij een nieuwe versie van dat model. Zodra dat gebeurt, zie je het in je rapport."
-      : "Verandert de bron alsnog, dan hoor je het van ons."
+    w.notFound
+      ? "Je feitenpagina en je profielen blijven staan. Zodra AI je wel noemt, zie je het in je rapport."
+      : d.finding.sourceType === "none"
+        ? "Antwoorden uit het geheugen van het model veranderen pas bij een nieuwe versie van dat model. Zodra dat gebeurt, zie je het in je rapport."
+        : "Verandert de bron alsnog, dan hoor je het van ons."
   }
 
 Je overzicht: ${d.links.dashboardUrl}

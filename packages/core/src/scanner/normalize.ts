@@ -11,7 +11,7 @@
  *  - service / policy / payment (subject = name): "yes" | "no"
  *  - price (subject = label): decimal string ("12.5")
  */
-import type { FactKey, Facts, Hours } from "../types";
+import { NOT_FOUND_LABEL, NOT_FOUND_VALUE, type FactKey, type Facts, type Hours } from "../types";
 
 export const DAY_NAMES_NL = ["maandag", "dinsdag", "woensdag", "donderdag", "vrijdag", "zaterdag", "zondag"] as const;
 
@@ -178,6 +178,7 @@ export function valuesMatch(factKey: FactKey, claimed: string, expected: string)
 
 /** Dutch, human readable rendering of a normalised value (used in summaries). */
 export function describeValue(factKey: FactKey, value: string, subject: string | null): string {
+  if (value === NOT_FOUND_LABEL || value === NOT_FOUND_VALUE) return NOT_FOUND_LABEL;
   switch (factKey) {
     case "existence":
       return value === "open" ? "open" : value === "temporarily_closed" ? "tijdelijk gesloten" : "permanent gesloten";

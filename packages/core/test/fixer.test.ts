@@ -1,7 +1,7 @@
 import { beforeEach, describe, expect, it, vi } from "vitest";
 import { MemDb } from "../src/db/mem";
 import { setDb } from "../src/shared/db";
-import { FIX_PATHS, fixPathFor, addDays } from "../src/fixer/paths";
+import { FIX_PATHS, NOT_FOUND_PATH, fixPathFor, fixPathForFinding, addDays } from "../src/fixer/paths";
 import { affectedPrompts, openFixForFinding, runRecheck, stillPresent } from "../src/fixer";
 import type { Finding, ScanReport, SourceType } from "../src/types";
 import type { BusinessRecord } from "../src/db/types";
@@ -38,6 +38,13 @@ describe("fix path selection", () => {
 
   it("falls back to 'none' for unknown types", () => {
     expect(fixPathFor("weird" as SourceType).action).toBe("none");
+  });
+
+  it("a not_found verdict takes its own path regardless of source type", () => {
+    expect(fixPathFor("none", "not_found")).toBe(NOT_FOUND_PATH);
+    expect(fixPathForFinding({ sourceType: "third_party", verdict: "not_found" })).toBe(NOT_FOUND_PATH);
+    expect(fixPathForFinding({ sourceType: "third_party", verdict: "wrong" })).toBe(FIX_PATHS.third_party);
+    expect(NOT_FOUND_PATH).toMatchObject({ action: "republish", recheckDays: 21, followUpDays: [45], unfixableAfterDays: 60, escalation: "resync", labelNl: "Niet gevonden: we maken je vindbaar" });
   });
 });
 
@@ -90,7 +97,9 @@ function report(db: MemDb, businessId: string, findings: Finding[], scanRunId: s
     checkedAt: new Date().toISOString(),
     totalAnswers: 10,
     wrongAnswers: findings.length,
-    engines: [{ engine: "chatgpt", correct: 10 - findings.length, wrong: findings.length, skipped: false }],
+    notFoundAnswers: 0,
+    visibility: "found",
+    engines: [{ engine: "chatgpt", correct: 10 - findings.length, wrong: findings.length, notFound: 0, skipped: false }],
     findings,
     correct: [],
   };
@@ -154,6 +163,25 @@ describe("openFixForFinding", () => {
     expect(out.action).toBe("none");
     expect(out.fix.evidence.note).toBe("uit het geheugen van het model");
     expect([...db.jobs.values()]).toHaveLength(0);
+  });
+
+  it("not_found → facts page published, platform channels + directories, recheck in 21 days", async () => {
+    const { finding, business } = await seed(db, "none", { sourceUrl: null, verdict: "not_found", wrongValue: "niet gevonden", frequency: 8 });
+    const out = await openFixForFinding(finding, { now: () => new Date("2026-10-07T10:00:00Z") });
+    expect(out.path).toBe(NOT_FOUND_PATH);
+    expect(out.action).toBe("republish");
+    expect(out.executed).toBe(true);
+    expect(out.fix.recheckAt).toBe(addDays("2026-10-07T10:00:00Z", 21).toISOString());
+    expect(out.fix.evidence.verdict).toBe("not_found");
+    expect(out.fix.evidence.publish).toMatchObject({ factsVersion: 1 });
+    expect(Array.isArray(out.fix.evidence.sync)).toBe(true);
+    const types = (await db.listChannels(business.id)).map((c) => c.type);
+    for (const t of ["facts_page", "gbp", "bing", "apple"]) expect(types).toContain(t);
+    expect((await db.getFinding(finding.id))!.status).toBe("fixing");
+    // No correction request for a wrong source and no owner instruction; only the directory sync's own listing requests.
+    const mails = [...db.jobs.values()].filter((j) => j.kind === "email");
+    expect(mails.length).toBeGreaterThan(0);
+    expect(mails.every((j) => j.payload.template === "directory_correction")).toBe(true);
   });
 
   it("does not open a second fix while one is open", async () => {
@@ -238,6 +266,46 @@ describe("runRecheck", () => {
     const mail = [...db.jobs.values()].find((j) => j.kind === "email")!;
     expect(mail.payload.template).toBe("unfixable");
     expect(String(mail.payload.note)).toContain("geheugen van het model");
+  });
+
+  it("not_found: still not found at day 30 → resync, follow-up recheck at day 45, unfixable only after 60", async () => {
+    const { finding } = await seed(db, "none", { sourceUrl: null, verdict: "not_found", wrongValue: "niet gevonden", frequency: 8 });
+    const opened = await openFixForFinding(finding, { now: () => new Date("2026-10-07T10:00:00Z") });
+    db.jobs.clear();
+    const runScan = vi.fn(async (opts: { businessId: string }) => {
+      const run = await db.createScanRun({ businessId: opts.businessId, kind: "recheck", engines: ["chatgpt"], samplesPerPrompt: 10, status: "done" });
+      return report(db, opts.businessId, [{ ...finding, status: "fixing" }], run.id);
+    });
+    const firstSeen = (await db.getFinding(finding.id))!.firstSeenAt;
+
+    const day30 = await runRecheck(opened.fix.id, { runScan, now: () => addDays(firstSeen, 30) });
+    expect(day30.result).toBe("still_wrong");
+    expect(day30.step).toBe("resync");
+    expect(day30.nextRecheckAt).toBe(addDays(firstSeen, 45).toISOString());
+    expect((await db.getFinding(finding.id))!.status).toBe("recheck");
+
+    const day46 = await runRecheck(opened.fix.id, { runScan, now: () => addDays(firstSeen, 46) });
+    expect(day46.result).toBe("still_wrong");
+    expect(day46.nextRecheckAt).toBe(addDays(addDays(firstSeen, 46), 21).toISOString());
+    expect([...db.jobs.values()].some((j) => j.kind === "email" && j.payload.template === "unfixable")).toBe(false);
+    expect((await db.getFinding(finding.id))!.status).toBe("recheck");
+
+    const day61 = await runRecheck(opened.fix.id, { runScan, now: () => addDays(firstSeen, 61) });
+    expect(day61.result).toBe("unfixable");
+    const mail = [...db.jobs.values()].find((j) => j.kind === "email" && j.payload.template === "unfixable")!;
+    expect(mail).toBeDefined();
+    expect(String(mail.payload.note)).toContain("60 dagen");
+  });
+
+  it("not_found resolves when the recheck no longer lists it, even if a wrong finding for the same key appears", async () => {
+    const { finding } = await seed(db, "none", { sourceUrl: null, verdict: "not_found", wrongValue: "niet gevonden", frequency: 8 });
+    const opened = await openFixForFinding(finding);
+    const runScan = vi.fn(async (opts: { businessId: string }) => {
+      const run = await db.createScanRun({ businessId: opts.businessId, kind: "recheck", engines: ["chatgpt"], samplesPerPrompt: 10, status: "done" });
+      return report(db, opts.businessId, [{ ...finding, id: "other", verdict: "wrong", wrongValue: "10:00-14:00", status: "open" }], run.id);
+    });
+    const out = await runRecheck(opened.fix.id, { runScan });
+    expect(out.result).toBe("resolved");
   });
 
   it("stillPresent matches by id or by engine+fact+subject", () => {

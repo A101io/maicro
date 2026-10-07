@@ -5,15 +5,24 @@
  * Thresholds (ARCHITECTURE.md): wrong when >= 30% of samples disagree;
  * unstable between 10% and 30%; for phone / address / existence a single
  * disagreeing sample is already a finding (the frequency tells the story).
+ *
+ * Not found: a sample whose extractor emitted the not-found sentinel counts
+ * as "the engine knows nothing about this business" for every probe of that
+ * prompt. When >= 50% of a group's samples are not found, the group gets a
+ * finding with verdict "not_found". Not-found samples are never wrong and
+ * never correct.
  */
-import type { Claim, Engine, FactKey, Facts, SourceType } from "../types";
-import { parseProbe, type PromptLike } from "./extract";
+import type { Claim, Engine, FactKey, Facts, SourceType, Verdict } from "../types";
+import { NOT_FOUND_LABEL } from "../types";
+import { isNotFoundClaim, parseProbe, type PromptLike } from "./extract";
 import { describeValue, factValue, valuesMatch } from "./normalize";
 
 export const WRONG_THRESHOLD = 0.3;
 export const UNSTABLE_THRESHOLD = 0.1;
 /** One disagreeing sample is enough for these keys. */
 export const STRICT_KEYS: FactKey[] = ["phone", "address", "existence"];
+/** Share of a group's samples that must say "not found" before it becomes a not_found finding. */
+export const NOT_FOUND_THRESHOLD = 0.5;
 
 export interface ComparableSample {
   sampleId: string;
@@ -28,21 +37,22 @@ export interface FindingCandidate {
   factKey: FactKey;
   subject: string | null;
   engine: Engine;
+  verdict: Exclude<Verdict, "correct">;
   wrongValue: string;
   correctValue: string;
   frequency: number;
   sampleCount: number;
-  /** Sample ids that carried the wrong value, first = evidenceBefore. */
+  /** Sample ids that carried the wrong value (or said not found), first = evidenceBefore. */
   wrongSampleIds: string[];
   /** Citations of the wrong samples, in order, de-duplicated. */
   citations: string[];
-  /** Pre-classified when the claims were about another business. */
-  sourceType?: Extract<SourceType, "other_entity">;
+  /** Pre-classified when the claims were about another business, or "none" for a not_found finding. */
+  sourceType?: Extract<SourceType, "other_entity" | "none">;
   /** Raw quotes carrying the wrong value (for attribution / display). */
   quotes: string[];
 }
 
-export type SampleVerdict = "correct" | "wrong" | "unknown" | "other_entity";
+export type SampleVerdict = "correct" | "wrong" | "unknown" | "other_entity" | "not_found";
 
 export interface CompareResult {
   findings: FindingCandidate[];
@@ -68,9 +78,11 @@ export function compare(samples: ComparableSample[], facts: Facts): CompareResul
   const wrongSamples = new Set<string>();
   const judgedSamples = new Set<string>();
   const otherEntitySamples = new Set<string>();
+  const notFoundSamples = new Set<string>();
   const correct: CompareResult["correct"] = [];
 
   for (const s of samples) {
+    if (s.claims.some(isNotFoundClaim)) notFoundSamples.add(s.sampleId);
     const probes = s.prompt.probes.length ? s.prompt.probes : [s.prompt.category];
     for (const probe of probes) {
       const { factKey, subject } = parseProbe(probe);
@@ -95,7 +107,13 @@ export function compare(samples: ComparableSample[], facts: Facts): CompareResul
     checkedKeys.add(groupKey(g.factKey, g.subject, g.engine));
     const wrong: { sampleId: string; value: string; citations: string[]; quote: string }[] = [];
     const other: { sampleId: string; value: string; citations: string[]; quote: string }[] = [];
+    const notFound: { sampleId: string; value: string; citations: string[]; quote: string }[] = [];
     for (const s of g.samples) {
+      if (notFoundSamples.has(s.sampleId)) {
+        const quote = samples.find((x) => x.sampleId === s.sampleId)?.claims.find(isNotFoundClaim)?.rawQuote ?? "";
+        notFound.push({ sampleId: s.sampleId, value: NOT_FOUND_LABEL, citations: [], quote });
+        continue;
+      }
       if (!s.claim) continue;
       judgedSamples.add(s.sampleId);
       if (s.claim.otherEntity) {
@@ -115,7 +133,7 @@ export function compare(samples: ComparableSample[], facts: Facts): CompareResul
     }
 
     const sampleCount = g.samples.length;
-    const build = (list: typeof wrong, sourceType?: "other_entity"): FindingCandidate => {
+    const build = (list: typeof wrong, sourceType?: "other_entity" | "none", verdict: FindingCandidate["verdict"] = "wrong"): FindingCandidate => {
       // Dominant wrong value.
       const counts = new Map<string, number>();
       for (const w of list) counts.set(w.value, (counts.get(w.value) ?? 0) + 1);
@@ -125,6 +143,7 @@ export function compare(samples: ComparableSample[], facts: Facts): CompareResul
         factKey: g.factKey,
         subject: g.subject,
         engine: g.engine,
+        verdict,
         wrongValue,
         correctValue: g.expected,
         frequency: list.length,
@@ -136,7 +155,10 @@ export function compare(samples: ComparableSample[], facts: Facts): CompareResul
       };
     };
 
-    // One candidate per (factKey, subject, engine): a wrong value beats an other-entity answer.
+    // Not found is its own finding next to a possible wrong one (different verdict, same key).
+    if (notFound.length && notFound.length / sampleCount >= NOT_FOUND_THRESHOLD) findings.push(build(notFound, "none", "not_found"));
+
+    // One wrong candidate per (factKey, subject, engine): a wrong value beats an other-entity answer.
     let pushed = false;
     if (wrong.length) {
       const ratio = wrong.length / sampleCount;
@@ -152,7 +174,8 @@ export function compare(samples: ComparableSample[], facts: Facts): CompareResul
   // Remove "correct" entries for samples that turned out wrong on another probe.
   const cleanCorrect = correct.filter((c) => !wrongSamples.has(c.sampleId) && !otherEntitySamples.has(c.sampleId));
   for (const s of samples) {
-    if (wrongSamples.has(s.sampleId)) verdicts.set(s.sampleId, "wrong");
+    if (notFoundSamples.has(s.sampleId)) verdicts.set(s.sampleId, "not_found");
+    else if (wrongSamples.has(s.sampleId)) verdicts.set(s.sampleId, "wrong");
     else if (otherEntitySamples.has(s.sampleId)) verdicts.set(s.sampleId, "other_entity");
     else if (judgedSamples.has(s.sampleId)) verdicts.set(s.sampleId, "correct");
     else verdicts.set(s.sampleId, "unknown");

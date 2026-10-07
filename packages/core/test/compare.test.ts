@@ -1,7 +1,8 @@
 import { describe, expect, it } from "vitest";
 import type { Claim, Engine } from "../src/types";
+import { NOT_FOUND_LABEL, NOT_FOUND_VALUE, visibilityFor } from "../src/types";
 import { compare, type ComparableSample } from "../src/scanner/compare";
-import { extractClaimsRules } from "../src/scanner/extract";
+import { extractClaimsRules, isNotFoundClaim, looksNotFound, notFoundClaim } from "../src/scanner/extract";
 import { factValue, normalizePhone, valuesMatch } from "../src/scanner/normalize";
 import { sampleFacts } from "./scanner-fixtures";
 
@@ -92,6 +93,78 @@ describe("compare thresholds", () => {
     expect(r.correct).toHaveLength(2);
     expect(r.correct[0]!.value).toBe("nee");
     expect(r.verdicts.get("chatgpt-service:bezorgen-5")).toBe("unknown");
+  });
+});
+
+describe("not found", () => {
+  const nf = (engine: Engine, probe: string, i: number): ComparableSample => {
+    const [factKey] = probe.includes(".") ? probe.split(".") : probe.includes(":") ? probe.split(":") : [probe];
+    const prompt = { category: factKey as Claim["factKey"], probes: [probe], textNl: `vraag ${probe}` };
+    return { sampleId: `${engine}-${probe}-${i}`, engine, prompt, claims: [notFoundClaim(prompt, `${engine}-${probe}-${i}`)], citations: [] };
+  };
+
+  it("becomes a not_found finding at >= 50% of the samples, never a wrong one", () => {
+    const ok = samples("chatgpt", "hours.6", ["closed", "closed", "closed", "closed", "closed", "closed", "closed", "closed", "closed", "closed"]);
+    const mixed = ok.map((s, i) => (i < 5 ? nf("chatgpt", "hours.6", i) : s));
+    const r = compare(mixed, facts);
+    expect(r.findings).toHaveLength(1);
+    expect(r.findings[0]).toMatchObject({ verdict: "not_found", wrongValue: NOT_FOUND_LABEL, correctValue: "closed", frequency: 5, sampleCount: 10, sourceType: "none" });
+    expect(r.findings[0]!.citations).toEqual([]);
+    expect(r.verdicts.get("chatgpt-hours.6-0")).toBe("not_found");
+    expect(r.verdicts.get("chatgpt-hours.6-9")).toBe("correct");
+    expect(r.correct).toHaveLength(5);
+
+    const below = ok.map((s, i) => (i < 4 ? nf("chatgpt", "hours.6", i) : s));
+    expect(compare(below, facts).findings).toHaveLength(0);
+    expect([...compare(below, facts).verdicts.values()].filter((v) => v === "not_found")).toHaveLength(4);
+  });
+
+  it("keeps a wrong finding next to a not_found one for the same key", () => {
+    const base = samples("gemini", "phone", ["+31235399999", "+31235312345", "+31235312345", "+31235312345"]);
+    const mixed = [nf("gemini", "phone", 10), nf("gemini", "phone", 11), nf("gemini", "phone", 12), nf("gemini", "phone", 13), ...base];
+    const r = compare(mixed, facts);
+    expect(r.findings.map((f) => f.verdict).sort()).toEqual(["not_found", "wrong"]);
+    expect(r.findings.find((f) => f.verdict === "wrong")!.frequency).toBe(1);
+    expect(r.findings.find((f) => f.verdict === "not_found")!.frequency).toBe(4);
+  });
+
+  it("visibility follows the share of not-found answers", () => {
+    expect(visibilityFor(100, 60)).toBe("unknown");
+    expect(visibilityFor(100, 59)).toBe("partial");
+    expect(visibilityFor(100, 25)).toBe("partial");
+    expect(visibilityFor(100, 24)).toBe("found");
+    expect(visibilityFor(0, 0)).toBe("found");
+  });
+
+  it("detects Dutch and English 'no information' answers, not 'bestaat niet meer'", () => {
+    for (const t of [
+      "Ik kan geen informatie vinden over Polyvale Nieuw in Haarlem.",
+      "Dat kan ik niet vinden.",
+      "Ik kon geen telefoonnummer vinden van dit bedrijf.",
+      "Het telefoonnummer is mij niet bekend.",
+      "I couldn't find anything about this business.",
+      "There is no information available about Polyvale.",
+      "I don't have information on that company.",
+      "Dit bedrijf ken ik niet.",
+      "Er zijn geen gegevens over dit bedrijf.",
+      "Polyvale Nieuw bestaat mogelijk niet.",
+      "Dit bedrijf bestaat niet.",
+    ]) {
+      expect(looksNotFound(t), t).toBe(true);
+    }
+    expect(looksNotFound("Bakkerij De Vries bestaat niet meer; de zaak is gestopt.")).toBe(false);
+    expect(looksNotFound("Nee, Bakkerij De Vries biedt geen bezorgen aan.")).toBe(false);
+    expect(looksNotFound("Je bereikt Bakkerij De Vries op 023-5312345.")).toBe(false);
+  });
+
+  it("rules extractor returns only the sentinel claim for a not-found answer", () => {
+    const prompt = { category: "phone" as const, probes: ["phone"], textNl: "Wat is het telefoonnummer?" };
+    const claims = extractClaimsRules("Ik kan geen informatie vinden over Polyvale Nieuw in Haarlem. Bel 023-5312345 niet.", facts, prompt, "s1");
+    expect(claims).toHaveLength(1);
+    expect(claims[0]).toMatchObject({ sampleId: "s1", factKey: "phone", subject: null, value: NOT_FOUND_VALUE, otherEntity: false });
+    expect(isNotFoundClaim(claims[0]!)).toBe(true);
+    const closed = extractClaimsRules("Bakkerij De Vries in Haarlem bestaat niet meer.", facts, { category: "existence", probes: ["existence"], textNl: "" });
+    expect(closed[0]!.value).toBe("permanently_closed");
   });
 });
 

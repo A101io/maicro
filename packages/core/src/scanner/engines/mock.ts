@@ -6,6 +6,10 @@
  * directory page (openingstijden.nl/{slug}, telefoonboek.nl/{slug}); some
  * cite nothing (model memory).
  *
+ * A business without a website, or whose slug contains "nieuw" or "onbekend",
+ * is one the mock AI has barely heard of: ~70% of its samples answer
+ * "Ik kan geen informatie vinden over {name} in {place}." (no citations).
+ *
  * Everything is seeded by business slug + prompt + engine + sampleIndex, so
  * the same inputs always give the same answer across runs and processes.
  */
@@ -17,6 +21,13 @@ import type { EngineClient, AskContext, EngineAnswer } from "./types";
 const WRONG_PAIR_RATE = 0.35; // share of (prompt, engine) pairs that carry a wrong value
 const WRONG_SAMPLE_RATE = 0.8; // within such a pair, share of samples that repeat it
 const OTHER_ENTITY_RATE = 0.04;
+/** For a business the mock "has never heard of": share of samples that say not found. */
+const NOT_FOUND_SAMPLE_RATE = 0.7;
+
+/** A business without a website, or whose slug says "nieuw" / "onbekend", is one the mock AI barely knows. */
+export function mockIsUnknownBusiness(slug: string, facts: Pick<Facts, "website">): boolean {
+  return facts.website == null || /nieuw|onbekend/.test(slug);
+}
 
 const OTHER_CITIES = ["Amsterdam", "Rotterdam", "Utrecht", "Eindhoven", "Groningen", "Leiden", "Zwolle", "Breda"];
 
@@ -193,6 +204,12 @@ export function createMockEngine(engine: Engine, options: MockEngineOptions = {}
 
       // Sample-level decisions.
       const rng = seededRandom(`${seedBase}|${sampleIndex}`);
+      if (mockIsUnknownBusiness(slug, facts)) {
+        const nfRng = seededRandom(`${seedBase}|${sampleIndex}|notfound`);
+        if (nfRng() < NOT_FOUND_SAMPLE_RATE) {
+          return { answerText: `Ik kan geen informatie vinden over ${facts.name} in ${facts.place}.`, citations: [], costCents: 0 };
+        }
+      }
       const wrong = wrongPair && rng() < WRONG_SAMPLE_RATE;
 
       let { text } = compose(category, probe, facts, wrong, rng, engine);

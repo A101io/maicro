@@ -95,6 +95,54 @@ describe("runScan (mock pipeline)", () => {
   });
 });
 
+describe("runScan on a business the AI has never heard of", () => {
+  it("Polyvale Nieuw in Haarlem without a website: visibility unknown, not_found findings, nothing counted as wrong twice", async () => {
+    const db = withMockDb();
+    const prepared = await prepareBusiness({ name: "Polyvale Nieuw", place: "Haarlem", db });
+    const provisional = (await db.latestFacts(prepared.business.id))!;
+    const { businessId: _b, version: _v, provisional: _p, verifiedAt: _va, ...data } = provisional;
+    await db.insertFacts(prepared.business.id, { ...data, website: null }, { provisional: true });
+
+    const report = await runScan({ businessId: prepared.business.id, kind: "free", db });
+    expect(report.totalAnswers).toBe(6 * 3 * 3);
+    expect(report.visibility).toBe("unknown");
+    expect(report.notFoundAnswers / report.totalAnswers).toBeGreaterThanOrEqual(0.6);
+    expect(report.wrongAnswers + report.notFoundAnswers).toBeLessThanOrEqual(report.totalAnswers);
+    const notFound = report.findings.filter((f) => f.verdict === "not_found");
+    expect(notFound.length).toBeGreaterThanOrEqual(1);
+    for (const f of notFound) {
+      expect(f.wrongValue).toBe("niet gevonden");
+      expect(f.sourceType).toBe("none");
+      expect(f.sourceUrl).toBeNull();
+      expect(f.frequency / f.sampleCount).toBeGreaterThanOrEqual(0.5);
+      expect(f.evidenceBefore).toBeTruthy();
+    }
+    // Per-engine counts add up and not-found is reported on its own.
+    const sum = report.engines.reduce((acc, e) => acc + e.notFound, 0);
+    expect(sum).toBe(report.notFoundAnswers);
+    expect(report.engines.every((e) => e.notFound > 0)).toBe(true);
+    expect(report.wrongAnswers).toBe(report.engines.reduce((acc, e) => acc + e.wrong, 0));
+
+    const rebuilt = await buildReport(report.scanRunId, db);
+    expect(rebuilt.visibility).toBe("unknown");
+    expect(rebuilt.notFoundAnswers).toBe(report.notFoundAnswers);
+
+    // A second scan upserts the same not_found findings (match key includes the verdict).
+    const second = await runScan({ businessId: prepared.business.id, kind: "free", db });
+    const ids = new Set(report.findings.map((f) => f.id));
+    expect(second.findings.every((f) => ids.has(f.id))).toBe(true);
+  });
+
+  it("a known business stays 'found'", async () => {
+    const db = withMockDb();
+    const prepared = await prepareBusiness({ name: "Bakkerij De Vries", place: "Haarlem", db });
+    const report = await runScan({ businessId: prepared.business.id, kind: "free", db });
+    expect(report.visibility).toBe("found");
+    expect(report.notFoundAnswers).toBe(0);
+    expect(report.findings.every((f) => f.verdict === "wrong")).toBe(true);
+  });
+});
+
 describe("resolve (mock)", () => {
   it("returns a synthetic candidate and drafts provisional facts", async () => {
     const [c] = await resolveBusiness("Garage Jansen", "Zwolle");

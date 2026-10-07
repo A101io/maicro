@@ -58,8 +58,10 @@ export type PromptInput = Omit<Prompt, "id" | "businessId"> & { businessId?: str
 export type SampleInput = Omit<Sample, "id" | "capturedAt"> & { capturedAt?: string };
 export type ClaimInput = Claim;
 /** What the scanner hands to upsertFindings; id/status/timestamps are managed by the db. */
-export type FindingInput = Omit<Finding, "id" | "status" | "firstSeenAt" | "resolvedAt" | "evidenceAfter"> & {
+export type FindingInput = Omit<Finding, "id" | "status" | "firstSeenAt" | "resolvedAt" | "evidenceAfter" | "verdict"> & {
   status?: FindingStatus;
+  /** defaults to "wrong" */
+  verdict?: Finding["verdict"];
 };
 export type FixInput = Omit<Fix, "id" | "scheduledAt" | "sentAt" | "recheckAt" | "resolvedAt" | "evidence"> &
   Partial<Pick<Fix, "scheduledAt" | "sentAt" | "recheckAt" | "resolvedAt" | "evidence">>;
@@ -117,7 +119,7 @@ export interface Db {
   listFindings(businessId: string, status?: FindingStatus | FindingStatus[]): Promise<Finding[]>;
   listFindingsByScanRun(scanRunId: string): Promise<Finding[]>;
   getFinding(id: string): Promise<Finding | null>;
-  /** Match on business_id + fact_key + subject + engine (non-resolved rows); update frequency/sample_count/values/source/scan_run, else insert. */
+  /** Match on business_id + fact_key + subject + engine + verdict (non-resolved rows); update frequency/sample_count/values/source/scan_run, else insert. */
   upsertFindings(findings: FindingInput[]): Promise<Finding[]>;
   updateFindingStatus(id: string, status: FindingStatus): Promise<Finding>;
   markFindingResolved(id: string, evidenceAfter?: string | null): Promise<Finding>;

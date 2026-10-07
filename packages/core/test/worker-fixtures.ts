@@ -58,6 +58,7 @@ export const finding: Finding = {
   factKey: "hours",
   subject: "6",
   engine: "chatgpt",
+  verdict: "wrong",
   wrongValue: "10:00-14:00",
   correctValue: "closed",
   frequency: 7,

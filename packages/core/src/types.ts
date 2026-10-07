@@ -116,6 +116,32 @@ export interface Claim {
 
 export type SourceType = "owned_facts_page" | "owned_website" | "directory_api" | "directory_form" | "third_party" | "other_entity" | "none";
 
+/**
+ * What an answer did with a fact: it matched, it was wrong, or the engine
+ * said it knows nothing about the business ("niet gevonden"). Not found is
+ * never counted as wrong: a business the AI has never heard of is its own
+ * state, not "nothing wrong".
+ */
+export type Verdict = "correct" | "wrong" | "not_found";
+
+/** Sentinel claim value an extractor emits when the answer says it has no information. Never a real fact value. */
+export const NOT_FOUND_VALUE = "__not_found__";
+/** The wrongValue stored on a not_found finding (Dutch, shown as-is). */
+export const NOT_FOUND_LABEL = "niet gevonden";
+
+/** How well the AI knows the business, from the share of not-found answers. */
+export type Visibility = "found" | "partial" | "unknown";
+export const VISIBILITY_UNKNOWN_RATIO = 0.6;
+export const VISIBILITY_PARTIAL_RATIO = 0.25;
+
+export function visibilityFor(totalAnswers: number, notFoundAnswers: number): Visibility {
+  if (totalAnswers <= 0) return "found";
+  const ratio = notFoundAnswers / totalAnswers;
+  if (ratio >= VISIBILITY_UNKNOWN_RATIO) return "unknown";
+  if (ratio >= VISIBILITY_PARTIAL_RATIO) return "partial";
+  return "found";
+}
+
 export type FindingStatus = "open" | "fixing" | "recheck" | "resolved" | "unfixable";
 
 export interface Finding {
@@ -125,9 +151,12 @@ export interface Finding {
   factKey: FactKey;
   subject: string | null;
   engine: Engine;
+  /** "wrong": the engine gave another value. "not_found": the engine said it has no information. */
+  verdict: Exclude<Verdict, "correct">;
+  /** the value the engine gave; NOT_FOUND_LABEL for a not_found finding */
   wrongValue: string;
   correctValue: string;
-  /** how many of N samples carried the wrong value */
+  /** how many of N samples carried the wrong value (or said not found) */
   frequency: number;
   sampleCount: number;
   sourceUrl: string | null;
@@ -187,8 +216,12 @@ export interface ScanReport {
   kind: ScanKind;
   checkedAt: string;
   totalAnswers: number;
+  /** answers that carried a wrong value (never includes not-found answers) */
   wrongAnswers: number;
-  engines: { engine: Engine; correct: number; wrong: number; skipped: boolean }[];
+  /** answers in which the engine said it has no information about the business */
+  notFoundAnswers: number;
+  visibility: Visibility;
+  engines: { engine: Engine; correct: number; wrong: number; notFound: number; skipped: boolean }[];
   findings: Finding[];
   correct: { prompt: string; engine: Engine; value: string }[];
 }

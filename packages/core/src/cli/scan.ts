@@ -91,14 +91,27 @@ const SOURCE_LABEL: Record<Finding["sourceType"], string> = {
   none: "het geheugen van het AI-model (geen bron)",
 };
 
+const VISIBILITY_LABEL: Record<ScanReport["visibility"], string> = {
+  found: "AI kent dit bedrijf.",
+  partial: "AI kent dit bedrijf maar half: een deel van de antwoorden is leeg.",
+  unknown: "AI vindt (bijna) niets over dit bedrijf. Het bestaat niet in het antwoord.",
+};
+
 /** Readable Dutch summary of a scan, e.g. "4 van 18 antwoorden kloppen niet". */
 export function summarizeNl(report: ScanReport): string {
   const lines: string[] = [];
-  const { business, totalAnswers, wrongAnswers } = report;
+  const { business, totalAnswers, wrongAnswers, notFoundAnswers = 0, visibility = "found" } = report;
   lines.push(`${business.name} (${business.place})`);
-  lines.push(`${wrongAnswers} van ${totalAnswers} antwoorden ${wrongAnswers === 1 ? "klopt" : "kloppen"} niet.`);
+  const headline = [`${wrongAnswers} van ${totalAnswers} antwoorden ${wrongAnswers === 1 ? "klopt" : "kloppen"} niet.`];
+  if (notFoundAnswers) headline.push(`${notFoundAnswers} ${notFoundAnswers === 1 ? "antwoord" : "antwoorden"}: niet gevonden.`);
+  if (visibility !== "found") headline.push(VISIBILITY_LABEL[visibility]);
+  lines.push(headline.join(" "));
   const perEngine = report.engines
-    .map((e) => (e.skipped ? `${ENGINE_LABEL[e.engine]}: niet gecontroleerd` : `${ENGINE_LABEL[e.engine]}: ${e.wrong} fout, ${e.correct} goed`))
+    .map((e) =>
+      e.skipped
+        ? `${ENGINE_LABEL[e.engine]}: niet gecontroleerd`
+        : `${ENGINE_LABEL[e.engine]}: ${e.wrong} fout, ${e.correct} goed${e.notFound ? `, ? ${e.notFound} niet gevonden` : ""}`,
+    )
     .join(" · ");
   lines.push(perEngine);
   if (report.findings.length) {
@@ -106,6 +119,10 @@ export function summarizeNl(report: ScanReport): string {
     lines.push("Wat er fout gaat:");
     for (const f of report.findings) {
       const what = describeFact(f.factKey, f.subject);
+      if (f.verdict === "not_found") {
+        lines.push(`- ${ENGINE_LABEL[f.engine]} vindt niets over ${what} van ${business.name} in ${business.place} (${f.frequency} van ${f.sampleCount} keer). Niet gevonden: we maken je vindbaar.`);
+        continue;
+      }
       if (f.sourceType === "other_entity") {
         const src = f.sourceUrl ? ` Bron: ${f.sourceUrl}.` : "";
         lines.push(`- ${ENGINE_LABEL[f.engine]} haalt ${business.name} in ${business.place} door elkaar met een ander bedrijf met dezelfde naam bij ${what} (${f.frequency} van ${f.sampleCount} keer).${src}`);

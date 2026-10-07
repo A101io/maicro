@@ -23,6 +23,26 @@ export function ReportFindingCard({ finding, business, checkedAt }: { finding: F
   const c = copy.result.card;
   const engine = ENGINE_LABEL[finding.engine];
   const host = hostOf(finding.sourceUrl);
+  if (finding.verdict === "not_found") {
+    // The engine knows nothing about the business: no wrong value, no source block.
+    return (
+      <FindingCard
+        engine={engine}
+        date={dateShort(checkedAt)}
+        labels={{ question: c.question, said: c.saidNotFound }}
+        question={questionFor(finding.factKey, finding.subject, business.name, business.place)}
+        answer={{ before: "", wrong: c.notFoundAnswer, after: "" }}
+        muted
+        correct={{ label: copy.findingVerdict.not_found, value: correctText(finding), tone: "neutral" }}
+        frequency={c.frequency(finding.frequency, finding.sampleCount)}
+        fix={{
+          label: c.action,
+          chip: { label: copy.findingStatus[finding.status], tone: statusTone[finding.status] },
+          text: copy.fixPathNotFound,
+        }}
+      />
+    );
+  }
   return (
     <FindingCard
       engine={engine}
@@ -74,6 +94,11 @@ export function EnginesRow({ engines }: { engines: ScanReport["engines"] }) {
             <>
               <span className="text-ok">✓ {e.correct}</span>
               <span className="text-wrong">✗ {e.wrong}</span>
+              {e.notFound > 0 && (
+                <span className="text-secondary" title={copy.result.engineNotFound}>
+                  ? {e.notFound}
+                </span>
+              )}
             </>
           )}
         </span>
@@ -109,12 +134,33 @@ export function CorrectAnswers({ items }: { items: ScanReport["correct"] }) {
 }
 
 export function ReportHeader({ report, as: Tag = "h1" }: { report: ScanReport; as?: "h1" | "h2" | "p" }) {
+  const R = copy.result;
+  const visibility = report.visibility ?? "found";
+  const notFound = report.notFoundAnswers ?? 0;
+  if (visibility === "unknown") {
+    // Grey hero state: AI has (almost) never heard of this business. Not red: nothing is "wrong", the business is absent.
+    return (
+      <header className="space-y-4">
+        <span className="chip-neutral text-secondary">{R.visibility.unknown}</span>
+        <Tag className="font-serif text-[28px] font-normal leading-[1.1] text-secondary sm:text-[36px]" style={{ letterSpacing: "-0.5px" }}>
+          {R.summaryUnknown(report.business.name)}
+        </Tag>
+        <p className="text-[17px]">
+          {R.summaryIntro(report.totalAnswers)} <strong className="font-semibold">{R.notFoundCount(notFound)}</strong>
+          {report.wrongAnswers > 0 ? ` ${R.summaryCount(report.wrongAnswers)}` : ""}
+        </p>
+        <p className="max-w-[60ch] text-[16px] text-secondary">{copy.fixPathNotFound}</p>
+      </header>
+    );
+  }
   return (
     <header className="space-y-3">
-      <Tag className="font-serif text-[28px] font-normal leading-[1.1] sm:text-[36px]" style={{ letterSpacing: "-0.5px" }}>{copy.result.title(report.business.name, dateShort(report.checkedAt))}</Tag>
+      <Tag className="font-serif text-[28px] font-normal leading-[1.1] sm:text-[36px]" style={{ letterSpacing: "-0.5px" }}>{R.title(report.business.name, dateShort(report.checkedAt))}</Tag>
+      {visibility === "partial" && <p className="text-[17px] text-secondary">{R.summaryPartial(report.business.name)}</p>}
       <p className="text-[17px]">
-        {copy.result.summaryIntro(report.totalAnswers)}{" "}
-        {report.wrongAnswers > 0 ? <strong className="font-semibold">{copy.result.summaryCount(report.wrongAnswers)}</strong> : copy.result.summaryAllOk}
+        {R.summaryIntro(report.totalAnswers)}{" "}
+        {report.wrongAnswers > 0 ? <strong className="font-semibold">{R.summaryCount(report.wrongAnswers)}</strong> : notFound > 0 ? null : R.summaryAllOk}
+        {notFound > 0 && <span className="text-secondary"> {R.notFoundCount(notFound)}</span>}
       </p>
     </header>
   );

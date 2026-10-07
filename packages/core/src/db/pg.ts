@@ -125,6 +125,7 @@ const mapFinding = (row: Row): Finding => {
     factKey: r.factKey as Finding["factKey"],
     subject: (r.subject as string | null) ?? null,
     engine: r.engine as Finding["engine"],
+    verdict: ((r.verdict as string | null) ?? "wrong") as Finding["verdict"],
     wrongValue: r.wrongValue as string,
     correctValue: r.correctValue as string,
     frequency: r.frequency as number,
@@ -402,6 +403,7 @@ export class PgDb implements Db {
           select * from finding
           where business_id = ${f.businessId} and fact_key = ${f.factKey}
             and subject is not distinct from ${f.subject} and engine = ${f.engine}
+            and verdict = ${f.verdict ?? "wrong"}::verdict
             and status in ${tx(OPEN_STATUSES)}
           order by first_seen_at limit 1 for update`;
         if (existing[0]) {
@@ -420,8 +422,8 @@ export class PgDb implements Db {
           out.push(mapFinding(rows[0]!));
         } else {
           const rows = await tx`
-            insert into finding (business_id, scan_run_id, fact_key, subject, engine, wrong_value, correct_value, frequency, sample_count, source_url, source_type, status, evidence_before)
-            values (${f.businessId}, ${f.scanRunId}, ${f.factKey}, ${f.subject}, ${f.engine}, ${f.wrongValue}, ${f.correctValue}, ${f.frequency}, ${f.sampleCount}, ${f.sourceUrl}, ${f.sourceType}, ${f.status ?? "open"}, ${f.evidenceBefore})
+            insert into finding (business_id, scan_run_id, fact_key, subject, engine, verdict, wrong_value, correct_value, frequency, sample_count, source_url, source_type, status, evidence_before)
+            values (${f.businessId}, ${f.scanRunId}, ${f.factKey}, ${f.subject}, ${f.engine}, ${f.verdict ?? "wrong"}, ${f.wrongValue}, ${f.correctValue}, ${f.frequency}, ${f.sampleCount}, ${f.sourceUrl}, ${f.sourceType}, ${f.status ?? "open"}, ${f.evidenceBefore})
             returning *`;
           out.push(mapFinding(rows[0]!));
         }

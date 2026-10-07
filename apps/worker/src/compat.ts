@@ -47,6 +47,8 @@ export async function runScan(opts: RunScanOptions): Promise<ScanReport> {
     checkedAt: new Date().toISOString(),
     totalAnswers: 0,
     wrongAnswers: 0,
+    notFoundAnswers: 0,
+    visibility: "found",
     engines: [],
     findings: [],
     correct: [],

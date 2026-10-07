@@ -7,7 +7,7 @@
  * Mock mode (MAICRO_MOCK=1 or no keys) runs the whole pipeline offline with
  * deterministic synthetic answers.
  */
-import { ENGINES, type Engine, type Facts, type Finding, type Prompt, type ScanKind, type ScanReport, type Sample } from "../types";
+import { ENGINES, visibilityFor, type Engine, type Facts, type Finding, type Prompt, type ScanKind, type ScanReport, type Sample } from "../types";
 import { db as defaultDb, type Db, type FindingInput } from "../db";
 import { generatePrompts, selectFreeScanPrompts } from "../prompts";
 import { attributeAll, type AttributionContext } from "./attribute";
@@ -132,19 +132,21 @@ function attributionContext(business: { domain: string | null; slug: string; nam
   };
 }
 
-/** Per-engine correct/wrong counts at sample level; skipped when unavailable or without samples. */
+/** Per-engine correct/wrong/not-found counts at sample level; skipped when unavailable or without samples. */
 function engineStats(engines: Engine[], samples: Pick<Sample, "id" | "engine">[], verdicts: CompareResult["verdicts"], unavailable: Set<Engine>) {
   return engines.map((engine) => {
     let correct = 0;
     let wrong = 0;
+    let notFound = 0;
     for (const s of samples) {
       if (s.engine !== engine) continue;
       const v = verdicts.get(s.id);
       if (v === "correct") correct++;
       else if (v === "wrong" || v === "other_entity") wrong++;
+      else if (v === "not_found") notFound++;
     }
     const hasSamples = samples.some((s) => s.engine === engine);
-    return { engine, correct, wrong, skipped: unavailable.has(engine) || !hasSamples };
+    return { engine, correct, wrong, notFound, skipped: unavailable.has(engine) || !hasSamples };
   });
 }
 
@@ -206,13 +208,14 @@ export async function runScan(opts: RunScanOptions): Promise<ScanReport> {
     opts.onProgress?.({ type: "phase", phase: "attribute" });
     const attributed = await attributeAll(result.findings, attributionContext(business, facts));
 
-    // Persist findings (upsert on business + factKey + subject + engine).
+    // Persist findings (upsert on business + factKey + subject + engine + verdict).
     const inputs: FindingInput[] = attributed.map((f) => ({
       businessId: business.id,
       scanRunId: scanRun.id,
       factKey: f.factKey,
       subject: f.subject,
       engine: f.engine,
+      verdict: f.verdict,
       wrongValue: f.wrongValue,
       correctValue: f.correctValue,
       frequency: f.frequency,
@@ -224,11 +227,11 @@ export async function runScan(opts: RunScanOptions): Promise<ScanReport> {
     const findings = await db.upsertFindings(inputs);
 
     // Diff vs previous open findings: anything we re-checked and no longer saw wrong is resolved.
-    const stillWrong = new Set(findings.map((f) => groupKey(f.factKey, f.subject, f.engine)));
+    const stillWrong = new Set(findings.map((f) => `${groupKey(f.factKey, f.subject, f.engine)}|${f.verdict}`));
     const resolved: Finding[] = [];
     for (const prev of previousOpen) {
       const key = groupKey(prev.factKey, prev.subject, prev.engine);
-      if (!result.checkedKeys.has(key) || stillWrong.has(key)) continue;
+      if (!result.checkedKeys.has(key) || stillWrong.has(`${key}|${prev.verdict}`)) continue;
       const after = result.correct.find((c) => c.engine === prev.engine && comparable.some((s) => s.sampleId === c.sampleId && s.prompt.probes.some((p) => p.startsWith(prev.factKey))));
       resolved.push(await db.markFindingResolved(prev.id, after?.sampleId ?? null));
     }
@@ -238,6 +241,7 @@ export async function runScan(opts: RunScanOptions): Promise<ScanReport> {
       scanRunId: scanRun.id,
       samples: samples.length,
       findings: findings.length,
+      notFound: findings.filter((f) => f.verdict === "not_found").length,
       newFindings: findings.filter((f) => f.scanRunId === scanRun.id && !previousOpen.some((p) => p.id === f.id)).length,
       resolved: resolved.length,
       unstable: result.unstable.length,
@@ -265,6 +269,7 @@ function assembleReport(args: {
   const { business, scanRun, engines, samples, result, findings, unavailable } = args;
   const verdictOf = (s: Sample) => result.verdicts.get(s.id);
   const wrongAnswers = samples.filter((s) => verdictOf(s) === "wrong" || verdictOf(s) === "other_entity").length;
+  const notFoundAnswers = samples.filter((s) => verdictOf(s) === "not_found").length;
   return {
     business: { id: business.id, slug: business.slug, name: business.name, place: business.place },
     scanRunId: scanRun.id,
@@ -272,6 +277,8 @@ function assembleReport(args: {
     checkedAt: scanRun.finishedAt ?? new Date().toISOString(),
     totalAnswers: samples.length,
     wrongAnswers,
+    notFoundAnswers,
+    visibility: visibilityFor(samples.length, notFoundAnswers),
     engines: engineStats(engines, samples, result.verdicts, unavailable),
     findings,
     correct: result.correct.map(({ prompt, engine, value }) => ({ prompt, engine, value })),

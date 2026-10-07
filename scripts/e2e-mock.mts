@@ -104,5 +104,15 @@ console.log(`mails: ${mails.length} in ${path.join(out, "mail")}`);
 console.log(`facts page: ${pageDir}`);
 console.log(`findings: ${findings.length}, fixes: ${fixes}, channels: ${channels.length}`);
 
+// 6. Not found: a business the mock AI has never heard of reads as "niet gevonden", not as "nothing wrong".
+step("not found: Polyvale Nieuw, Haarlem");
+const unknown = await prepareBusiness({ name: "Polyvale Nieuw", place: "Haarlem", db });
+const unknownScan = await runScan({ businessId: unknown.business.id, kind: "free", db });
+console.log(`free scan ${unknownScan.scanRunId}: ${unknownScan.wrongAnswers} wrong, ${unknownScan.notFoundAnswers} not found of ${unknownScan.totalAnswers}, visibility ${unknownScan.visibility}`);
+assert.equal(unknownScan.visibility, "unknown", "unknown business has visibility unknown");
+assert.ok(unknownScan.findings.some((f) => f.verdict === "not_found"), "at least one not_found finding");
+assert.ok(unknownScan.wrongAnswers + unknownScan.notFoundAnswers <= unknownScan.totalAnswers, "not found is never counted as wrong");
+assert.ok(unknownScan.findings.filter((f) => f.verdict === "not_found").every((f) => f.sourceType === "none" && f.sourceUrl === null), "not_found findings carry no source");
+
 await db.close();
 console.log("\nOK e2e-mock");

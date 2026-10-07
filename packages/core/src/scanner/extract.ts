@@ -11,7 +11,7 @@
  *    LLM call fails.
  */
 import { z } from "zod";
-import type { Claim, FactKey, Facts, Prompt } from "../types";
+import { NOT_FOUND_VALUE, type Claim, type FactKey, type Facts, type Prompt } from "../types";
 import {
   DAY_NAMES_NL,
   normalizeAddress,
@@ -43,6 +43,60 @@ export function parseProbe(probe: string): { factKey: FactKey; subject: string |
   const factKey = (m?.[1] ?? probe) as FactKey;
   const subject = m?.[2] ?? null;
   return { factKey, subject: subject === "" ? null : subject };
+}
+
+// ---------------------------------------------------------------------------
+// Not found: the engine says it has no information about the business
+// ---------------------------------------------------------------------------
+
+/**
+ * Phrases (Dutch + English) with which an engine says it knows nothing about
+ * the business. "bestaat niet meer" is excluded: that is a (wrong or right)
+ * claim that the business closed, not an absence of information.
+ */
+export const NOT_FOUND_PATTERNS: RegExp[] = [
+  /geen informatie/i,
+  /kan ik niet vinden/i,
+  /kon ik niet vinden/i,
+  /ik kon geen/i,
+  /ik kan geen/i,
+  /niet bekend/i,
+  /ken ik niet/i,
+  /geen gegevens/i,
+  /bestaat (?:mogelijk )?niet\b(?! meer)/i,
+  /i couldn'?t find/i,
+  /i could not find/i,
+  /no information/i,
+  /i don'?t have (?:any )?information/i,
+  /i do not have (?:any )?information/i,
+];
+
+/** Does the answer say the engine has no information about the business? */
+export function looksNotFound(answerText: string): boolean {
+  return NOT_FOUND_PATTERNS.some((re) => re.test(answerText));
+}
+
+/** Does the answer carry anything that looks like a business fact (phone, time range, price, street address, URL, open/closed)? */
+export function namesBusinessFacts(answerText: string): boolean {
+  return (
+    PHONE_RE.test(answerText) ||
+    TIME_RANGE.test(answerText) ||
+    PRICE_RE.test(answerText) ||
+    STREET_RE.test(answerText) ||
+    /(?:https?:\/\/|www\.)[a-z0-9-]+\./i.test(answerText) ||
+    /\b(?:geopend|gesloten|open van)\b/i.test(answerText)
+  );
+}
+
+/** The sentinel claim that marks a sample as "not found". Keyed to the prompt category; subject = the first probe's subject. */
+export function notFoundClaim(prompt: PromptLike, sampleId = "", confidence = 0.9, rawQuote = ""): Claim {
+  const first = prompt.probes[0] ?? prompt.category;
+  const { subject } = parseProbe(first);
+  return { sampleId, factKey: prompt.category, subject, value: NOT_FOUND_VALUE, confidence, otherEntity: false, rawQuote: rawQuote.trim().slice(0, 300) };
+}
+
+export function isNotFoundClaim(c: Pick<Claim, "value">): boolean {
+  return c.value === NOT_FOUND_VALUE;
 }
 
 // ---------------------------------------------------------------------------
@@ -106,6 +160,7 @@ function yesNo(answer: string): "yes" | "no" | null {
 }
 
 export function extractClaimsRules(answerText: string, facts: Facts, prompt: PromptLike, sampleId = ""): Claim[] {
+  if (looksNotFound(answerText)) return [notFoundClaim(prompt, sampleId, 0.9, answerText)];
   const claims: Claim[] = [];
   const otherEntity = detectOtherEntity(answerText, facts);
   const lower = answerText.toLowerCase();
@@ -264,6 +319,10 @@ export async function extractClaimsLlm(answerText: string, facts: Facts, prompt:
   const raw = completion.choices[0]?.message?.content ?? "{}";
   const parsed = ExtractionSchema.safeParse(JSON.parse(raw));
   if (!parsed.success) throw new Error(`extraction schema mismatch: ${parsed.error.message}`);
+  // The model gives no claims and the answer names no facts: the engine knows nothing about the business.
+  if (looksNotFound(answerText) || (parsed.data.claims.length === 0 && !namesBusinessFacts(answerText))) {
+    return [notFoundClaim(prompt, sampleId, parsed.data.claims.length === 0 ? 0.9 : 0.7, answerText)];
+  }
   const otherEntityHint = detectOtherEntity(answerText, facts);
   return parsed.data.claims.map((c) => ({
     sampleId,

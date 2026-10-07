@@ -86,8 +86,8 @@ export default async function ResultPage({ params, searchParams }: { params: Pro
           </p>
         </section>
 
-        {/* Zelf oplossen */}
-        {findings.length > 0 && (
+        {/* Zelf oplossen (not-found findings have no source to fix) */}
+        {findings.some((f) => f.verdict !== "not_found") && (
           <details className="card mt-4">
             <summary className="flex items-center justify-between px-5 py-4 text-[15px] font-medium">
               <span>{R.selfFix.summary}</span>
@@ -96,7 +96,7 @@ export default async function ResultPage({ params, searchParams }: { params: Pro
             <div className="border-t border-rule px-5 py-4">
               <p className="text-[15px] text-secondary">{R.selfFix.intro}</p>
               <ul className="mt-3 divide-y divide-rule">
-                {findings.map((f) => (
+                {findings.filter((f) => f.verdict !== "not_found").map((f) => (
                   <li key={f.id} className="grid gap-1 py-3 text-[14px] sm:grid-cols-[200px_1fr] sm:gap-4">
                     <span className="font-mono text-[13px] break-all">
                       {f.sourceUrl ? (

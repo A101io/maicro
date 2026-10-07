@@ -13,7 +13,7 @@ import type { BusinessRecord, Db } from "../db/types.js";
 import { getDb, getFix, isMock } from "../shared/db.js";
 import { log, errorMessage } from "../shared/log.js";
 import { findingWordsNl, hostOfUrl } from "../shared/facts-nl.js";
-import { publishFactsPage, syncAllChannels, syncOneChannel } from "../publisher/index.js";
+import { discoverDirectories, ensurePlatformChannels, publishFactsPage, syncAllChannels, syncOneChannel } from "../publisher/index.js";
 import { directoryForUrl } from "../publisher/channels/directories.js";
 import { dashboardUrl, factsPageUrl } from "../reporter/links.js";
 import {
@@ -23,7 +23,7 @@ import {
   ownerWebsiteReminderEmail,
   type CorrectionContext,
 } from "./email-templates.js";
-import { addDays, daysBetween, fixPathFor, type FixPath } from "./paths.js";
+import { addDays, daysBetween, fixPathForFinding, type FixPath } from "./paths.js";
 
 export * from "./paths.js";
 export * from "./email-templates.js";
@@ -116,7 +116,11 @@ export function stillPresent(finding: Finding, report: ScanReport): boolean {
   return report.findings.some(
     (f) =>
       f.id === finding.id ||
-      (f.engine === finding.engine && f.factKey === finding.factKey && (f.subject ?? null) === (finding.subject ?? null) && f.status !== "resolved"),
+      (f.engine === finding.engine &&
+        f.factKey === finding.factKey &&
+        (f.subject ?? null) === (finding.subject ?? null) &&
+        (f.verdict ?? "wrong") === (finding.verdict ?? "wrong") &&
+        f.status !== "resolved"),
   );
 }
 
@@ -155,14 +159,15 @@ export async function openFixForFinding(finding: Finding, deps: FixerDeps = {}):
   const db = getDb();
   const now = deps.now?.() ?? new Date();
   const existing = (await db.listFixes(finding.id)).find((x) => x.resolvedAt === null);
-  const path = fixPathFor(finding.sourceType);
+  const path = fixPathForFinding(finding);
   if (existing) {
     return { fix: existing, finding, path, action: existing.action, executed: false, note: "fix already open" };
   }
   const business = await db.getBusiness(finding.businessId);
   if (!business) throw new Error(`business ${finding.businessId} not found`);
   const w = findingWordsNl(finding);
-  const target = finding.sourceUrl ?? (finding.sourceType === "owned_facts_page" || finding.sourceType === "other_entity" ? factsPageUrl(business) : finding.sourceType);
+  const notFound = finding.verdict === "not_found";
+  const target = finding.sourceUrl ?? (notFound || finding.sourceType === "owned_facts_page" || finding.sourceType === "other_entity" ? factsPageUrl(business) : finding.sourceType);
 
   let fix = await db.insertFix({
     findingId: finding.id,
@@ -170,7 +175,7 @@ export async function openFixForFinding(finding: Finding, deps: FixerDeps = {}):
     target,
     scheduledAt: now.toISOString(),
     recheckAt: addDays(now, path.recheckDays).toISOString(),
-    evidence: { sourceType: finding.sourceType, wrong: w.wrong, correct: w.correct, path: path.action },
+    evidence: { sourceType: finding.sourceType, verdict: finding.verdict, wrong: w.wrong, correct: w.correct, path: path.action },
   });
 
   let executed = false;
@@ -178,6 +183,23 @@ export async function openFixForFinding(finding: Finding, deps: FixerDeps = {}):
   const ev: Record<string, unknown> = { ...fix.evidence };
 
   try {
+    if (notFound) {
+      // Make the business findable: facts page + every channel + directory discovery.
+      if (deps.republished?.has(business.id)) {
+        ev.publish = { dedupedInBatch: true, at: now.toISOString() };
+      } else {
+        const pub = await publishFactsPage(business.id);
+        deps.republished?.add(business.id);
+        ev.publish = { url: pub.url, factsVersion: pub.factsVersion, at: now.toISOString() };
+      }
+      await ensurePlatformChannels(business.id);
+      const discovered = await discoverDirectories(business.id);
+      const sync = await syncAllChannels(business.id);
+      ev.discover = discovered.map((c) => c.name);
+      ev.sync = sync.results.map((r) => ({ channel: r.channelId, status: r.status }));
+      executed = true;
+      note = "Not found: facts page published, channels synced, directories discovered.";
+    } else
     switch (path.action) {
       case "republish": {
         if (deps.republished?.has(business.id)) {
@@ -311,7 +333,7 @@ export async function runRecheck(fixId: string, deps: FixerDeps = {}): Promise<R
   }
   const business = await db.getBusiness(finding.businessId);
   if (!business) throw new Error(`business ${finding.businessId} not found`);
-  const path = fixPathFor(finding.sourceType);
+  const path = fixPathForFinding(finding);
 
   const prompts = affectedPrompts(finding, await db.listPrompts(business.id, { activeOnly: true }));
   const report = await runScan({
@@ -391,13 +413,25 @@ export async function runRecheck(fixId: string, deps: FixerDeps = {}): Promise<R
       }
       break;
     }
+    case "resync": {
+      // Not found: sync everything once more and come back at the follow-up day (45), then every recheckDays.
+      const sync = await syncAllChannels(business.id);
+      const resyncs = Array.isArray(ev.resyncs) ? (ev.resyncs as unknown[]) : [];
+      ev.resyncs = [...resyncs, { at: now.toISOString(), results: sync.results.map((r) => ({ channel: r.channelId, status: r.status })) }];
+      step = "resync";
+      break;
+    }
     case "model_release":
     default:
       step = "wait_for_model_release";
       break;
   }
 
-  const nextRecheckAt = addDays(now, path.recheckDays).toISOString();
+  let nextRecheckAt = addDays(now, path.recheckDays).toISOString();
+  if (path.escalation === "resync") {
+    const followUp = (path.followUpDays ?? []).map((d) => addDays(finding.firstSeenAt, d)).find((d) => d.getTime() > now.getTime());
+    if (followUp) nextRecheckAt = followUp.toISOString();
+  }
   await db.updateFix(fix.id, { recheckAt: nextRecheckAt, evidence: ev });
   await db.updateFindingStatus(finding.id, "recheck");
   await db.logEvent(business.id, "finding.still_wrong", { findingId: finding.id, fixId: fix.id, scanRunId: report.scanRunId, step, nextRecheckAt });
