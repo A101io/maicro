@@ -17,6 +17,7 @@ export async function seedDemo(): Promise<string> {
     ownerEmail: "eigenaar@bakkerijdevries.nl",
     plan: "monitor",
     status: "trial",
+    sector: "winkels",
   });
   const facts: Omit<Facts, "businessId" | "version" | "provisional" | "verifiedAt"> = {
     name: business.name,
@@ -42,6 +43,10 @@ export async function seedDemo(): Promise<string> {
     policies: ["Bestellen kan telefonisch", "Taarten minimaal 2 dagen van tevoren"],
     paymentMethods: ["pin", "contant"],
     notConfusedWith: ["Bakkerij De Vries in Hoofddorp (ander bedrijf)"],
+    serviceArea: { places: ["Haarlem", "Heemstede"], radiusKm: null },
+    urgency: { available: false, hoursNl: null },
+    credentials: [],
+    sector: "winkels",
   };
   await db.insertFacts(business.id, facts, { provisional: false, verifiedAt: new Date().toISOString() });
   const job = await db.enqueueJob("setup", { businessId: business.id });

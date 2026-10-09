@@ -5,6 +5,38 @@
 
 export type BusinessStatus = "scanned" | "trial" | "active" | "paused" | "churned";
 
+/**
+ * Sector slugs (docs/CRITERIA.md "Sectoren"). The sector picks the extra
+ * question set on top of the base prompts. Inferred from the Google category
+ * or the KvK SBI code; the owner can override it.
+ */
+export type SectorSlug =
+  | "loodgieters-installateurs"
+  | "aannemers-dakdekkers-schilders"
+  | "vve-beheer"
+  | "zorg-praktijken"
+  | "horeca"
+  | "winkels"
+  | "garages-fietsenmakers"
+  | "kappers-schoonheid"
+  | "advocaten-notarissen-accountants"
+  | "makelaars-hypotheek"
+  | "kinderopvang-sport-rijscholen";
+
+export const SECTOR_SLUGS: SectorSlug[] = [
+  "loodgieters-installateurs",
+  "aannemers-dakdekkers-schilders",
+  "vve-beheer",
+  "zorg-praktijken",
+  "horeca",
+  "winkels",
+  "garages-fietsenmakers",
+  "kappers-schoonheid",
+  "advocaten-notarissen-accountants",
+  "makelaars-hypotheek",
+  "kinderopvang-sport-rijscholen",
+];
+
 export interface Business {
   id: string;
   slug: string;
@@ -13,6 +45,8 @@ export interface Business {
   domain: string | null;
   kvk: string | null;
   googlePlaceId: string | null;
+  /** Sector pack used for the extra questions; null = base questions only. */
+  sector: SectorSlug | null;
   plan: "none" | "setup" | "monitor";
   status: BusinessStatus;
   ownerEmail: string | null;
@@ -31,6 +65,19 @@ export interface PriceItem {
   label: string;
   amount: number; // EUR
   unit?: string; // "per uur", "per stuk"
+}
+
+/** Werkgebied: a list of places and/or a radius around the business. */
+export interface ServiceArea {
+  places: string[];
+  radiusKm: number | null;
+}
+
+/** Spoed en beschikbaarheid: is there an emergency / same-day service, and when. */
+export interface Urgency {
+  available: boolean;
+  /** "24 uur per dag, 7 dagen per week", "ma-vr 7:00-22:00", ... */
+  hoursNl: string | null;
 }
 
 export interface Facts {
@@ -53,7 +100,17 @@ export interface Facts {
   policies: string[]; // "Alleen op afspraak", "Pinnen mogelijk"
   paymentMethods: string[];
   notConfusedWith: string[]; // disambiguation lines
+  /** Criterium 4 (werkgebied). Optional for facts stored before the sector layer. */
+  serviceArea?: ServiceArea;
+  /** Criterium 5 (spoed en beschikbaarheid). */
+  urgency?: Urgency;
+  /** Criterium 12 (erkenningen en kwalificaties), free list: "Erkend installateur", "BIG-registratie". */
+  credentials?: string[];
+  /** Owner override of the sector; falls back to Business.sector. */
+  sector?: SectorSlug | null;
 }
+
+export const EMPTY_SERVICE_AREA: ServiceArea = { places: [], radiusKm: null };
 
 /** Keys an engine's claim can be matched to. */
 export type FactKey =
@@ -65,9 +122,28 @@ export type FactKey =
   | "service" // services yes/no
   | "price"
   | "policy"
-  | "payment";
+  | "payment"
+  | "area" // werkgebied (criterium 4)
+  | "urgency" // spoed / beschikbaarheid (criterium 5)
+  | "credential" // erkenningen en kwalificaties (criterium 12)
+  | "identity"; // naamgenoot (criterium 11); also fed by otherEntity claims
+
+export const FACT_KEYS: FactKey[] = ["existence", "hours", "phone", "address", "website", "service", "price", "policy", "payment", "area", "urgency", "credential", "identity"];
 
 export type PromptCategory = FactKey;
+
+/** Criterium ids 1..12 from docs/CRITERIA.md. */
+export type CriteriumId = 1 | 2 | 3 | 4 | 5 | 6 | 7 | 8 | 9 | 10 | 11 | 12;
+
+export type Severity = "afhaker" | "misleider" | "verwarring";
+
+/**
+ * "about": a question about the business ("Is X zondag open?"), judged on the
+ * value. "recommendation": a question for a recommendation ("Welke bakker in
+ * Haarlem is zondag open?"), judged on one thing only: is the business named.
+ * Never on position.
+ */
+export type PromptKind = "about" | "recommendation";
 
 export interface Prompt {
   id: string;
@@ -77,6 +153,10 @@ export interface Prompt {
   /** which fact field(s) this prompt probes, e.g. "hours.6" or "service:verhuur" */
   probes: string[];
   active: boolean;
+  /** Criterium this prompt feeds (1..12); derived from the probe when absent. */
+  criterium?: CriteriumId | null;
+  /** "about" (default) or "recommendation". */
+  kind?: PromptKind;
 }
 
 export type Engine = "chatgpt" | "gemini" | "perplexity" | "google_ai" | "copilot";
@@ -128,6 +208,12 @@ export type Verdict = "correct" | "wrong" | "not_found";
 export const NOT_FOUND_VALUE = "__not_found__";
 /** The wrongValue stored on a not_found finding (Dutch, shown as-is). */
 export const NOT_FOUND_LABEL = "niet gevonden";
+/** Claim value an extractor emits when a recommendation answer does not name the business. */
+export const ABSENT_VALUE = "__absent__";
+/** Claim value when a recommendation answer does name the business. */
+export const PRESENT_VALUE = "__present__";
+/** The wrongValue stored on a finding from a recommendation question (Dutch, shown as-is). */
+export const ABSENT_LABEL = "niet genoemd";
 
 /** How well the AI knows the business, from the share of not-found answers. */
 export type Visibility = "found" | "partial" | "unknown";
@@ -166,7 +252,17 @@ export interface Finding {
   resolvedAt: string | null;
   evidenceBefore: string | null; // sample id
   evidenceAfter: string | null; // sample id
+  /** "about" (default): a wrong value. "recommendation": the business was not named where its facts say it belongs. */
+  evidenceKind?: PromptKind;
+  /** Criterium 1..12 this finding belongs to. */
+  criterium?: CriteriumId | null;
 }
+
+/**
+ * A finding-shaped entry for a wrong value seen below the criterium threshold
+ * (the "instabiel" band). Reported, never persisted, never fixed.
+ */
+export type InstableFinding = Omit<Finding, "id" | "status" | "firstSeenAt" | "resolvedAt" | "evidenceAfter"> & { instable: true };
 
 export type ScanKind = "free" | "baseline" | "monthly" | "recheck" | "ondemand";
 
@@ -209,6 +305,25 @@ export interface Channel {
   lastSyncedAt: string | null;
 }
 
+/** The colour of the dot (docs/CRITERIA.md "Ernst en kleur: de stipregel"). */
+export type Stip = "rood" | "oranje" | "groen" | "grijs";
+
+export interface EngineStip {
+  engine: Engine;
+  stip: Stip;
+  /** share of NL assistant use; engines under STIP_ENGINE_MIN_USAGE do not decide the overall colour */
+  usage: number;
+  counts: boolean;
+}
+
+/** A criterium an engine could not say anything about (>= 50% of its samples not found). */
+export interface CriteriumNotFound {
+  criterium: CriteriumId;
+  engine: Engine;
+  frequency: number;
+  sampleCount: number;
+}
+
 /** Result of a scan as shown on the result page. */
 export interface ScanReport {
   business: Pick<Business, "id" | "slug" | "name" | "place">;
@@ -224,4 +339,13 @@ export interface ScanReport {
   engines: { engine: Engine; correct: number; wrong: number; notFound: number; skipped: boolean }[];
   findings: Finding[];
   correct: { prompt: string; engine: Engine; value: string }[];
+  /** Overall colour: worst colour among the engines that count (>= 10% NL usage). */
+  stip: Stip;
+  engineStips: EngineStip[];
+  /** Persisted findings grouped by the severity of their criterium. */
+  findingsBySeverity: Record<Severity, Finding[]>;
+  /** Wrong values below the threshold: shown, no fix. */
+  instable: InstableFinding[];
+  /** Criteria the engine said it knows nothing about. Criterium 1 here weighs as an afhaker. */
+  criteriaNotFound: CriteriumNotFound[];
 }

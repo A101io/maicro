@@ -18,6 +18,9 @@ const links = { dashboardUrl: "https://maicro.nl/dashboard", factsPageUrl: "http
 const ctx = { business: { name: business.name, place: business.place, ownerEmail: business.ownerEmail, kvk: business.kvk }, factsPageUrl: "https://feiten.bakkerijjansen.nl/" };
 
 const notFoundFinding = { ...finding, id: "f2", verdict: "not_found" as const, wrongValue: "niet gevonden", sourceType: "none" as const, sourceUrl: null, frequency: 8 };
+const recommendationFinding = { ...finding, id: "f5", factKey: "service" as const, subject: "desembrood", wrongValue: "niet genoemd", correctValue: "yes", sourceType: "none" as const, sourceUrl: null, frequency: 7, evidenceKind: "recommendation" as const, criterium: 6 as const };
+const phoneFinding = { ...finding, id: "f6", factKey: "phone" as const, subject: null, wrongValue: "+31231234568", correctValue: "+31231234567", frequency: 2, criterium: 2 as const };
+const instableFinding = { ...finding, id: undefined, status: undefined, firstSeenAt: undefined, resolvedAt: undefined, evidenceAfter: undefined, factKey: "price" as const, subject: "Desembrood", wrongValue: "5.5", correctValue: "4.5", frequency: 1, sampleCount: 10, instable: true as const, criterium: 9 as const };
 
 const all: Record<string, Mail | { subject: string; text: string }> = {
   welcome: welcomeEmail({
@@ -37,6 +40,24 @@ const all: Record<string, Mail | { subject: string; text: string }> = {
     findings: [finding, notFoundFinding, { ...notFoundFinding, id: "f3", factKey: "phone", subject: null }, { ...notFoundFinding, id: "f4", factKey: "address", subject: null }],
     engines: ["chatgpt", "gemini", "perplexity", "google_ai", "copilot"],
     links,
+  }),
+  baselineStip: baselineSummaryEmail({
+    business,
+    checkedAt: "2026-10-02T03:00:00Z",
+    totalAnswers: 100,
+    wrongAnswers: 3,
+    findings: [{ ...finding, criterium: 3 }, recommendationFinding, phoneFinding],
+    engines: ["chatgpt", "gemini", "perplexity", "google_ai", "copilot"],
+    links,
+    stip: "rood",
+    engineStips: [
+      { engine: "chatgpt", stip: "rood", usage: 0.83, counts: true },
+      { engine: "gemini", stip: "groen", usage: 0.12, counts: true },
+      { engine: "perplexity", stip: "oranje", usage: 0.04, counts: false },
+      { engine: "google_ai", stip: "groen", usage: 0.6, counts: true },
+      { engine: "copilot", stip: "grijs", usage: 0.15, counts: true },
+    ],
+    instable: [instableFinding as never],
   }),
   resolution: resolutionNoticeEmail({
     business,
@@ -122,6 +143,23 @@ describe("email templates", () => {
     expect(statusLine({ totalAnswers: 12, wrongAnswers: 1, resolved: 1, inProgress: 1 })).toBe("2 fouten gevonden, 1 hersteld, 1 in behandeling");
     expect(statusLine({ totalAnswers: 12, wrongAnswers: 0, resolved: 0, inProgress: 3, notFound: 3 })).toBe("3 in behandeling, 3 vragen: AI vindt niets over je");
     expect(statusLine({ totalAnswers: 12, wrongAnswers: 1, resolved: 0, inProgress: 1, notFound: 1 })).toBe("1 fout gevonden, 1 in behandeling, 1 vraag: AI vindt niets over je");
+  });
+
+  it("the baseline mail opens with the colour, groups findings by severity and names a recommendation absence, never a score", () => {
+    const b = all.baselineStip!;
+    expect(b.text).toContain("Stip: rood. AI stuurt klanten weg.");
+    expect(b.text).toContain("Per AI: ChatGPT: rood, Gemini: groen, Perplexity: oranje, Google AI: groen, Copilot: grijs.");
+    const afhaker = b.text.indexOf("Afhaker (2)");
+    const misleider = b.text.indexOf("Misleider (1)");
+    expect(afhaker).toBeGreaterThan(0);
+    expect(misleider).toBeGreaterThan(afhaker);
+    expect(b.text).toContain("Aanbevelingsvraag over: of desembrood wordt aangeboden");
+    expect(b.text).toContain("ChatGPT noemt je niet (7 van de 10 keer)");
+    expect(b.text).toContain("Geen bron: dit gegeven staat nergens waar AI het kan lezen.");
+    expect(b.text).toContain("Wat we doen: Niet genoemd: we zetten dit gegeven op je feitenpagina");
+    expect(b.text).toContain("Instabiel (1)");
+    expect(b.text).toContain("ChatGPT zei 1 van de 10 keer \"€ 5,50\" over de prijs van Desembrood; het is € 4,50.");
+    expect(b.text).not.toMatch(/score|\d+ ?\/ ?100|punten/i);
   });
 
   it("not found is named as such, never as a wrong value or a source", () => {

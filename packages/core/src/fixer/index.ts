@@ -23,7 +23,7 @@ import {
   ownerWebsiteReminderEmail,
   type CorrectionContext,
 } from "./email-templates.js";
-import { addDays, daysBetween, fixPathForFinding, type FixPath } from "./paths.js";
+import { addDays, daysBetween, fixPathForFinding, isFindabilityFinding, type FixPath } from "./paths.js";
 
 export * from "./paths.js";
 export * from "./email-templates.js";
@@ -102,8 +102,9 @@ function thirdPartyAddress(finding: Finding): { to: string | null; guessed: bool
 }
 
 /** Prompts that probe the finding's fact (category + subject). */
-export function affectedPrompts(finding: Pick<Finding, "factKey" | "subject">, prompts: Prompt[]): Prompt[] {
-  const active = prompts.filter((p) => p.active);
+export function affectedPrompts(finding: Pick<Finding, "factKey" | "subject"> & Partial<Pick<Finding, "evidenceKind">>, prompts: Prompt[]): Prompt[] {
+  const kind = finding.evidenceKind ?? "about";
+  const active = prompts.filter((p) => p.active && (p.kind ?? "about") === kind);
   const byCategory = active.filter((p) => p.category === finding.factKey);
   if (!finding.subject) return byCategory;
   const subj = finding.subject.toLowerCase();
@@ -120,6 +121,7 @@ export function stillPresent(finding: Finding, report: ScanReport): boolean {
         f.factKey === finding.factKey &&
         (f.subject ?? null) === (finding.subject ?? null) &&
         (f.verdict ?? "wrong") === (finding.verdict ?? "wrong") &&
+        (f.evidenceKind ?? "about") === (finding.evidenceKind ?? "about") &&
         f.status !== "resolved"),
   );
 }
@@ -166,7 +168,8 @@ export async function openFixForFinding(finding: Finding, deps: FixerDeps = {}):
   const business = await db.getBusiness(finding.businessId);
   if (!business) throw new Error(`business ${finding.businessId} not found`);
   const w = findingWordsNl(finding);
-  const notFound = finding.verdict === "not_found";
+  // not_found, or not named in a recommendation without a cited source: make the fact findable.
+  const notFound = isFindabilityFinding(finding);
   const target = finding.sourceUrl ?? (notFound || finding.sourceType === "owned_facts_page" || finding.sourceType === "other_entity" ? factsPageUrl(business) : finding.sourceType);
 
   let fix = await db.insertFix({

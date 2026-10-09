@@ -44,7 +44,27 @@ function inferProbe(promptNl: string): { category: FactKey; probe: string } {
   if (p.startsWith("doet ")) return { category: "service", probe: `service:${promptNl.match(/ook (.+?)\?/i)?.[1] ?? ""}` };
   if (p.includes("openingstijden")) return { category: "hours", probe: "hours" };
   if (dayIdx >= 0 || p.includes("hoe laat") || p.includes("tot hoe laat")) return { category: "hours", probe: `hours.${dayIdx >= 0 ? dayIdx : 5}` };
+  if (p.includes("spoed") || p.includes("storingsdienst") || p.includes("24-uurs") || p.includes("vandaag")) return { category: "urgency", probe: "urgency" };
+  if (p.includes("komt ") || p.includes("werkt ")) return { category: "area", probe: `area:${promptNl.match(/in ([^?]+)\?/)?.[1] ?? ""}` };
+  if (p.includes("erkend") || p.includes("aangesloten") || p.includes("registratie")) return { category: "credential", probe: `credential:${promptNl.match(/(?:voor|bij) ([^?]+)\?/)?.[1] ?? ""}` };
+  if (p.includes("hetzelfde")) return { category: "identity", probe: `identity:${promptNl.match(/als (.+?)\?/)?.[1] ?? ""}` };
   return { category: "existence", probe: "existence" };
+}
+
+/** Does the prompt ask for a recommendation ("welke bakker in Haarlem ...")? Used when no Prompt object is passed. */
+function looksLikeRecommendation(promptNl: string): boolean {
+  return /^(welke|wie|waar)\b/i.test(promptNl.trim()) || /, wie kan/i.test(promptNl);
+}
+
+/** Plausible other businesses for a recommendation answer. */
+const OTHER_BUSINESSES = ["Van der Berg", "De Wit", "Bos & Zn", "Hendriks", "Jansen", "Visser", "Smit", "Mulder"];
+
+/** A recommendation answer: a short list that includes the business, or (wrong) leaves it out. */
+function composeRecommendation(promptNl: string, facts: Facts, absent: boolean, rng: () => number): Composed {
+  const picks = [...OTHER_BUSINESSES].sort(() => rng() - 0.5).slice(0, 3).map((n) => `${n} ${facts.place}`);
+  const names = absent ? picks : [picks[0]!, facts.name, picks[1]!];
+  const lines = names.map((n, i) => `${i + 1}. ${n}`);
+  return { text: `Een paar opties in ${facts.place}:\n${lines.join("\n")}\nBel even om te vragen of ze kunnen.`, injected: absent ? "absent from recommendation" : undefined };
 }
 
 const hoursText = (h: Hours | undefined, day: number) =>
@@ -143,6 +163,35 @@ function compose(category: FactKey, probe: string, facts: Facts, wrong: boolean,
         ? { text: `Nee, bij ${name} in ${place} kun je alleen contant betalen.`, injected: "payment no" }
         : { text: `Ja, bij ${name} in ${place} kun je gewoon pinnen.` };
     }
+    case "area": {
+      const where = subject ?? place;
+      const inArea = facts.serviceArea ? facts.serviceArea.places.some((p) => p.toLowerCase() === where.toLowerCase()) || where.toLowerCase() === place.toLowerCase() : true;
+      const says = wrong ? !inArea : inArea;
+      return says
+        ? { text: `Ja, ${name} werkt ook in ${where} en omgeving.`, injected: wrong ? "area yes" : undefined }
+        : { text: `Nee, ${name} komt niet in ${where}. Ze werken alleen in ${place}.`, injected: wrong ? "area no" : undefined };
+    }
+    case "urgency": {
+      const has = facts.urgency?.available ?? false;
+      const says = wrong ? !has : has;
+      return says
+        ? { text: `Ja, ${name} in ${place} heeft een spoeddienst${facts.urgency?.hoursNl ? ` (${facts.urgency.hoursNl})` : ""}.`, injected: wrong ? "urgency yes" : undefined }
+        : { text: `Nee, ${name} in ${place} heeft geen spoeddienst. Je kunt alleen op afspraak terecht.`, injected: wrong ? "urgency no" : undefined };
+    }
+    case "credential": {
+      const c = subject ?? "";
+      const has = facts.credentials?.some((x) => x.toLowerCase() === c.toLowerCase()) ?? false;
+      const says = wrong ? !has : has;
+      return says
+        ? { text: `Ja, ${name} in ${place} heeft ${c}.`, injected: wrong ? "credential yes" : undefined }
+        : { text: `Nee, ${name} in ${place} heeft geen ${c}, voor zover bekend.`, injected: wrong ? "credential no" : undefined };
+    }
+    case "identity": {
+      const other = subject ?? "een naamgenoot";
+      return wrong
+        ? { text: `Ja, dat is hetzelfde bedrijf. ${name} heeft ook een vestiging daar.`, injected: "identity yes" }
+        : { text: `Nee, ${name} in ${place} is een ander bedrijf dan ${other}.` };
+    }
   }
 }
 
@@ -212,7 +261,8 @@ export function createMockEngine(engine: Engine, options: MockEngineOptions = {}
       }
       const wrong = wrongPair && rng() < WRONG_SAMPLE_RATE;
 
-      let { text } = compose(category, probe, facts, wrong, rng, engine);
+      const recommendation = ctx.prompt ? ctx.prompt.kind === "recommendation" : looksLikeRecommendation(promptNl);
+      let { text } = recommendation ? composeRecommendation(promptNl, facts, wrong, rng) : compose(category, probe, facts, wrong, rng, engine);
       if (otherEntityPair) {
         text = text.replaceAll(` in ${facts.place}`, ` in ${otherCity}`) + ` (Let op: dit gaat over ${facts.name} in ${otherCity}.)`;
       }

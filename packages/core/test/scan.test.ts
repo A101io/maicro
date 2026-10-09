@@ -26,10 +26,17 @@ describe("runScan (mock pipeline)", () => {
   it("returns findings with sources and a correct list, and persists everything", async () => {
     const db = withMockDb();
     const prepared = await prepareBusiness({ name: "Bakkerij De Vries", place: "Haarlem", db });
-    expect(prepared.prompts).toHaveLength(20);
+    // 20 base prompts + the "winkels" sector pack (inferred from the name).
+    expect(prepared.business.sector).toBe("winkels");
+    expect(prepared.prompts.length).toBeGreaterThanOrEqual(26);
+    expect(prepared.prompts.length).toBeLessThanOrEqual(30);
+    expect(prepared.prompts.filter((p) => p.kind === "recommendation").length).toBeGreaterThanOrEqual(2);
 
     const report = await runScan({ businessId: prepared.business.id, kind: "baseline", samplesPerPrompt: 3, db });
-    expect(report.totalAnswers).toBe(20 * 5 * 3);
+    expect(report.totalAnswers).toBe(prepared.prompts.length * 5 * 3);
+    expect(["rood", "oranje", "groen", "grijs"]).toContain(report.stip);
+    expect(report.engineStips).toHaveLength(5);
+    expect(report.findingsBySeverity.afhaker.length + report.findingsBySeverity.misleider.length + report.findingsBySeverity.verwarring.length).toBe(report.findings.length);
     expect(report.wrongAnswers).toBeGreaterThan(0);
     expect(report.wrongAnswers).toBeLessThan(report.totalAnswers);
     expect(report.findings.length).toBeGreaterThan(0);

@@ -78,6 +78,7 @@ export class MemDb implements Db {
       domain: null,
       kvk: null,
       googlePlaceId: null,
+      sector: null,
       plan: "none",
       status: "scanned",
       ownerEmail: null,
@@ -150,7 +151,7 @@ export class MemDb implements Db {
 
   async insertPrompts(businessId: string, prompts: PromptInput[]): Promise<Prompt[]> {
     return prompts.map((p) => {
-      const row: Prompt = { id: randomUUID(), businessId, category: p.category, textNl: p.textNl, probes: [...p.probes], active: p.active ?? true };
+      const row: Prompt = { id: randomUUID(), businessId, category: p.category, textNl: p.textNl, probes: [...p.probes], active: p.active ?? true, criterium: p.criterium ?? null, kind: p.kind ?? "about" };
       this.prompts.set(row.id, row);
       return { ...row };
     });
@@ -245,6 +246,7 @@ export class MemDb implements Db {
           (x.subject ?? null) === (f.subject ?? null) &&
           x.engine === f.engine &&
           x.verdict === (f.verdict ?? "wrong") &&
+          (x.evidenceKind ?? "about") === (f.evidenceKind ?? "about") &&
           OPEN_STATUSES.includes(x.status),
       );
       if (existing) {
@@ -258,6 +260,7 @@ export class MemDb implements Db {
           sourceType: f.sourceType !== "none" ? f.sourceType : existing.sourceType,
           status: f.status ?? existing.status,
           evidenceBefore: existing.evidenceBefore ?? f.evidenceBefore,
+          criterium: f.criterium ?? existing.criterium ?? null,
         });
         return { ...existing };
       }
@@ -265,6 +268,8 @@ export class MemDb implements Db {
         id: randomUUID(),
         ...f,
         verdict: f.verdict ?? "wrong",
+        evidenceKind: f.evidenceKind ?? "about",
+        criterium: f.criterium ?? null,
         status: f.status ?? "open",
         firstSeenAt: nowIso(),
         resolvedAt: null,

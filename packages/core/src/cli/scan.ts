@@ -12,8 +12,10 @@
  */
 import { mkdir, readFile, writeFile } from "node:fs/promises";
 import path from "node:path";
-import { ENGINE_LABEL, ENGINES, type Engine, type Finding, type ScanKind, type ScanReport } from "../types";
+import { ENGINE_LABEL, ENGINES, type Engine, type Finding, type ScanKind, type ScanReport, type Severity } from "../types";
 import { db } from "../db";
+import { copy } from "../copy";
+import { criterium, criteriumFor } from "../criteria";
 import { prepareBusiness } from "../scanner/onboard";
 import { runScan } from "../scanner";
 import { describeFact, describeValue } from "../scanner/normalize";
@@ -97,47 +99,87 @@ const VISIBILITY_LABEL: Record<ScanReport["visibility"], string> = {
   unknown: "AI vindt (bijna) niets over dit bedrijf. Het bestaat niet in het antwoord.",
 };
 
-/** Readable Dutch summary of a scan, e.g. "4 van 18 antwoorden kloppen niet". */
+const STIP_DOT: Record<ScanReport["stip"], string> = { rood: "●", oranje: "●", groen: "●", grijs: "○" };
+
+function criteriumLabel(f: Pick<Finding, "factKey" | "subject" | "criterium" | "sourceType">): string {
+  const id = f.criterium ?? criteriumFor(f.factKey, f.subject, null, { otherEntity: f.sourceType === "other_entity" });
+  return `${id}. ${criterium(id).labelNl}`;
+}
+
+/** One line per finding, Dutch, with the criterium in front. */
+function findingLine(f: Finding, business: ScanReport["business"]): string {
+  const what = describeFact(f.factKey, f.subject);
+  const crit = criteriumLabel(f);
+  const freq = `${f.frequency} van ${f.sampleCount} keer`;
+  if (f.verdict === "not_found") {
+    return `- [${crit}] ${ENGINE_LABEL[f.engine]} vindt niets over ${what} van ${business.name} in ${business.place} (${freq}). Niet gevonden: we maken je vindbaar.`;
+  }
+  if (f.evidenceKind === "recommendation") {
+    const right = describeValue(f.factKey, f.correctValue, f.subject);
+    const src = f.sourceUrl ? ` Bron: ${f.sourceUrl}.` : "";
+    return `- [${crit}] ${ENGINE_LABEL[f.engine]} noemt ${business.name} niet bij een aanbevelingsvraag over ${what} (${freq}), terwijl het klopt: "${right}".${src}`;
+  }
+  if (f.sourceType === "other_entity") {
+    const src = f.sourceUrl ? ` Bron: ${f.sourceUrl}.` : "";
+    return `- [${crit}] ${ENGINE_LABEL[f.engine]} haalt ${business.name} in ${business.place} door elkaar met een ander bedrijf met dezelfde naam bij ${what} (${freq}).${src}`;
+  }
+  const wrong = describeValue(f.factKey, f.wrongValue, f.subject);
+  const right = describeValue(f.factKey, f.correctValue, f.subject);
+  const src = f.sourceUrl ? `${SOURCE_LABEL[f.sourceType]} (${f.sourceUrl})` : SOURCE_LABEL[f.sourceType];
+  const status = f.status === "open" ? "" : ` [${f.status}]`;
+  return `- [${crit}] ${ENGINE_LABEL[f.engine]} zegt over ${what}: "${wrong}" (${freq}); juist is "${right}". Bron: ${src}.${status}`;
+}
+
+/**
+ * Readable Dutch summary of a scan: the colour of the dot, the engines, the
+ * findings grouped by severity. Never a score.
+ */
 export function summarizeNl(report: ScanReport): string {
   const lines: string[] = [];
   const { business, totalAnswers, wrongAnswers, notFoundAnswers = 0, visibility = "found" } = report;
+  const stip = report.stip ?? "grijs";
   lines.push(`${business.name} (${business.place})`);
-  const headline = [`${wrongAnswers} van ${totalAnswers} antwoorden ${wrongAnswers === 1 ? "klopt" : "kloppen"} niet.`];
+  const headline = [`${STIP_DOT[stip]} ${copy.stip[stip]}: ${copy.stipMeaning[stip]}.`, `${wrongAnswers} van ${totalAnswers} antwoorden ${wrongAnswers === 1 ? "klopt" : "kloppen"} niet.`];
   if (notFoundAnswers) headline.push(`${notFoundAnswers} ${notFoundAnswers === 1 ? "antwoord" : "antwoorden"}: niet gevonden.`);
   if (visibility !== "found") headline.push(VISIBILITY_LABEL[visibility]);
   lines.push(headline.join(" "));
+  const stipOf = new Map((report.engineStips ?? []).map((e) => [e.engine, e]));
   const perEngine = report.engines
-    .map((e) =>
-      e.skipped
+    .map((e) => {
+      const es = stipOf.get(e.engine);
+      const colour = es ? `${copy.stip[es.stip].toLowerCase()}${es.counts ? "" : " (telt niet mee)"}` : "";
+      return e.skipped
         ? `${ENGINE_LABEL[e.engine]}: niet gecontroleerd`
-        : `${ENGINE_LABEL[e.engine]}: ${e.wrong} fout, ${e.correct} goed${e.notFound ? `, ? ${e.notFound} niet gevonden` : ""}`,
-    )
+        : `${ENGINE_LABEL[e.engine]}: ${colour ? `${colour}, ` : ""}${e.wrong} fout, ${e.correct} goed${e.notFound ? `, ${e.notFound} niet gevonden` : ""}`;
+    })
     .join(" · ");
   lines.push(perEngine);
+  const groups = report.findingsBySeverity ?? { afhaker: report.findings, misleider: [], verwarring: [] };
+  const order: Severity[] = ["afhaker", "misleider", "verwarring"];
   if (report.findings.length) {
-    lines.push("");
-    lines.push("Wat er fout gaat:");
-    for (const f of report.findings) {
-      const what = describeFact(f.factKey, f.subject);
-      if (f.verdict === "not_found") {
-        lines.push(`- ${ENGINE_LABEL[f.engine]} vindt niets over ${what} van ${business.name} in ${business.place} (${f.frequency} van ${f.sampleCount} keer). Niet gevonden: we maken je vindbaar.`);
-        continue;
-      }
-      if (f.sourceType === "other_entity") {
-        const src = f.sourceUrl ? ` Bron: ${f.sourceUrl}.` : "";
-        lines.push(`- ${ENGINE_LABEL[f.engine]} haalt ${business.name} in ${business.place} door elkaar met een ander bedrijf met dezelfde naam bij ${what} (${f.frequency} van ${f.sampleCount} keer).${src}`);
-        continue;
-      }
-      const wrong = describeValue(f.factKey, f.wrongValue, f.subject);
-      const right = describeValue(f.factKey, f.correctValue, f.subject);
-      const freq = `${f.frequency} van ${f.sampleCount} keer`;
-      const src = f.sourceUrl ? `${SOURCE_LABEL[f.sourceType]} (${f.sourceUrl})` : SOURCE_LABEL[f.sourceType];
-      const status = f.status === "open" ? "" : ` [${f.status}]`;
-      lines.push(`- ${ENGINE_LABEL[f.engine]} zegt over ${what}: "${wrong}" (${freq}); juist is "${right}". Bron: ${src}.${status}`);
+    for (const sev of order) {
+      const list = groups[sev];
+      if (!list.length) continue;
+      lines.push("");
+      lines.push(`${copy.severity[sev]} (${list.length}): ${copy.severityExplain[sev]}`);
+      for (const f of list) lines.push(findingLine(f, business));
     }
   } else {
     lines.push("");
     lines.push("Alles wat we controleerden klopt.");
+  }
+  if (report.criteriaNotFound?.length) {
+    lines.push("");
+    lines.push("Niet gevonden per criterium:");
+    for (const c of report.criteriaNotFound) lines.push(`- ${c.criterium}. ${criterium(c.criterium).labelNl}: ${ENGINE_LABEL[c.engine]} weet het niet (${c.frequency} van ${c.sampleCount} keer).`);
+  }
+  if (report.instable?.length) {
+    lines.push("");
+    lines.push(`${copy.instable} (${report.instable.length}): ${copy.instableLine}`);
+    for (const f of report.instable) {
+      const what = describeFact(f.factKey, f.subject);
+      lines.push(`- [${criteriumLabel(f)}] ${ENGINE_LABEL[f.engine]} zei ${f.frequency} van ${f.sampleCount} keer "${describeValue(f.factKey, f.wrongValue, f.subject)}" over ${what}; juist is "${describeValue(f.factKey, f.correctValue, f.subject)}".`);
+    }
   }
   if (report.correct.length) {
     lines.push("");
@@ -160,6 +202,7 @@ export function markdownNl(report: ScanReport): string {
   const [, headline, perEngine, ...rest] = summarizeNl(report).split("\n");
   const lines = [`# ${report.business.name} – ${report.business.place}`, "", `Gecontroleerd op ${when}.`, "", `**${headline}**`, "", perEngine ?? "", ""];
   for (const l of rest) lines.push(l.startsWith("- ") || !l ? l : `**${l}**`);
+  lines.push("", `_${copy.recommendation.note}_`);
   return lines.join("\n").replace(/\n{3,}/g, "\n\n") + "\n";
 }
 

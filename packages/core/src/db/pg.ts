@@ -55,6 +55,7 @@ function mapBusiness(row: Row): BusinessRecord {
     domain: (r.domain as string | null) ?? null,
     kvk: (r.kvk as string | null) ?? null,
     googlePlaceId: (r.googlePlaceId as string | null) ?? null,
+    sector: (r.sector as BusinessRecord["sector"] | null) ?? null,
     plan: r.plan as BusinessRecord["plan"],
     status: r.status as BusinessRecord["status"],
     ownerEmail: (r.ownerEmail as string | null) ?? null,
@@ -75,6 +76,8 @@ const mapPrompt = (r: Row): Prompt => ({
   textNl: r.textNl as string,
   probes: (r.probes as string[]) ?? [],
   active: r.active as boolean,
+  criterium: (r.criterium as Prompt["criterium"]) ?? null,
+  kind: ((r.kind as string | null) ?? "about") as Prompt["kind"],
 });
 
 const mapScanRun = (row: Row): ScanRun => {
@@ -137,6 +140,8 @@ const mapFinding = (row: Row): Finding => {
     resolvedAt: (r.resolvedAt as string | null) ?? null,
     evidenceBefore: (r.evidenceBefore as string | null) ?? null,
     evidenceAfter: (r.evidenceAfter as string | null) ?? null,
+    evidenceKind: ((r.evidenceKind as string | null) ?? "about") as Finding["evidenceKind"],
+    criterium: (r.criterium as Finding["criterium"]) ?? null,
   };
 };
 
@@ -220,7 +225,7 @@ export class PgDb implements Db {
     const slug = input.slug ?? slugify(input.name, input.place);
     const cols: Row = {};
     const keys: (keyof BusinessUpsert)[] = [
-      "name", "place", "domain", "kvk", "googlePlaceId", "plan", "status", "ownerEmail", "ownerUserId",
+      "name", "place", "domain", "kvk", "googlePlaceId", "sector", "plan", "status", "ownerEmail", "ownerUserId",
       "stripeCustomerId", "stripeSubscriptionId", "factsHost", "anniversaryDay",
     ];
     for (const k of keys) if (input[k] !== undefined) cols[k] = input[k];
@@ -297,7 +302,7 @@ export class PgDb implements Db {
 
   async insertPrompts(businessId: string, prompts: PromptInput[]): Promise<Prompt[]> {
     if (!prompts.length) return [];
-    const rows = prompts.map((p) => ({ businessId, category: p.category, textNl: p.textNl, probes: p.probes, active: p.active ?? true }));
+    const rows = prompts.map((p) => ({ businessId, category: p.category, textNl: p.textNl, probes: p.probes, active: p.active ?? true, criterium: p.criterium ?? null, kind: p.kind ?? "about" }));
     const out = await this.sql`insert into prompt ${this.sql(rows)} returning *`;
     return out.map(mapPrompt);
   }
@@ -404,6 +409,7 @@ export class PgDb implements Db {
           where business_id = ${f.businessId} and fact_key = ${f.factKey}
             and subject is not distinct from ${f.subject} and engine = ${f.engine}
             and verdict = ${f.verdict ?? "wrong"}::verdict
+            and evidence_kind = ${f.evidenceKind ?? "about"}
             and status in ${tx(OPEN_STATUSES)}
           order by first_seen_at limit 1 for update`;
         if (existing[0]) {
@@ -417,13 +423,14 @@ export class PgDb implements Db {
               source_url = coalesce(${f.sourceUrl}, source_url),
               source_type = case when ${f.sourceType}::source_type = 'none' then source_type else ${f.sourceType}::source_type end,
               status = ${f.status ?? (existing[0].status as string)},
-              evidence_before = coalesce(evidence_before, ${f.evidenceBefore})
+              evidence_before = coalesce(evidence_before, ${f.evidenceBefore}),
+              criterium = coalesce(${f.criterium ?? null}, criterium)
             where id = ${existing[0].id as string} returning *`;
           out.push(mapFinding(rows[0]!));
         } else {
           const rows = await tx`
-            insert into finding (business_id, scan_run_id, fact_key, subject, engine, verdict, wrong_value, correct_value, frequency, sample_count, source_url, source_type, status, evidence_before)
-            values (${f.businessId}, ${f.scanRunId}, ${f.factKey}, ${f.subject}, ${f.engine}, ${f.verdict ?? "wrong"}, ${f.wrongValue}, ${f.correctValue}, ${f.frequency}, ${f.sampleCount}, ${f.sourceUrl}, ${f.sourceType}, ${f.status ?? "open"}, ${f.evidenceBefore})
+            insert into finding (business_id, scan_run_id, fact_key, subject, engine, verdict, wrong_value, correct_value, frequency, sample_count, source_url, source_type, status, evidence_before, evidence_kind, criterium)
+            values (${f.businessId}, ${f.scanRunId}, ${f.factKey}, ${f.subject}, ${f.engine}, ${f.verdict ?? "wrong"}, ${f.wrongValue}, ${f.correctValue}, ${f.frequency}, ${f.sampleCount}, ${f.sourceUrl}, ${f.sourceType}, ${f.status ?? "open"}, ${f.evidenceBefore}, ${f.evidenceKind ?? "about"}, ${f.criterium ?? null})
             returning *`;
           out.push(mapFinding(rows[0]!));
         }

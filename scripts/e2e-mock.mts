@@ -28,9 +28,15 @@ const step = (s: string) => console.log(`\n== ${s}`);
 step("prepareBusiness + free scan");
 const { business, created } = await prepareBusiness({ name: "Bakkerij De Vries", place: "Haarlem", db });
 assert.ok(created, "business created");
+assert.equal(business.sector, "winkels", "sector inferred from the mock Google category");
 const free = await runScan({ businessId: business.id, kind: "free", db });
-console.log(`free scan ${free.scanRunId}: ${free.wrongAnswers}/${free.totalAnswers} wrong`);
+console.log(`free scan ${free.scanRunId}: ${free.wrongAnswers}/${free.totalAnswers} wrong, stip ${free.stip} (${free.engineStips.map((e) => `${e.engine}=${e.stip}`).join(", ")})`);
 assert.ok(free.totalAnswers > 0 && free.wrongAnswers > 0, "free scan produced findings");
+assert.equal(free.totalAnswers, 6 * 3 * 3, "free scan stays at 6 prompts x 3 engines x 3 samples");
+assert.ok(["rood", "oranje", "groen", "grijs"].includes(free.stip), "free scan carries a stip colour");
+assert.equal(free.findingsBySeverity.afhaker.length + free.findingsBySeverity.misleider.length + free.findingsBySeverity.verwarring.length, free.findings.length, "findings grouped by severity");
+const freePrompts = await db.listPrompts(business.id, { activeOnly: true });
+assert.ok(freePrompts.some((p) => p.kind === "recommendation"), "stored prompts include recommendation questions");
 
 // 2. Result page e-mail capture + checkout (what /api/report-email, /api/checkout and the Stripe webhook do).
 step("email capture + checkout");
@@ -91,6 +97,18 @@ assert.ok(html.includes(business.name), "rendered facts page contains the busine
 
 const findings = await db.listFindings(business.id);
 assert.ok(findings.length > 0, "findings persisted");
+// Recommendation questions: the mock leaves the business out of part of its lists, so at least one
+// "niet genoemd" finding exists, linked to a criterium, with the fact as the correct value.
+const recFindings = findings.filter((f) => f.evidenceKind === "recommendation");
+assert.ok(recFindings.length > 0, "a recommendation finding (business absent) exists");
+assert.ok(recFindings.every((f) => f.wrongValue === "niet genoemd" && f.criterium != null && f.correctValue !== ""), "recommendation findings carry 'niet genoemd' + criterium");
+assert.ok(findings.every((f) => f.criterium != null), "every finding carries its criterium");
+const scans = await db.listScanRuns(business.id);
+const { buildReport } = await import("@maicro/core/scanner");
+const full = await buildReport(scans[0]!.id, db);
+console.log(`latest scan ${full.kind}: stip ${full.stip}, ${full.findings.length} findings, ${full.instable.length} instable, ${full.criteriaNotFound.length} criteria not found`);
+assert.ok(["rood", "oranje", "groen", "grijs"].includes(full.stip), "full scan carries a stip colour");
+assert.ok(full.engineStips.filter((e) => e.counts).length === 4, "chatgpt, google_ai, copilot and gemini count for the stip; perplexity does not");
 let fixes = 0;
 for (const f of findings) fixes += (await db.listFixes(f.id)).length;
 assert.ok(fixes > 0, "fixes opened for findings");
@@ -100,6 +118,8 @@ const bodies = await Promise.all(mails.map((m) => readFile(path.join(out, "mail"
 const has = (needle: string) => bodies.some((x) => x.includes(needle));
 assert.ok(has(copy.email.subjects.welcome) || has("Welkom"), "welcome mail written");
 assert.ok(has("antwoorden") || has("antwoord"), "baseline summary mail written");
+assert.ok(has("Stip: "), "baseline mail shows the colour of the dot");
+assert.ok(!bodies.some((x) => /\b\d{1,3}\s*\/\s*100\b|score/i.test(x)), "mails never show a score");
 console.log(`mails: ${mails.length} in ${path.join(out, "mail")}`);
 console.log(`facts page: ${pageDir}`);
 console.log(`findings: ${findings.length}, fixes: ${fixes}, channels: ${channels.length}`);

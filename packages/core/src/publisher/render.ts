@@ -93,6 +93,23 @@ function hoursRows(hours: Hours[]): { day: string; text: string; schema: Record<
   });
 }
 
+/** "Heemstede, Hoofddorp" and/or "binnen 25 km van Haarlem". */
+export function serviceAreaLine(facts: Facts): string | null {
+  const area = facts.serviceArea;
+  if (!area) return null;
+  const parts: string[] = [];
+  if (area.places.length) parts.push(area.places.join(", "));
+  if (area.radiusKm != null) parts.push(`binnen ${area.radiusKm} km van ${facts.place}`);
+  return parts.length ? parts.join("; ") : null;
+}
+
+export function urgencyLine(facts: Facts): string | null {
+  const u = facts.urgency;
+  if (!u) return null;
+  if (!u.available) return "Geen spoeddienst.";
+  return u.hoursNl ? `Spoeddienst beschikbaar: ${u.hoursNl}.` : "Spoeddienst beschikbaar.";
+}
+
 function openStatusLine(facts: Facts): string {
   switch (facts.openStatus) {
     case "temporarily_closed":
@@ -137,9 +154,26 @@ export function buildJsonLd(facts: Facts, business: Business, canonicalUrl: stri
       ...(p.unit ? { description: p.unit } : {}),
     }));
   }
-  if (facts.openStatus === "permanently_closed") {
-    ld.additionalProperty = { "@type": "PropertyValue", name: "status", value: "permanently closed" };
+  const extra: Record<string, unknown>[] = [];
+  if (facts.openStatus === "permanently_closed") extra.push({ "@type": "PropertyValue", name: "status", value: "permanently closed" });
+  // Werkgebied (criterium 4): places as City, a radius as GeoCircle around the business.
+  const area = facts.serviceArea;
+  if (area && (area.places.length || area.radiusKm != null)) {
+    const served: Record<string, unknown>[] = area.places.map((p) => ({ "@type": "City", name: p }));
+    if (area.radiusKm != null) {
+      served.push({ "@type": "GeoCircle", geoMidpoint: { "@type": "PostalAddress", addressLocality: facts.place, addressCountry: "NL" }, geoRadius: `${area.radiusKm * 1000}` });
+    }
+    ld.areaServed = served.length === 1 ? served[0] : served;
   }
+  // Spoed (criterium 5): no schema.org type for an emergency line; a named property both humans and models can read.
+  if (facts.urgency) {
+    extra.push({ "@type": "PropertyValue", name: "spoeddienst", value: facts.urgency.available ? "ja" : "nee", ...(facts.urgency.hoursNl ? { description: facts.urgency.hoursNl } : {}) });
+  }
+  // Erkenningen (criterium 12).
+  if (facts.credentials?.length) {
+    ld.hasCredential = facts.credentials.map((c) => ({ "@type": "EducationalOccupationalCredential", name: c }));
+  }
+  if (extra.length) ld.additionalProperty = extra.length === 1 ? extra[0] : extra;
   return ld;
 }
 
@@ -178,6 +212,23 @@ export function buildLlmsTxt(facts: Facts, business: Business, canonicalUrl: str
     lines.push("");
     lines.push("## Betalen");
     lines.push(`- ${facts.paymentMethods.join(", ")}`);
+  }
+  const areaLine = serviceAreaLine(facts);
+  if (areaLine) {
+    lines.push("");
+    lines.push("## Werkgebied");
+    lines.push(`- ${areaLine}`);
+  }
+  const urgency = urgencyLine(facts);
+  if (urgency) {
+    lines.push("");
+    lines.push("## Spoed");
+    lines.push(`- ${urgency}`);
+  }
+  if (facts.credentials?.length) {
+    lines.push("");
+    lines.push("## Erkenningen");
+    for (const c of facts.credentials) lines.push(`- ${c}`);
   }
   if (facts.notConfusedWith.length) {
     lines.push("");
@@ -303,6 +354,29 @@ ${list(facts.policies)}
     sections.push(`<section id="betalen">
 <h2>Betalen</h2>
 <p>${escapeHtml(facts.paymentMethods.join(", "))}</p>
+</section>`);
+  }
+
+  const areaText = serviceAreaLine(facts);
+  if (areaText) {
+    sections.push(`<section id="werkgebied">
+<h2>Werkgebied</h2>
+<p>${escapeHtml(areaText)}</p>
+</section>`);
+  }
+
+  const urgencyText = urgencyLine(facts);
+  if (urgencyText) {
+    sections.push(`<section id="spoed">
+<h2>Spoed</h2>
+<p>${escapeHtml(urgencyText)}</p>
+</section>`);
+  }
+
+  if (facts.credentials?.length) {
+    sections.push(`<section id="erkenningen">
+<h2>Erkenningen</h2>
+${list(facts.credentials)}
 </section>`);
   }
 

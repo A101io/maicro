@@ -7,7 +7,7 @@
  *     dashboard and `/r/voorbeeld` (→ latest run) have content.
  */
 import type { Db } from "@maicro/core/db";
-import type { Engine, Finding, ScanReport } from "@maicro/core/types";
+import type { Engine, EngineStip, Finding, ScanReport } from "@maicro/core/types";
 import { prepareBusiness, runScan } from "@maicro/core/scanner";
 
 export const DEMO_OWNER_EMAIL = "eigenaar@bakkerijdevries.nl";
@@ -17,10 +17,18 @@ const checkedAt = new Date().toISOString();
 const base = { businessId: "demo", scanRunId: "demo", sampleCount: 3, verdict: "wrong" as const, resolvedAt: null, evidenceBefore: null, evidenceAfter: null, status: "open" as const, firstSeenAt: checkedAt };
 
 export const demoFindings: Finding[] = [
-  { ...base, id: "f-demo-1", factKey: "hours", subject: "6", engine: "chatgpt", wrongValue: "zondag geopend van 9:00 tot 17:00", correctValue: "zondag gesloten", frequency: 3, sourceUrl: "https://openingstijden.nl/haarlem/bakkerij-de-vries", sourceType: "directory_form" },
-  { ...base, id: "f-demo-2", factKey: "phone", subject: null, engine: "copilot", wrongValue: "023 532 00 41", correctValue: "023 531 22 18", frequency: 2, sourceUrl: "https://www.telefoonboek.nl/bedrijven/haarlem/bakkerij-de-vries", sourceType: "third_party" },
-  { ...base, id: "f-demo-3", factKey: "service", subject: "bezorgen", engine: "google_ai", wrongValue: "bezorgt in heel Haarlem", correctValue: "bezorgt niet", frequency: 3, sourceUrl: "https://bakkerijdevries.nl/corona-bezorgservice", sourceType: "owned_website" },
-  { ...base, id: "f-demo-4", factKey: "address", subject: null, engine: "chatgpt", wrongValue: "Kruisstraat 8, Hoofddorp", correctValue: "Grote Houtstraat 112, Haarlem", frequency: 1, sourceUrl: null, sourceType: "other_entity" },
+  { ...base, id: "f-demo-1", factKey: "hours", subject: "6", engine: "chatgpt", wrongValue: "zondag geopend van 9:00 tot 17:00", correctValue: "zondag gesloten", frequency: 3, sourceUrl: "https://openingstijden.nl/haarlem/bakkerij-de-vries", sourceType: "directory_form", evidenceKind: "about", criterium: 3 },
+  { ...base, id: "f-demo-2", factKey: "phone", subject: null, engine: "copilot", wrongValue: "023 532 00 41", correctValue: "023 531 22 18", frequency: 2, sourceUrl: "https://www.telefoonboek.nl/bedrijven/haarlem/bakkerij-de-vries", sourceType: "third_party", evidenceKind: "about", criterium: 2 },
+  { ...base, id: "f-demo-3", factKey: "service", subject: "bezorgen", engine: "google_ai", wrongValue: "bezorgt in heel Haarlem", correctValue: "bezorgt niet", frequency: 3, sourceUrl: "https://bakkerijdevries.nl/corona-bezorgservice", sourceType: "owned_website", evidenceKind: "about", criterium: 7 },
+  { ...base, id: "f-demo-4", factKey: "address", subject: null, engine: "chatgpt", wrongValue: "Kruisstraat 8, Hoofddorp", correctValue: "Grote Houtstraat 112, Haarlem", frequency: 1, sourceUrl: null, sourceType: "other_entity", evidenceKind: "about", criterium: 11 },
+  { ...base, id: "f-demo-5", factKey: "service", subject: "glutenvrij brood", engine: "google_ai", wrongValue: "niet genoemd", correctValue: "ja", frequency: 2, sourceUrl: null, sourceType: "none", evidenceKind: "recommendation", criterium: 6 },
+];
+
+/** Demo colours: ChatGPT and Copilot carry afhakers (hours, phone), Google AI only misleiders. */
+export const demoEngineStips: EngineStip[] = [
+  { engine: "chatgpt", stip: "rood", usage: 0.83, counts: true },
+  { engine: "google_ai", stip: "oranje", usage: 0.6, counts: true },
+  { engine: "copilot", stip: "rood", usage: 0.15, counts: true },
 ];
 
 export const demoCorrect: ScanReport["correct"] = [
@@ -48,6 +56,15 @@ export function demoReport(): ScanReport {
     engines: engines.map((engine) => ({ engine, correct: demoCorrect.filter((c) => c.engine === engine).length, wrong: demoFindings.filter((f) => f.engine === engine).length, notFound: 0, skipped: false })),
     findings: demoFindings,
     correct: demoCorrect,
+    stip: "rood",
+    engineStips: demoEngineStips,
+    findingsBySeverity: {
+      afhaker: demoFindings.filter((f) => f.criterium != null && f.criterium <= 5),
+      misleider: demoFindings.filter((f) => f.criterium != null && f.criterium >= 6 && f.criterium <= 10),
+      verwarring: demoFindings.filter((f) => f.criterium != null && f.criterium >= 11),
+    },
+    instable: [],
+    criteriaNotFound: [],
   };
 }
 

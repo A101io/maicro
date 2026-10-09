@@ -10,7 +10,8 @@
  * phone / address / hours heuristically. Always provisional=true; the owner
  * confirms them in setup (facts v1, verified_at).
  */
-import type { Facts, Hours } from "../types";
+import type { Facts, Hours, SectorSlug, ServiceArea, Urgency } from "../types";
+import { inferSector } from "../prompts/sectors";
 import { DAY_NAMES_NL, normalizePhone, normalizeTime, slugify } from "./normalize";
 import { fetchText, hashString, htmlToText, seededRandom } from "./util";
 
@@ -26,6 +27,15 @@ export interface BusinessCandidate {
   openStatus: Facts["openStatus"];
   hours: Hours[];
   source: "google" | "kvk" | "mock";
+  /** Google Places primary type ("plumber") or a Dutch category word; picks the sector pack. */
+  googleCategory?: string | null;
+  /** KvK SBI code of the main activity. */
+  sbi?: string | null;
+}
+
+/** Sector for a candidate: Google category first, then SBI, then a word in the name; null when unknown (owner picks). */
+export function sectorForCandidate(c: Pick<BusinessCandidate, "googleCategory" | "sbi" | "name">): SectorSlug | null {
+  return inferSector(c.googleCategory, c.sbi) ?? inferSector(c.name);
 }
 
 export type DraftFacts = Omit<Facts, "businessId" | "version">;
@@ -44,6 +54,8 @@ interface GPlace {
   nationalPhoneNumber?: string;
   internationalPhoneNumber?: string;
   businessStatus?: "OPERATIONAL" | "CLOSED_TEMPORARILY" | "CLOSED_PERMANENTLY";
+  primaryType?: string;
+  types?: string[];
   regularOpeningHours?: { periods?: { open?: { day?: number; hour?: number; minute?: number }; close?: { day?: number; hour?: number; minute?: number } }[] };
 }
 
@@ -83,7 +95,7 @@ async function googlePlaces(query: string, place?: string): Promise<BusinessCand
       "content-type": "application/json",
       "x-goog-api-key": key,
       "x-goog-fieldmask":
-        "places.id,places.displayName,places.formattedAddress,places.websiteUri,places.nationalPhoneNumber,places.internationalPhoneNumber,places.businessStatus,places.regularOpeningHours",
+        "places.id,places.displayName,places.formattedAddress,places.websiteUri,places.nationalPhoneNumber,places.internationalPhoneNumber,places.businessStatus,places.regularOpeningHours,places.primaryType,places.types",
     },
     body: JSON.stringify({ textQuery: place ? `${query} ${place}` : query, languageCode: "nl", regionCode: "NL", maxResultCount: 3 }),
   });
@@ -103,6 +115,7 @@ async function googlePlaces(query: string, place?: string): Promise<BusinessCand
       openStatus: p.businessStatus === "CLOSED_PERMANENTLY" ? "permanently_closed" : p.businessStatus === "CLOSED_TEMPORARILY" ? "temporarily_closed" : "open",
       hours: hoursFromGoogle(p),
       source: "google",
+      googleCategory: p.primaryType ?? p.types?.[0] ?? null,
     };
   });
 }
@@ -114,6 +127,7 @@ async function googlePlaces(query: string, place?: string): Promise<BusinessCand
 interface KvkResult {
   kvkNummer?: string;
   naam?: string;
+  sbiActiviteiten?: { sbiCode?: string; indHoofdactiviteit?: string }[];
   adres?: { binnenlandsAdres?: { straatnaam?: string; huisnummer?: number; huisnummerToevoeging?: string; postcode?: string; plaats?: string } };
 }
 
@@ -143,6 +157,7 @@ async function kvkSearch(query: string, place?: string): Promise<BusinessCandida
       openStatus: "open",
       hours: [],
       source: "kvk",
+      sbi: r.sbiActiviteiten?.find((a) => a.indHoofdactiviteit === "Ja")?.sbiCode ?? r.sbiActiviteiten?.[0]?.sbiCode ?? null,
     };
   });
 }
@@ -153,16 +168,38 @@ async function kvkSearch(query: string, place?: string): Promise<BusinessCandida
 
 const STREETS = ["Grote Houtstraat", "Stationsplein", "Kerkstraat", "Dorpsstraat", "Zijlweg", "Molenstraat", "Hoofdstraat", "Marktplein", "Nieuwstraat", "Lange Veerstraat"];
 
-/** Keyword -> plausible services / prices / policies for synthetic facts. */
-const PROFILES: { match: RegExp; yes: string[]; no: string[]; prices: Facts["prices"]; policies: string[] }[] = [
-  { match: /bakker/i, yes: ["taarten op bestelling", "glutenvrij brood"], no: ["bezorgen", "catering"], prices: [{ label: "een brood", amount: 3.95 }, { label: "appeltaart", amount: 14.5 }], policies: ["Pinnen mogelijk", "Bestellen kan telefonisch"] },
-  { match: /kapper|kapsalon|barber/i, yes: ["knippen zonder afspraak", "kleuren"], no: ["extensions", "nagels"], prices: [{ label: "knippen", amount: 32.5 }, { label: "kleuren", amount: 65 }], policies: ["Alleen op afspraak", "Pinnen mogelijk"] },
-  { match: /garage|auto/i, yes: ["apk-keuring", "bandenwissel"], no: ["schadeherstel", "ruitreparatie"], prices: [{ label: "apk", amount: 49 }, { label: "bandenwissel", amount: 35 }], policies: ["Alleen op afspraak", "Pinnen mogelijk"] },
-  { match: /fiets/i, yes: ["reparatie", "verhuur"], no: ["e-bike verhuur", "bezorgen"], prices: [{ label: "bandenplakken", amount: 12.5 }, { label: "fietshuur per dag", amount: 15 }], policies: ["Pinnen mogelijk", "Reparatie zonder afspraak"] },
-  { match: /restaurant|eetcafe|café|cafe|bistro/i, yes: ["reserveren", "vegetarische gerechten"], no: ["bezorgen", "afhalen"], prices: [{ label: "dagmenu", amount: 27.5 }, { label: "lunch", amount: 14.5 }], policies: ["Reserveren aanbevolen", "Pinnen mogelijk"] },
-  { match: /tandarts|fysio|praktijk/i, yes: ["spoedafspraken", "nieuwe patiënten"], no: ["avondspreekuur", "weekenddienst"], prices: [], policies: ["Alleen op afspraak", "Pinnen mogelijk"] },
-  { match: /.*/, yes: ["advies op maat", "reparatie"], no: ["bezorgen", "verhuur"], prices: [{ label: "intakegesprek", amount: 45 }, { label: "uurtarief", amount: 65 }], policies: ["Pinnen mogelijk", "Alleen op afspraak"] },
+/** Keyword -> plausible services / prices / policies / sector fields for synthetic facts. */
+interface Profile {
+  match: RegExp;
+  category: string;
+  yes: string[];
+  no: string[];
+  prices: Facts["prices"];
+  policies: string[];
+  area?: string[];
+  urgency?: Urgency;
+  credentials?: string[];
+}
+const PROFILES: Profile[] = [
+  { match: /bakker/i, category: "bakkerij", yes: ["taarten op bestelling", "glutenvrij brood"], no: ["bezorgen", "catering"], prices: [{ label: "een brood", amount: 3.95 }, { label: "appeltaart", amount: 14.5 }], policies: ["Pinnen mogelijk", "Bestellen kan telefonisch"] },
+  { match: /kapper|kapsalon|barber/i, category: "kapper", yes: ["knippen zonder afspraak", "kleuren"], no: ["extensions", "nagels"], prices: [{ label: "knippen", amount: 32.5 }, { label: "kleuren", amount: 65 }], policies: ["Knippen zonder afspraak", "Pinnen mogelijk"] },
+  { match: /garage|auto/i, category: "garage", yes: ["apk-keuring", "bandenwissel"], no: ["schadeherstel", "ruitreparatie"], prices: [{ label: "apk", amount: 49 }, { label: "bandenwissel", amount: 35 }], policies: ["Zonder afspraak welkom", "Pinnen mogelijk"], area: ["Zwolle", "Kampen"] },
+  { match: /fiets/i, category: "fietsenmaker", yes: ["reparatie", "verhuur"], no: ["e-bike verhuur", "bezorgen"], prices: [{ label: "bandenplakken", amount: 12.5 }, { label: "fietshuur per dag", amount: 15 }], policies: ["Pinnen mogelijk", "Reparatie zonder afspraak"] },
+  { match: /restaurant|eetcafe|café|cafe|bistro|lunchroom/i, category: "restaurant", yes: ["terras", "vegetarische gerechten"], no: ["bezorgen", "afhalen"], prices: [{ label: "dagmenu", amount: 27.5 }, { label: "lunch", amount: 14.5 }], policies: ["Reserveren mogelijk", "Pinnen mogelijk"] },
+  { match: /tandarts|fysio|praktijk|huisarts|dierenarts/i, category: "praktijk", yes: ["manuele therapie", "sportfysiotherapie"], no: ["avondspreekuur", "echo"], prices: [], policies: ["Zonder verwijzing welkom", "Nieuwe patiënten welkom"], urgency: { available: true, hoursNl: "ma-vr 8:00-20:00" }, credentials: ["BIG-registratie"] },
+  { match: /loodgiet|install|elektr|cv/i, category: "loodgieter", yes: ["warmtepompen", "cv-ketels"], no: ["zonnepanelen", "dakwerk"], prices: [{ label: "uurtarief", amount: 65 }], policies: ["Geen voorrijkosten", "Pinnen mogelijk"], area: ["Heemstede", "Hoofddorp"], urgency: { available: true, hoursNl: "24 uur per dag, 7 dagen per week" }, credentials: ["warmtepompen", "gas"] },
+  { match: /aannem|dak|schilder|hoven|stuk/i, category: "aannemer", yes: ["dakkapellen", "verbouwingen"], no: ["nieuwbouw", "sloopwerk"], prices: [{ label: "uurtarief", amount: 55 }], policies: ["Gratis offerte", "Pinnen mogelijk"], area: ["Heemstede", "Bloemendaal"], credentials: ["Bouwgarant"] },
+  { match: /vve|vastgoed/i, category: "vve-beheer", yes: ["technisch beheer", "mjop"], no: ["verhuur", "makelaardij"], prices: [{ label: "beheer per appartement per maand", amount: 12.5 }], policies: ["Gratis kennismaking"], area: ["Utrecht", "Nieuwegein"], credentials: ["VvE Belang"] },
+  { match: /advoca|notar|account|administratie/i, category: "advocaat", yes: ["arbeidsrecht", "particulieren"], no: ["strafrecht", "fiscaal advies"], prices: [{ label: "uurtarief", amount: 225 }], policies: ["Gratis eerste gesprek"], credentials: ["Orde van Advocaten"] },
+  { match: /makelaar|hypotheek/i, category: "makelaar", yes: ["verkoop", "verhuur"], no: ["taxaties", "bedrijfspanden"], prices: [{ label: "courtage", amount: 1.2, unit: "%" }], policies: ["Vaste prijs mogelijk"], area: ["Hilversum", "Bussum"], credentials: ["NVM-lid"] },
+  { match: /opvang|kinderdag|bso|sport|fitness|rijschool/i, category: "kinderopvang", yes: ["babygroep", "flexibele opvang"], no: ["naschoolse opvang", "weekendopvang"], prices: [{ label: "uurtarief", amount: 10.25 }], policies: ["Pinnen mogelijk"], urgency: { available: true, hoursNl: "direct plek" } },
+  { match: /winkel|slager|bloem|boek|drogist/i, category: "winkel", yes: ["online bestellen", "afhalen"], no: ["bezorgen", "verhuur"], prices: [{ label: "cadeaubon", amount: 25 }], policies: ["Pinnen mogelijk"] },
+  { match: /.*/, category: "", yes: ["advies op maat", "reparatie"], no: ["bezorgen", "verhuur"], prices: [{ label: "intakegesprek", amount: 45 }, { label: "uurtarief", amount: 65 }], policies: ["Pinnen mogelijk", "Alleen op afspraak"] },
 ];
+
+export function mockProfile(name: string): Profile {
+  return PROFILES.find((p) => p.match.test(name))!;
+}
 
 export function mockCandidate(query: string, place?: string): BusinessCandidate {
   const plc = place ?? "Haarlem";
@@ -193,6 +230,7 @@ export function mockCandidate(query: string, place?: string): BusinessCandidate 
       { day: 6, open: null, close: null, closed: true },
     ],
     source: "mock",
+    googleCategory: mockProfile(query).category || null,
   };
 }
 
@@ -212,10 +250,13 @@ export async function resolveBusiness(query: string, place?: string): Promise<Bu
   // Merge: attach a KvK number to a Google candidate with the same postcode.
   for (const g of google) {
     const k = kvk.find((x) => x.postcode && g.postcode && x.postcode.replace(/\s/g, "") === g.postcode.replace(/\s/g, ""));
-    if (k) g.kvk = k.kvk;
+    if (k) {
+      g.kvk = k.kvk;
+      g.sbi = k.sbi ?? null;
+    }
   }
   const merged = [...google, ...kvk.filter((k) => !google.some((g) => g.kvk === k.kvk))];
-  if (!merged.length) return [mockCandidate(query, place)].map((c) => ({ ...c, placeId: null, kvk: null, website: null, phone: null, address: null, postcode: null, hours: [] }));
+  if (!merged.length) return [mockCandidate(query, place)].map((c) => ({ ...c, placeId: null, kvk: null, website: null, phone: null, address: null, postcode: null, hours: [], googleCategory: null }));
   return merged.slice(0, 3);
 }
 
@@ -293,7 +334,7 @@ async function scrapeSite(website: string): Promise<{ phone: string | null; addr
  */
 export async function draftProvisionalFacts(candidate: BusinessCandidate, opts: { place?: string } = {}): Promise<DraftFacts> {
   const place = candidate.place ?? opts.place ?? "";
-  const profile = PROFILES.find((p) => p.match.test(candidate.name))!;
+  const profile = mockProfile(candidate.name);
   let scraped: Awaited<ReturnType<typeof scrapeSite>> = { phone: null, address: null, postcode: null, place: null, hours: [] };
   if (!isMock() && candidate.website) {
     try {
@@ -323,5 +364,10 @@ export async function draftProvisionalFacts(candidate: BusinessCandidate, opts: 
     policies: isMock() ? profile.policies : [],
     paymentMethods: isMock() ? ["pin", "contant"] : [],
     notConfusedWith: [],
+    // Sector-layer fields (criteria 4, 5, 12): the owner fills them in; the mock profile pre-fills them.
+    serviceArea: isMock() && profile.area ? ({ places: profile.area, radiusKm: null } satisfies ServiceArea) : { places: [], radiusKm: null },
+    urgency: isMock() ? profile.urgency : undefined,
+    credentials: isMock() ? (profile.credentials ?? []) : [],
+    sector: sectorForCandidate(candidate),
   };
 }
