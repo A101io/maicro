@@ -32,6 +32,15 @@ interface Args {
   verbose: boolean;
 }
 
+/** Estimated engine cost of a scan's answers (extraction calls are not counted). */
+async function answerCostCents(scanRunId: string): Promise<number> {
+  return (await db.getScanRun(scanRunId))?.costCents ?? 0;
+}
+
+function formatCost(cents: number): string {
+  return `geschatte kosten antwoorden $${(cents / 100).toFixed(2)}`;
+}
+
 function parseArgs(argv: string[]): Args {
   const args: Args = { kind: "free", out: "out/scans", verbose: false };
   for (let i = 0; i < argv.length; i++) {
@@ -246,7 +255,7 @@ async function main(): Promise<void> {
   if (args.list) {
     const rows = await readList(args.list);
     await mkdir(args.out, { recursive: true });
-    const totals = { businesses: 0, answers: 0, wrong: 0, findings: 0 };
+    const totals = { businesses: 0, answers: 0, wrong: 0, findings: 0, costCents: 0 };
     for (const row of rows) {
       try {
         const report = await scanOne(row.name, row.place, args);
@@ -254,7 +263,9 @@ async function main(): Promise<void> {
         await writeFile(`${base}.json`, JSON.stringify(report, null, 2));
         await writeFile(`${base}.md`, markdownNl(report));
         console.log(summarizeNl(report));
-        console.log(`→ ${base}.json, ${base}.md\n`);
+        const cost = await answerCostCents(report.scanRunId);
+        totals.costCents += cost;
+        console.log(`→ ${base}.json, ${base}.md · ${formatCost(cost)} (totaal ${formatCost(totals.costCents)})\n`);
         totals.businesses++;
         totals.answers += report.totalAnswers;
         totals.wrong += report.wrongAnswers;
@@ -263,10 +274,11 @@ async function main(): Promise<void> {
         console.error(`${row.name} (${row.place}): mislukt – ${(err as Error).message}\n`);
       }
     }
-    console.log(`Totaal: ${totals.businesses} bedrijven, ${totals.wrong} van ${totals.answers} antwoorden kloppen niet, ${totals.findings} bevindingen.`);
+    console.log(`Totaal: ${totals.businesses} bedrijven, ${totals.wrong} van ${totals.answers} antwoorden kloppen niet, ${totals.findings} bevindingen, ${formatCost(totals.costCents)}.`);
   } else if (args.name && args.place) {
     const report = await scanOne(args.name, args.place, args);
     console.log(summarizeNl(report));
+    console.log(formatCost(await answerCostCents(report.scanRunId)));
     if (args.json) {
       await mkdir(path.dirname(args.json), { recursive: true });
       await writeFile(args.json, JSON.stringify(report, null, 2));

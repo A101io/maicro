@@ -34,7 +34,7 @@ Not done yet: `DATABASE_URL` / service-role key in a secret store, and a run of 
 
 ## Next steps, in order
 1. Real database: project and migrations done (see Supabase above). Remaining: put `DATABASE_URL` (pooler, service role) in `.env`, run `MAICRO_DB=pg pnpm e2e:mock` against it once, then clear the rows it wrote.
-2. First real engine: `OPENAI_API_KEY` (ChatGPT sampling + extraction). Run `pnpm scan --list <20 businesses in one town>` and read `out/scans/*.md`. This validates the idea before anything else.
+2. First real engine (runbook: `docs/FIRST-REAL-SCAN.md`): `OPENAI_API_KEY` (ChatGPT sampling + extraction). Run `pnpm scan --list <20 businesses in one town>` and read `out/scans/*.md`. This validates the idea before anything else.
 3. `GOOGLE_PLACES_API_KEY` so business resolution and the `/scan/kies` step work.
 4. Stripe test keys + prices; Resend; deploy web (Vercel) and worker (Fly/Railway); Cloudflare for SaaS for facts hosts.
 5. Then Gemini, Perplexity, SerpAPI.
