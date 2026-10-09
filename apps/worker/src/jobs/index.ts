@@ -2,6 +2,7 @@ import type { Job } from "@maicro/core/db";
 import { email, fixes, followup, operatorTask, publish, recheck, report, sync } from "./misc.js";
 import { scan } from "./scan.js";
 import { setup } from "./setup.js";
+import { paidOnlyBlock } from "./paid.js";
 import type { Handler, JobKind, JobPayloads } from "./types.js";
 
 export * from "./types.js";
@@ -24,7 +25,12 @@ const handlers: { [K in JobKind]: Handler<K> } = {
 
 export function handlerFor(kind: string): AnyHandler | null {
   const h = (handlers as Record<string, AnyHandler | undefined>)[kind];
-  return h ?? null;
+  if (!h) return null;
+  return async (payload, job) => {
+    const blocked = await paidOnlyBlock(kind as JobKind, (payload ?? {}) as Record<string, unknown>);
+    if (blocked) return { skipped: blocked };
+    return h(payload, job);
+  };
 }
 
 export function validatePayload(kind: JobKind, payload: Record<string, unknown>): string | null {

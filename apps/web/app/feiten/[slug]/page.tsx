@@ -1,19 +1,30 @@
+import type { Metadata } from "next";
 import { notFound } from "next/navigation";
 import { copy } from "@maicro/core/copy";
 import { ready } from "@/lib/db";
 import { factsPageBody } from "@/lib/factsPage";
+import { getSession, getOwnedBusiness } from "@/lib/session";
 
 export const dynamic = "force-dynamic";
+
+export const metadata: Metadata = { robots: { index: false } };
 
 /**
  * Owner preview of the facts page: the same HTML the publisher serves on
  * feiten.{domain}, wrapped in a thin preview bar.
+ *
+ * Only the signed-in owner sees it. It renders whatever facts were last saved,
+ * confirmed or not, and it is served from Maicro's own domain: open to anyone,
+ * it would let whoever last claimed a business show their version of it here.
  */
 export default async function FactsPreviewPage({ params }: { params: Promise<{ slug: string }> }) {
   const { slug } = await params;
   const db = await ready();
   const business = await db.getBusiness(slug);
   if (!business) notFound();
+  const session = await getSession();
+  const owned = session ? await getOwnedBusiness(session) : null;
+  if (owned?.id !== business.id) notFound();
   const facts = await db.latestFacts(business.id);
   if (!facts) notFound();
   const body = factsPageBody(facts, business);
