@@ -25,15 +25,9 @@ jobs:
 
   postgres:
     # The migrations and PgDb against a real Postgres, driven by the mock engines.
+    # Uses the Postgres preinstalled on the runner: a Docker Hub service image
+    # hit the anonymous pull rate limit on the first run.
     runs-on: ubuntu-latest
-    services:
-      postgres:
-        image: postgres:17
-        env:
-          POSTGRES_PASSWORD: postgres
-        ports: ["5432:5432"]
-        options: >-
-          --health-cmd pg_isready --health-interval 5s --health-timeout 5s --health-retries 10
     env:
       PGPASSWORD: postgres
       PG_ADMIN_URL: postgresql://postgres:postgres@localhost:5432/postgres
@@ -44,5 +38,10 @@ jobs:
         with:
           node-version: 22
           cache: pnpm
+      - name: Start Postgres
+        run: |
+          sudo systemctl start postgresql.service
+          pg_isready --timeout=30
+          sudo -u postgres psql -c "alter user postgres password 'postgres'"
       - run: pnpm install --frozen-lockfile
       - run: pnpm verify:pg
