@@ -343,6 +343,12 @@ export const copy = {
     },
   },
 
+  scanBusy: {
+    title: "Even geen gratis controles",
+    body: "We doen elke dag een beperkt aantal gratis controles en die zijn voor vandaag op. Probeer het morgen opnieuw.",
+    back: "Terug naar de voorpagina",
+  },
+
   scan: {
     title: "We controleren je bedrijf",
     steps: {

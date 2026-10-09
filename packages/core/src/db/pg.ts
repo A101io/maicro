@@ -502,6 +502,11 @@ export class PgDb implements Db {
     return rows.map(mapEvent);
   }
 
+  async countEventsSince(type: string, since: Date): Promise<number> {
+    const [row] = await this.sql`select count(*)::int as n from event where type = ${type} and at >= ${since}`;
+    return Number(row?.n ?? 0);
+  }
+
   // --- channels ---
   async listChannels(businessId: string): Promise<Channel[]> {
     const rows = await this.sql`select * from channel where business_id = ${businessId} order by type, name`;

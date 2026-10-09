@@ -9,6 +9,19 @@ export const env = {
   get mock(): boolean {
     return read("MAICRO_MOCK") === "1" || !read("DATABASE_URL");
   },
+  /** Engines answer for real (and cost money) unless MAICRO_MOCK=1, whatever the database. */
+  get realEngines(): boolean {
+    return read("MAICRO_MOCK") !== "1";
+  },
+  /**
+   * Free scans the whole site may start per rolling 24 hours while the engines
+   * are real. Each costs ~54 engine calls plus extraction and anyone can start
+   * one, so the cap is on by default; 0 stops free scans entirely.
+   */
+  get freeScansPerDay(): number {
+    const n = Number(read("FREE_SCANS_PER_DAY") ?? 25);
+    return Number.isFinite(n) && n >= 0 ? Math.floor(n) : 25;
+  },
   get baseUrl(): string {
     return read("PUBLIC_BASE_URL") ?? "http://localhost:3000";
   },

@@ -121,6 +121,13 @@ describe.each(backends)("%s", (_name, makeDb) => {
 
     await db.logEvent(b.id, "test", { a: 1 });
     expect((await db.listEvents(b.id))[0]?.type).toBe("test");
+
+    const hourAgo = new Date(Date.now() - 3_600_000);
+    await db.logEvent(b.id, "scan.requested", {});
+    await db.logEvent(null, "scan.requested", {});
+    expect(await db.countEventsSince("scan.requested", hourAgo)).toBe(2);
+    expect(await db.countEventsSince("scan.requested", new Date(Date.now() + 60_000))).toBe(0);
+    expect(await db.countEventsSince("nothing", hourAgo)).toBe(0);
   });
 
   it("keeps sector, prompt kind/criterium and separates recommendation findings from about findings", async () => {

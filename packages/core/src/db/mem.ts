@@ -365,6 +365,10 @@ export class MemDb implements Db {
     return this.events.filter((e) => e.businessId === businessId).slice(-limit).reverse();
   }
 
+  async countEventsSince(type: string, since: Date): Promise<number> {
+    return this.events.filter((e) => e.type === type && new Date(e.at).getTime() >= since.getTime()).length;
+  }
+
   // --- channels ---
   async listChannels(businessId: string): Promise<Channel[]> {
     return [...this.channels.values()].filter((c) => c.businessId === businessId);
