@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { renderFactsPage, buildSitemap, formatDateNl } from "../src/publisher/render";
+import { renderFactsPage, buildSitemap, formatDateNl, safeWebUrl } from "../src/publisher/render";
 import { business, facts } from "./worker-fixtures";
 
 describe("renderFactsPage", () => {
@@ -85,5 +85,24 @@ describe("renderFactsPage", () => {
 
   it("formats Dutch dates", () => {
     expect(formatDateNl("2026-03-01T12:00:00Z")).toBe("1 maart 2026");
+  });
+});
+
+describe("owner-typed website", () => {
+  it("never becomes a script link", () => {
+    for (const bad of ["javascript:alert(document.cookie)", " JavaScript:alert(1)", "data:text/html,<script>alert(1)</script>", "vbscript:x"]) {
+      const page = renderFactsPage({ ...facts, website: bad }, business, { host: "feiten.bakkerijjansen.nl" });
+      expect(page.html.toLowerCase()).not.toMatch(/href="\s*(javascript|data|vbscript):/);
+      expect(page.llmsTxt ?? "").not.toMatch(/javascript:/i);
+      expect(safeWebUrl(bad)).toBeNull();
+    }
+  });
+
+  it("keeps http(s) and completes a bare domain", () => {
+    expect(safeWebUrl("https://bakkerijjansen.nl")).toBe("https://bakkerijjansen.nl");
+    expect(safeWebUrl("http://x.nl/a")).toBe("http://x.nl/a");
+    expect(safeWebUrl("bakkerijjansen.nl")).toBe("https://bakkerijjansen.nl");
+    const page = renderFactsPage({ ...facts, website: "bakkerijjansen.nl" }, business, { host: "feiten.bakkerijjansen.nl" });
+    expect(page.html).toContain('href="https://bakkerijjansen.nl" rel="me"');
   });
 });

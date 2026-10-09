@@ -61,6 +61,20 @@ export function escapeHtml(s: string): string {
     .replace(/'/g, "&#39;");
 }
 
+/**
+ * The owner types their website into a form, so it is untrusted: escaping
+ * stops it breaking out of the attribute but not `javascript:` in an href.
+ * Only http(s) survives; a bare domain gets https://; anything else is dropped.
+ */
+export function safeWebUrl(raw: string | null | undefined): string | null {
+  const s = (raw ?? "").trim();
+  if (!s) return null;
+  if (/^https?:\/\//i.test(s)) return s;
+  if (/^[a-z][a-z0-9+.-]*:/i.test(s)) return null; // javascript:, data:, mailto:, ...
+  if (/^[a-z0-9-]+(\.[a-z0-9-]+)+(\/\S*)?$/i.test(s)) return `https://${s}`;
+  return null;
+}
+
 export function defaultFactsHost(business: Pick<Business, "slug">): string {
   const suffix = process.env.FACTS_HOST_SUFFIX || "maicro.nl";
   return `${business.slug}.feiten.${suffix}`;
@@ -124,14 +138,15 @@ function openStatusLine(facts: Facts): string {
 export function buildJsonLd(facts: Facts, business: Business, canonicalUrl: string): Record<string, unknown> {
   const rows = hoursRows(facts.hours);
   const sameAs: string[] = [];
-  if (facts.website) sameAs.push(facts.website);
+  const website = safeWebUrl(facts.website);
+  if (website) sameAs.push(website);
   if (business.googlePlaceId) sameAs.push(`https://www.google.com/maps/place/?q=place_id:${business.googlePlaceId}`);
   const ld: Record<string, unknown> = {
     "@context": "https://schema.org",
     "@type": "LocalBusiness",
     "@id": `${canonicalUrl}#business`,
     name: facts.name,
-    url: facts.website ?? canonicalUrl,
+    url: website ?? canonicalUrl,
     address: {
       "@type": "PostalAddress",
       streetAddress: facts.address ?? undefined,
@@ -187,7 +202,8 @@ export function buildLlmsTxt(facts: Facts, business: Business, canonicalUrl: str
   if (facts.address) lines.push(`- Adres: ${facts.address}${facts.postcode ? `, ${facts.postcode}` : ""} ${facts.place}`);
   if (facts.phone) lines.push(`- Telefoon: ${facts.phone}`);
   if (facts.email) lines.push(`- E-mail: ${facts.email}`);
-  if (facts.website) lines.push(`- Website: ${facts.website}`);
+  const website = safeWebUrl(facts.website);
+  if (website) lines.push(`- Website: ${website}`);
   if (business.kvk) lines.push(`- KvK: ${business.kvk}`);
   lines.push("");
   lines.push("## Openingstijden");
@@ -310,7 +326,7 @@ ${business.kvk ? `<p class="meta">KvK-nummer: ${escapeHtml(business.kvk)}</p>` :
 ${addressLine ? `<dt>Adres</dt><dd>${escapeHtml(addressLine)}</dd>` : ""}
 ${facts.phone ? `<dt>Telefoon</dt><dd><a href="tel:${escapeHtml(facts.phone.replace(/\s+/g, ""))}">${escapeHtml(facts.phone)}</a></dd>` : ""}
 ${facts.email ? `<dt>E-mail</dt><dd><a href="mailto:${escapeHtml(facts.email)}">${escapeHtml(facts.email)}</a></dd>` : ""}
-${facts.website ? `<dt>Website</dt><dd><a href="${escapeHtml(facts.website)}" rel="me">${escapeHtml(facts.website)}</a></dd>` : ""}
+${safeWebUrl(facts.website) ? `<dt>Website</dt><dd><a href="${escapeHtml(safeWebUrl(facts.website)!)}" rel="me">${escapeHtml(facts.website!)}</a></dd>` : ""}
 </dl>
 </section>`);
 
