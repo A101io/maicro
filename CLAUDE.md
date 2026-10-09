@@ -26,8 +26,14 @@ Done and verified in mock mode: scanner core (5 engines, extraction, compare, at
 
 Not built: Bing/Apple/form-directory adapters (fall to operator queue), Copilot browser adapter (`setCopilotAdapter`), WordPress plugin, quarterly plan.
 
+## Supabase
+Project `maicro`, ref **`bbynmqvaxpjdnkaasutd`**, eu-west-1 (Ireland), org A101BV — https://bbynmqvaxpjdnkaasutd.supabase.co.
+Migrations 0001–0004 are applied (ledger: `supabase_migrations.schema_migrations`). Every public table has RLS; the four internal tables (`prompt`, `sample`, `claim`, `job`) have no policies, so only the service role / table owner reach them.
+The same org holds **`hlelpndtejajipqwjwrf` (Sitty)** and **`muuijbupsnhascqzfbin` (Sonable)** — check the ref on every call; the names give no warning.
+Not done yet: `DATABASE_URL` / service-role key in a secret store, and a run of the pipeline against this project.
+
 ## Next steps, in order
-1. Real database: create Supabase project, apply `supabase/migrations/0001_init.sql`, `0002_not_found.sql` and `0003_sectors.sql`, set `DATABASE_URL`, `MAICRO_MOCK=0`, run `pnpm e2e:mock` against it, fix `PgDb` issues.
+1. Real database: project and migrations done (see Supabase above). Remaining: put `DATABASE_URL` (pooler, service role) in `.env`, run `MAICRO_DB=pg pnpm e2e:mock` against it once, then clear the rows it wrote.
 2. First real engine: `OPENAI_API_KEY` (ChatGPT sampling + extraction). Run `pnpm scan --list <20 businesses in one town>` and read `out/scans/*.md`. This validates the idea before anything else.
 3. `GOOGLE_PLACES_API_KEY` so business resolution and the `/scan/kies` step work.
 4. Stripe test keys + prices; Resend; deploy web (Vercel) and worker (Fly/Railway); Cloudflare for SaaS for facts hosts.
