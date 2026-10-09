@@ -6,8 +6,12 @@
  * field(s) it probes in `probes` (e.g. "hours.6", "service:verhuur",
  * "payment:pin") so the extractor and comparer know what to look for.
  */
-import type { FactKey, Facts, Hours, Prompt } from "../types";
+import type { FactKey, Facts, Hours, Prompt, SectorSlug } from "../types";
 import { DAY_NAMES_NL, normalizeHours } from "../scanner/normalize";
+import { FACT_KEY_CRITERIUM } from "../criteria";
+import { sectorPrompts, type SectorPromptTemplate } from "./sectors";
+
+export * from "./sectors";
 
 export type PromptTemplate = Omit<Prompt, "id" | "businessId">;
 
@@ -16,7 +20,12 @@ interface Ctx {
   place: string;
 }
 
-const t = (category: FactKey, textNl: string, probes: string[]): PromptTemplate => ({ category, textNl, probes, active: true });
+const t = (category: FactKey, textNl: string, probes: string[]): PromptTemplate => ({ category, textNl, probes, active: true, criterium: FACT_KEY_CRITERIUM[category], kind: "about" });
+
+/** The sector that applies to a facts record (owner override on the facts, else the business sector). */
+export function sectorOf(facts: Pick<Facts, "sector">, fallback?: SectorSlug | null): SectorSlug | null {
+  return facts.sector ?? fallback ?? null;
+}
 
 /** Existence: three phrasings so model memory and web answers both get probed. */
 export function existencePrompts({ name, place }: Ctx): PromptTemplate[] {
@@ -87,7 +96,10 @@ export function websitePrompts({ name, place }: Ctx): PromptTemplate[] {
 export function servicePrompts({ name, place }: Ctx, facts: Facts): PromptTemplate[] {
   const yes = facts.servicesYes.slice(0, 2);
   const no = facts.servicesNo.slice(0, 2);
-  return [...yes, ...no].map((service) => t("service", `Doet ${name} in ${place} ook ${service}?`, [`service:${service}`]));
+  return [
+    ...yes.map((service) => t("service", `Doet ${name} in ${place} ook ${service}?`, [`service:${service}`])),
+    ...no.map((service) => ({ ...t("service", `Doet ${name} in ${place} ook ${service}?`, [`service:${service}`]), criterium: 7 as const })),
+  ];
 }
 
 export function pricePrompts({ name, place }: Ctx, facts: Facts): PromptTemplate[] {
@@ -102,12 +114,17 @@ export function paymentPrompts({ name, place }: Ctx): PromptTemplate[] {
   return [t("payment", `Kan ik bij ${name} in ${place} pinnen?`, ["payment:pin"])];
 }
 
+export interface GenerateOptions {
+  /** Sector pack to add; defaults to facts.sector. */
+  sector?: SectorSlug | null;
+}
+
 /**
- * All prompts for a business. Count: 3 existence + 4 hours + 2 phone + 1 address
- * + 1 website + up to 4 service + up to 2 price + up to 2 policy + 1 payment
- * = up to 20.
+ * Base prompts for a business (no sector layer). Count: 3 existence + 4 hours
+ * + 2 phone + 1 address + 1 website + up to 4 service + up to 2 price + up to
+ * 2 policy + 1 payment = up to 20.
  */
-export function generatePrompts(facts: Facts): PromptTemplate[] {
+export function basePrompts(facts: Facts): PromptTemplate[] {
   const ctx: Ctx = { name: facts.name, place: facts.place };
   return [
     ...existencePrompts(ctx),
@@ -123,26 +140,47 @@ export function generatePrompts(facts: Facts): PromptTemplate[] {
 }
 
 /**
- * The 6 most valuable prompts for the free scan: existence, Sunday hours,
- * phone, address, one service the business does NOT offer (falls back to one
- * it does), and pin payment.
+ * All prompts for a business: the base prompts plus the sector pack (6 to 10
+ * extra questions, at least two of them recommendation questions). A text
+ * that already exists in the base set is not added twice.
  */
-export function freeScanPrompts(facts: Facts): PromptTemplate[] {
+export function generatePrompts(facts: Facts, opts: GenerateOptions = {}): PromptTemplate[] {
+  const base = basePrompts(facts);
+  const seen = new Set(base.map((p) => p.textNl));
+  const extra: PromptTemplate[] = sectorPrompts(facts, sectorOf(facts, opts.sector)).filter((p) => !seen.has(p.textNl));
+  return [...base, ...extra];
+}
+
+/**
+ * The 6 prompts for the free scan. With a sector: existence, phone, Sunday
+ * hours and up to 3 sector prompts of which one asks for a recommendation.
+ * Without a sector: existence, Sunday hours, phone, address, one service the
+ * business does NOT offer (falls back to one it does), and pin payment.
+ */
+export function freeScanPrompts(facts: Facts, opts: GenerateOptions = {}): PromptTemplate[] {
   const ctx: Ctx = { name: facts.name, place: facts.place };
+  const sunday = t("hours", `Is ${facts.name} in ${facts.place} op zondag open?`, ["hours.6"]);
+  const sector: SectorPromptTemplate[] = sectorPrompts(facts, sectorOf(facts, opts.sector));
+  if (sector.length) {
+    const out: PromptTemplate[] = [existencePrompts(ctx)[0]!, phonePrompts(ctx)[0]!, sunday];
+    const rec = sector.find((p) => p.kind === "recommendation");
+    const abouts = sector.filter((p) => p.kind === "about" && !out.some((o) => o.textNl === p.textNl));
+    const picked: PromptTemplate[] = [...abouts.slice(0, rec ? 2 : 3)];
+    if (rec) picked.push(rec);
+    // Top up with base prompts when the pack is short.
+    const fill = [addressPrompts(ctx)[0]!, paymentPrompts(ctx)[0]!];
+    while (picked.length < 3 && fill.length) picked.push(fill.shift()!);
+    return [...out, ...picked].slice(0, 6);
+  }
   const service = facts.servicesNo[0] ?? facts.servicesYes[0];
-  const out: PromptTemplate[] = [
-    existencePrompts(ctx)[0]!,
-    t("hours", `Is ${facts.name} in ${facts.place} op zondag open?`, ["hours.6"]),
-    phonePrompts(ctx)[0]!,
-    addressPrompts(ctx)[0]!,
-  ];
+  const out: PromptTemplate[] = [existencePrompts(ctx)[0]!, sunday, phonePrompts(ctx)[0]!, addressPrompts(ctx)[0]!];
   if (service) out.push(t("service", `Doet ${facts.name} in ${facts.place} ook ${service}?`, [`service:${service}`]));
   out.push(paymentPrompts(ctx)[0]!);
   return out;
 }
 
 /** Pick, from a stored prompt list, the ones that match the free-scan templates (by text). */
-export function selectFreeScanPrompts<T extends { textNl: string }>(prompts: T[], facts: Facts): T[] {
-  const wanted = new Set(freeScanPrompts(facts).map((p) => p.textNl));
+export function selectFreeScanPrompts<T extends { textNl: string }>(prompts: T[], facts: Facts, opts: GenerateOptions = {}): T[] {
+  const wanted = new Set(freeScanPrompts(facts, opts).map((p) => p.textNl));
   return prompts.filter((p) => wanted.has(p.textNl));
 }

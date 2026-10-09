@@ -54,13 +54,15 @@ function sourceLabel(f: Finding): string {
   return hostOfUrl(f.sourceUrl) ?? "onbekende bron";
 }
 
-/** Not-found answer count + visibility for a scan run, rebuilt from stored samples and claims. */
-async function notFoundStats(scanRunId: string | null | undefined): Promise<{ notFoundAnswers: number; visibility: ScanReport["visibility"] } | null> {
+/** Not-found answer count, visibility, colour and instable answers for a scan run, rebuilt from stored samples and claims. */
+async function notFoundStats(
+  scanRunId: string | null | undefined,
+): Promise<Pick<ScanReport, "notFoundAnswers" | "visibility" | "stip" | "engineStips" | "instable"> | null> {
   if (!scanRunId) return null;
   try {
     const { buildReport } = await import("../scanner/index.js");
     const r = await buildReport(scanRunId);
-    return { notFoundAnswers: r.notFoundAnswers, visibility: r.visibility };
+    return { notFoundAnswers: r.notFoundAnswers, visibility: r.visibility, stip: r.stip, engineStips: r.engineStips, instable: r.instable };
   } catch (err) {
     log.warn("reporter.not_found_stats_failed", { scanRunId, error: String((err as Error)?.message ?? err) });
     return null;
@@ -154,11 +156,14 @@ export async function sendBaselineSummary(scanRunId: string): Promise<MailResult
     wrongAnswers: findings.filter((f) => f.verdict !== "not_found").length,
     notFoundAnswers: nf?.notFoundAnswers,
     visibility: nf?.visibility,
+    stip: nf?.stip,
+    engineStips: nf?.engineStips,
+    instable: nf?.instable,
     findings,
     engines: run.engines,
     links: { dashboardUrl: dashboardUrl(business), factsPageUrl: factsPageUrl(business) },
   });
-  return deliver(business, m, "baseline", { scanRunId });
+  return deliver(business, m, "baseline", { scanRunId, stip: nf?.stip ?? null });
 }
 
 export async function sendResolutionNotice(findingId: string): Promise<MailResult | null> {
@@ -236,6 +241,9 @@ export async function sendMonthlyReport(businessId: string, opts: MonthlyReportO
     notFound: openFindings.filter(isNotFound).length + unfixable.filter(isNotFound).length,
     notFoundAnswers: nf?.notFoundAnswers,
     visibility: nf?.visibility,
+    stip: nf?.stip,
+    engineStips: nf?.engineStips,
+    instable: nf?.instable,
     resolved: resolvedThisMonth.length,
     inProgress: openFindings.length,
     unfixable: unfixable.length,
@@ -244,7 +252,7 @@ export async function sendMonthlyReport(businessId: string, opts: MonthlyReportO
     engines,
     links: { dashboardUrl: dashboardUrl(business), factsPageUrl: factsPageUrl(business) },
   });
-  return deliver(business, m, "report", { scanRunId: run?.id ?? null, open: openFindings.length, resolved: resolvedThisMonth.length });
+  return deliver(business, m, "report", { scanRunId: run?.id ?? null, open: openFindings.length, resolved: resolvedThisMonth.length, stip: nf?.stip ?? null });
 }
 
 /** Non-customer follow-up after the free scan (day 7 / day 21). */

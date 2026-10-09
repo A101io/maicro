@@ -77,6 +77,50 @@ Maicro
 "
 `;
 
+exports[`email templates > snapshots > baselineStip 1`] = `
+"Eerste controle van Bakkerij Jansen: 3 antwoorden kloppen niet
+
+Hoi,
+
+Op 2 oktober 2026 stelden we 100 vragen over Bakkerij Jansen aan ChatGPT, Gemini, Perplexity, Google AI, Copilot. 3 antwoorden klopten niet. Dit is wat we vonden en wat we eraan doen.
+
+Stip: rood. AI stuurt klanten weg. Minstens één antwoord stuurt klanten weg. Dat herstellen we eerst.
+Per AI: ChatGPT: rood, Gemini: groen, Perplexity: oranje, Google AI: groen, Copilot: grijs.
+
+Afhaker (2): Eén fout en de klant komt niet.
+
+Over: de openingstijden op zondag
+ChatGPT zei: 10:00 tot 14:00 (7 van de 10 keer)
+Klopt niet. Het is: gesloten
+Waar het vandaan komt: openingstijden.nl
+Wat we doen: We vragen de bron uit jouw naam om de gegevens te corrigeren.
+
+Over: het telefoonnummer
+ChatGPT zei: +31231234568 (2 van de 10 keer)
+Klopt niet. Het is: +31231234567
+Waar het vandaan komt: openingstijden.nl
+Wat we doen: We vragen de bron uit jouw naam om de gegevens te corrigeren.
+
+Misleider (1): De klant komt wel, maar voor het verkeerde.
+
+Aanbevelingsvraag over: of desembrood wordt aangeboden
+ChatGPT noemt je niet (7 van de 10 keer)
+Je wordt niet genoemd, terwijl dit bij je klopt. Jouw gegeven is: ja
+Geen bron: dit gegeven staat nergens waar AI het kan lezen.
+Wat we doen: Niet genoemd: we zetten dit gegeven op je feitenpagina en in je profielen, en controleren na 3 weken opnieuw.
+
+Instabiel (1): Dit antwoord klopte af en toe niet. Te zelden om te herstellen; we houden het in de gaten.
+- ChatGPT zei 1 van de 10 keer "€ 5,50" over de prijs van Desembrood; het is € 4,50.
+
+Elke fout controleren we opnieuw zodra de bron is aangepast. Je hoort van ons als een antwoord is hersteld, met het antwoord van voor en na.
+
+Je overzicht: https://maicro.nl/dashboard
+
+Groet,
+Maicro
+"
+`;
+
 exports[`email templates > snapshots > correction 1`] = `
 "Correctie gegevens Bakkerij Jansen, Haarlem
 

@@ -2,7 +2,8 @@
 
 import { revalidatePath } from "next/cache";
 import { redirect } from "next/navigation";
-import type { Facts, Hours, PriceItem } from "@maicro/core/types";
+import type { Facts, Hours, PriceItem, SectorSlug } from "@maicro/core/types";
+import { SECTOR_SLUGS } from "@maicro/core/types";
 import { ready } from "@/lib/db";
 import { requireOwner } from "@/lib/owner";
 
@@ -25,6 +26,12 @@ function parseFacts(form: FormData, businessId: string): Omit<Facts, "businessId
   }
   const list = (k: string) => form.getAll(k).map((v) => String(v).trim()).filter(Boolean);
   const openStatus = str(form, "openStatus");
+  // Sector-layer fields (criteria 4, 5, 12). The form may omit them; then they stay empty / unknown.
+  const radiusRaw = str(form, "serviceAreaRadiusKm");
+  const radiusKm = radiusRaw != null && Number.isFinite(Number(radiusRaw)) && Number(radiusRaw) > 0 ? Number(radiusRaw) : null;
+  const urgencyAvailable = form.has("urgencyAvailable") ? form.get("urgencyAvailable") === "on" || form.get("urgencyAvailable") === "true" : null;
+  const sectorRaw = str(form, "sector");
+  const sector: SectorSlug | null = sectorRaw && (SECTOR_SLUGS as string[]).includes(sectorRaw) ? (sectorRaw as SectorSlug) : null;
   return {
     name: str(form, "name") ?? "",
     place: str(form, "place") ?? "",
@@ -41,6 +48,10 @@ function parseFacts(form: FormData, businessId: string): Omit<Facts, "businessId
     policies: list("policies"),
     paymentMethods: list("paymentMethods"),
     notConfusedWith: list("notConfusedWith"),
+    serviceArea: { places: list("serviceAreaPlaces"), radiusKm },
+    urgency: urgencyAvailable == null ? undefined : { available: urgencyAvailable, hoursNl: str(form, "urgencyHours") },
+    credentials: list("credentials"),
+    sector,
   };
 }
 
@@ -52,7 +63,14 @@ export async function saveFacts(form: FormData) {
   if (!data.name || !data.place) redirect("/app/gegevens?fout=1");
   const now = new Date().toISOString();
   const facts = await db.insertFacts(business.id, data, { provisional: false, verifiedAt: now });
-  await db.upsertBusiness({ id: business.id, slug: business.slug, name: data.name, place: data.place, domain: business.domain ?? (data.website ? data.website.replace(/^https?:\/\//, "").replace(/^www\./, "").split("/")[0]! : null) });
+  await db.upsertBusiness({
+    id: business.id,
+    slug: business.slug,
+    name: data.name,
+    place: data.place,
+    domain: business.domain ?? (data.website ? data.website.replace(/^https?:\/\//, "").replace(/^www\./, "").split("/")[0]! : null),
+    ...(data.sector ? { sector: data.sector } : {}),
+  });
   await db.enqueueJob("publish", { businessId: business.id, reason: `facts v${facts.version} confirmed` });
   await db.enqueueJob("sync", { businessId: business.id }, new Date(Date.now() + 1000));
   await db.logEvent(business.id, "facts.confirmed", { version: facts.version });

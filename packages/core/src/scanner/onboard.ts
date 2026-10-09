@@ -6,7 +6,7 @@ import type { Prompt } from "../types";
 import { db as defaultDb, type BusinessRecord, type Db } from "../db";
 import { generatePrompts } from "../prompts";
 import { normalizeWebsite, slugify } from "./normalize";
-import { draftProvisionalFacts, resolveBusiness, type BusinessCandidate } from "./resolve";
+import { draftProvisionalFacts, resolveBusiness, sectorForCandidate, type BusinessCandidate } from "./resolve";
 
 export interface PrepareOptions {
   name: string;
@@ -42,6 +42,7 @@ export async function prepareBusiness(opts: PrepareOptions): Promise<Prepared> {
     domain: existing?.domain ?? normalizeWebsite(candidate.website),
     kvk: existing?.kvk ?? candidate.kvk,
     googlePlaceId: existing?.googlePlaceId ?? candidate.placeId,
+    sector: existing?.sector ?? sectorForCandidate(candidate),
   });
 
   let facts = await db.latestFacts(business.id);
@@ -50,7 +51,7 @@ export async function prepareBusiness(opts: PrepareOptions): Promise<Prepared> {
     facts = await db.insertFacts(business.id, { ...draft, place: opts.place }, { provisional: true });
   }
   let prompts = await db.listPrompts(business.id, { activeOnly: true });
-  if (!prompts.length) prompts = await db.insertPrompts(business.id, generatePrompts(facts));
+  if (!prompts.length) prompts = await db.insertPrompts(business.id, generatePrompts(facts, { sector: business.sector }));
 
   return { business, factsVersion: facts.version, prompts, candidate, created: !existing };
 }

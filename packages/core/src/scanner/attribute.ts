@@ -129,6 +129,8 @@ export interface AttributeOptions {
 export async function attributeFinding(candidate: FindingCandidate, ctx: AttributionContext, opts: AttributeOptions = {}): Promise<Attribution> {
   // Not found: there is no page carrying a wrong value; the engine simply has nothing.
   if (candidate.verdict === "not_found") return { sourceUrl: null, sourceType: "none" };
+  // Not named in a recommendation: no page carries "niet genoemd"; the remedy is the facts page (fixer RECOMMENDATION_PATH).
+  if (candidate.evidenceKind === "recommendation") return { sourceUrl: null, sourceType: "none" };
   if (candidate.sourceType === "other_entity") {
     return { sourceUrl: candidate.citations[0] ?? null, sourceType: "other_entity" };
   }

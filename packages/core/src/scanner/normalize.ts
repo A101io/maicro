@@ -10,8 +10,13 @@
  *  - website: hostname without "www." ("bakkerijdevries.nl")
  *  - service / policy / payment (subject = name): "yes" | "no"
  *  - price (subject = label): decimal string ("12.5")
+ *  - area (subject = place): "yes" | "no"   (werkgebied)
+ *  - urgency: "yes" | "no"                   (spoed / beschikbaarheid)
+ *  - credential (subject = name): "yes" | "no"
+ *  - identity (subject = other business): "no" = a different business (the owner's position)
+ *  - recommendation answers: PRESENT_VALUE | ABSENT_VALUE (is the business named)
  */
-import { NOT_FOUND_LABEL, NOT_FOUND_VALUE, type FactKey, type Facts, type Hours } from "../types";
+import { ABSENT_LABEL, ABSENT_VALUE, NOT_FOUND_LABEL, NOT_FOUND_VALUE, PRESENT_VALUE, type FactKey, type Facts, type Hours } from "../types";
 
 export const DAY_NAMES_NL = ["maandag", "dinsdag", "woensdag", "donderdag", "vrijdag", "zaterdag", "zondag"] as const;
 
@@ -147,8 +152,32 @@ export function factValue(facts: Facts, factKey: FactKey, subject: string | null
       if (methods.length === 0) return null;
       return methods.some((m) => m.includes(s)) ? "yes" : "no";
     }
+    case "area": {
+      const area = facts.serviceArea;
+      if (!area) return null;
+      if (!subject) return area.places.length || area.radiusKm != null ? "yes" : null;
+      const s = normalizeLabel(subject);
+      if (s === normalizeLabel(facts.place)) return "yes";
+      if (area.places.some((p) => normalizeLabel(p) === s)) return "yes";
+      // A place outside the list: only a "no" when the owner listed places and gave no radius.
+      if (area.places.length && area.radiusKm == null) return "no";
+      return null;
+    }
+    case "urgency":
+      return facts.urgency ? (facts.urgency.available ? "yes" : "no") : null;
+    case "credential": {
+      if (!subject) return facts.credentials?.length ? "yes" : null;
+      const s = normalizeLabel(subject);
+      return facts.credentials?.some((c) => normalizeLabel(c) === s) ? "yes" : null;
+    }
+    case "identity":
+      // The owner's position is always: that is a different business.
+      return facts.notConfusedWith.length || subject ? "no" : null;
   }
 }
+
+/** Expected value for a recommendation prompt: the business should be named. */
+export const RECOMMENDATION_EXPECTED = PRESENT_VALUE;
 
 /** Does a claimed value agree with the owner value? Some keys compare fuzzily. */
 export function valuesMatch(factKey: FactKey, claimed: string, expected: string): boolean {
@@ -179,6 +208,8 @@ export function valuesMatch(factKey: FactKey, claimed: string, expected: string)
 /** Dutch, human readable rendering of a normalised value (used in summaries). */
 export function describeValue(factKey: FactKey, value: string, subject: string | null): string {
   if (value === NOT_FOUND_LABEL || value === NOT_FOUND_VALUE) return NOT_FOUND_LABEL;
+  if (value === ABSENT_VALUE || value === ABSENT_LABEL) return ABSENT_LABEL;
+  if (value === PRESENT_VALUE) return "genoemd";
   switch (factKey) {
     case "existence":
       return value === "open" ? "open" : value === "temporarily_closed" ? "tijdelijk gesloten" : "permanent gesloten";
@@ -191,7 +222,12 @@ export function describeValue(factKey: FactKey, value: string, subject: string |
     case "service":
     case "policy":
     case "payment":
+    case "area":
+    case "urgency":
+    case "credential":
       return value === "yes" ? "ja" : value === "no" ? "nee" : value;
+    case "identity":
+      return value === "no" ? "een ander bedrijf" : value === "yes" ? "hetzelfde bedrijf" : value;
     case "price":
       return `€ ${value.replace(".", ",")}`;
     default:
@@ -220,6 +256,14 @@ export function describeFact(factKey: FactKey, subject: string | null): string {
       return `voorwaarde: ${subject ?? ""}`;
     case "payment":
       return subject === "pin" ? "pinnen" : `betalen: ${subject ?? ""}`;
+    case "area":
+      return subject ? `werkgebied: ${subject}` : "werkgebied";
+    case "urgency":
+      return "spoed en beschikbaarheid";
+    case "credential":
+      return subject ? `erkenning: ${subject}` : "erkenningen";
+    case "identity":
+      return subject ? `naamgenoot: ${subject}` : "naamgenoot";
   }
 }
 

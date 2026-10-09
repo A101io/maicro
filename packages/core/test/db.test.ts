@@ -88,3 +88,26 @@ describe("MemDb round trip", () => {
     expect((await db.listEvents(b.id))[0]?.type).toBe("test");
   });
 });
+
+describe("MemDb sector layer", () => {
+  it("keeps sector, prompt kind/criterium and separates recommendation findings from about findings", async () => {
+    const db = withMockDb();
+    const b = await db.upsertBusiness({ name: "Loodgieter Bos", place: "Zwolle", sector: "loodgieters-installateurs" });
+    expect((await db.getBusiness(b.id))?.sector).toBe("loodgieters-installateurs");
+    const [p] = await db.insertPrompts(b.id, [{ category: "service", textNl: "Wie installeert warmtepompen in Zwolle?", probes: ["service:warmtepompen"], active: true, kind: "recommendation", criterium: 6 }]);
+    expect(p).toMatchObject({ kind: "recommendation", criterium: 6 });
+    const run = await db.createScanRun({ businessId: b.id, kind: "baseline", engines: ["chatgpt"], samplesPerPrompt: 3 });
+    const base = { businessId: b.id, scanRunId: run.id, factKey: "service" as const, subject: "warmtepompen", engine: "chatgpt" as const, correctValue: "yes", frequency: 2, sampleCount: 3, sourceUrl: null, sourceType: "none" as const, evidenceBefore: null };
+    const [about] = await db.upsertFindings([{ ...base, wrongValue: "no", criterium: 6 }]);
+    const [rec] = await db.upsertFindings([{ ...base, wrongValue: "niet genoemd", evidenceKind: "recommendation", criterium: 6 }]);
+    expect(rec!.id).not.toBe(about!.id);
+    expect(about!.evidenceKind).toBe("about");
+    expect(rec!.evidenceKind).toBe("recommendation");
+    expect(rec!.criterium).toBe(6);
+    const [again] = await db.upsertFindings([{ ...base, wrongValue: "niet genoemd", evidenceKind: "recommendation", frequency: 3 }]);
+    expect(again!.id).toBe(rec!.id);
+    expect(again!.frequency).toBe(3);
+    expect(again!.criterium).toBe(6);
+    expect(await db.listFindings(b.id, "open")).toHaveLength(2);
+  });
+});

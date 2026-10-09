@@ -5,8 +5,10 @@
  * zien), one number per claim, no exclamation marks, no countdowns, no jargon
  * (no GEO/AEO/LLM/prompt/credits/garantie). Every mail is pure data in → text out.
  */
-import type { Business, Engine, Finding, Visibility } from "../types.js";
+import type { Business, Engine, EngineStip, Finding, InstableFinding, Severity, Stip, Visibility } from "../types.js";
 import { ENGINE_LABEL } from "../types.js";
+import { copy } from "../copy/index.js";
+import { criteriumFor, severityOf } from "../criteria.js";
 import { findingWordsNl, hostOfUrl, notFoundCountNl, visibilityLineNl } from "../shared/facts-nl.js";
 import { fixPathForFinding } from "../fixer/paths.js";
 import { formatDateNl } from "../publisher/render.js";
@@ -89,6 +91,17 @@ function sourceLine(f: Finding): string {
 export function findingBlock(f: Finding, opts: { promptText?: string | null; nextStep?: string } = {}): string {
   const w = findingWordsNl(f);
   const next = opts.nextStep ?? fixPathForFinding(f).labelNl;
+  if (w.recommendation) {
+    // The business was not named where its facts say it belongs; the fact itself is the evidence.
+    const lines = [
+      opts.promptText ? `Vraag: ${opts.promptText}` : `Aanbevelingsvraag over: ${w.what}`,
+      `${engineName(f.engine)} noemt je niet (${w.frequency})`,
+      `${copy.recommendation.line} Jouw gegeven is: ${w.correct}`,
+      f.sourceType === "none" ? copy.recommendation.noSource : `Waar het vandaan komt: ${sourceLine(f)}`,
+      `Wat we doen: ${next}`,
+    ];
+    return lines.join("\n");
+  }
   if (w.notFound) {
     // No wrong value and no source: the engine knows nothing about the business.
     const lines = [
@@ -108,6 +121,50 @@ export function findingBlock(f: Finding, opts: { promptText?: string | null; nex
     `Wat we doen: ${next}`,
   ];
   return lines.join("\n");
+}
+
+/** "Stip: rood. AI stuurt klanten weg." plus one line per engine that was checked. */
+export function stipParagraph(d: { stip?: Stip; engineStips?: EngineStip[] }): string {
+  if (!d.stip) return "";
+  const lines = [`Stip: ${copy.stip[d.stip].toLowerCase()}. ${copy.stipMeaning[d.stip]}. ${copy.stipLine[d.stip]}`];
+  const per = (d.engineStips ?? []).map((e) => `${engineName(e.engine)}: ${copy.stip[e.stip].toLowerCase()}`);
+  if (per.length) lines.push(`Per AI: ${per.join(", ")}.`);
+  return lines.join("\n");
+}
+
+function severityFor(f: Finding): Severity {
+  return severityOf(f.criterium ?? criteriumFor(f.factKey, f.subject, null, { otherEntity: f.sourceType === "other_entity" }));
+}
+
+/**
+ * Findings grouped by severity, worst first, each as a findingBlock. Order:
+ * afhakers (one wrong answer and the customer does not come), misleiders,
+ * verwarring. Never a score.
+ */
+export function findingsBySeverityText(findings: Finding[], opts: { max?: number; nextStepFor?: (f: Finding) => string } = {}): string {
+  const max = opts.max ?? 8;
+  const order: Severity[] = ["afhaker", "misleider", "verwarring"];
+  const parts: string[] = [];
+  let used = 0;
+  for (const sev of order) {
+    const list = findings.filter((f) => severityFor(f) === sev);
+    if (!list.length) continue;
+    const shown = list.slice(0, Math.max(0, max - used));
+    if (!shown.length) break;
+    used += shown.length;
+    parts.push(`${copy.severity[sev]} (${list.length}): ${copy.severityExplain[sev]}\n\n${shown.map((f) => findingBlock(f, { nextStep: opts.nextStepFor?.(f) })).join("\n\n")}`);
+  }
+  return parts.join("\n\n");
+}
+
+/** Lines for instable answers (below the threshold): shown, no fix. */
+export function instableText(instable: InstableFinding[] | undefined): string {
+  if (!instable?.length) return "";
+  const lines = instable.slice(0, 5).map((f) => {
+    const w = findingWordsNl(f);
+    return `- ${engineName(f.engine)} zei ${w.frequency} "${w.wrong}" over ${w.what}; het is ${w.correct}.`;
+  });
+  return `${copy.instable} (${instable.length}): ${copy.instableLine}\n${lines.join("\n")}`;
 }
 
 /** Paragraph for the baseline / monthly mails when answers came back empty; empty string otherwise. */
@@ -187,6 +244,10 @@ export interface BaselineData {
   promptsById?: Record<string, string>;
   links: Links;
   engines: Engine[];
+  /** colour of the dot; when present the mail opens with it and groups findings by severity */
+  stip?: Stip;
+  engineStips?: EngineStip[];
+  instable?: InstableFinding[];
 }
 
 export function baselineSummaryEmail(d: BaselineData): Mail {
@@ -201,8 +262,10 @@ export function baselineSummaryEmail(d: BaselineData): Mail {
         : d.wrongAnswers === 0
           ? `Eerste controle van ${d.business.name}: ${notFoundCountNl(notFoundFindings || d.notFoundAnswers || 0)}`
           : `Eerste controle van ${d.business.name}: ${d.wrongAnswers} ${d.wrongAnswers === 1 ? "antwoord klopt" : "antwoorden kloppen"} niet`;
-  const blocks = d.findings.slice(0, 8).map((f) => findingBlock(f)).join("\n\n");
+  const blocks = d.stip ? findingsBySeverityText(d.findings) : d.findings.slice(0, 8).map((f) => findingBlock(f)).join("\n\n");
   const nf = notFoundParagraph({ business: d.business, notFoundAnswers: d.notFoundAnswers, visibility, notFoundFindings });
+  const stip = stipParagraph(d);
+  const instable = instableText(d.instable);
   const text = `Hoi,
 
 Op ${formatDateNl(d.checkedAt)} stelden we ${d.totalAnswers} vragen over ${d.business.name} aan ${engines}. ${
@@ -212,7 +275,7 @@ Op ${formatDateNl(d.checkedAt)} stelden we ${d.totalAnswers} vragen over ${d.bus
         ? "Geen verkeerde antwoorden."
         : `${d.wrongAnswers} ${d.wrongAnswers === 1 ? "antwoord klopte" : "antwoorden klopten"} niet. Dit is wat we vonden en wat we eraan doen.`
   }
-${nf ? `\n${nf}\n` : ""}${blocks ? `\n${blocks}\n` : ""}${d.findings.length > 8 ? `\nEn nog ${d.findings.length - 8} ${d.findings.length - 8 === 1 ? "fout" : "fouten"}, zie je overzicht.\n` : ""}
+${stip ? `\n${stip}\n` : ""}${nf ? `\n${nf}\n` : ""}${blocks ? `\n${blocks}\n` : ""}${d.findings.length > 8 ? `\nEn nog ${d.findings.length - 8} ${d.findings.length - 8 === 1 ? "fout" : "fouten"}, zie je overzicht.\n` : ""}${instable ? `\n${instable}\n` : ""}
 Elke fout controleren we opnieuw zodra de bron is aangepast. Je hoort van ons als een antwoord is hersteld, met het antwoord van voor en na.
 
 Je overzicht: ${d.links.dashboardUrl}
@@ -301,24 +364,35 @@ export interface MonthlyReportData {
   openFindings: OpenFindingLine[];
   links: Links;
   engines: Engine[];
+  stip?: Stip;
+  engineStips?: EngineStip[];
+  instable?: InstableFinding[];
 }
 
 export function monthlyReportEmail(d: MonthlyReportData): Mail {
   const line = statusLine(d);
-  const subject = `${d.business.name} in ${d.month}: ${line}`;
+  const subject = d.stip ? `${d.business.name} in ${d.month}: ${copy.stip[d.stip].toLowerCase()}, ${line}` : `${d.business.name} in ${d.month}: ${line}`;
   const proofs = d.proofCards
     .map((p) => `${engineName(p.engine)} zei: "${p.before}"\nNu: "${p.after}"\nBron: ${p.source}, hersteld in ${p.days} ${p.days === 1 ? "dag" : "dagen"}.`)
     .join("\n\n");
-  const open = d.openFindings.map((o) => findingBlock(o.finding, { nextStep: o.nextStep })).join("\n\n");
+  const nextStepOf = new Map(d.openFindings.map((o) => [o.finding.id, o.nextStep]));
+  const open = d.stip
+    ? findingsBySeverityText(
+        d.openFindings.map((o) => o.finding),
+        { max: 50, nextStepFor: (f) => nextStepOf.get(f.id) ?? fixPathForFinding(f).labelNl },
+      )
+    : d.openFindings.map((o) => findingBlock(o.finding, { nextStep: o.nextStep })).join("\n\n");
   const nf = notFoundParagraph({ business: d.business, notFoundAnswers: d.notFoundAnswers, visibility: d.visibility, notFoundFindings: d.notFound });
+  const stip = stipParagraph(d);
+  const instable = instableText(d.instable);
   const text = `Hoi,
 
 Controle van ${formatDateNl(d.checkedAt)}: ${line}.
 
 We stelden ${d.totalAnswers} vragen over ${d.business.name} aan ${d.engines.map(engineName).join(", ")}.
-${nf ? `\n${nf}\n` : ""}${proofs ? `\nHersteld deze maand\n\n${proofs}\n` : ""}${open ? `\nNog open\n\n${open}\n` : ""}${
+${stip ? `\n${stip}\n` : ""}${nf ? `\n${nf}\n` : ""}${proofs ? `\nHersteld deze maand\n\n${proofs}\n` : ""}${open ? `\nNog open\n\n${open}\n` : ""}${
     !proofs && !open ? "\nEr is niets te herstellen. Fijn.\n" : ""
-  }
+  }${instable ? `\n${instable}\n` : ""}
 Alle antwoorden, met datum en bron: ${d.links.dashboardUrl}
 
 Groet,

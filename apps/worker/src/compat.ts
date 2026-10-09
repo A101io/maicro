@@ -52,6 +52,11 @@ export async function runScan(opts: RunScanOptions): Promise<ScanReport> {
     engines: [],
     findings: [],
     correct: [],
+    stip: "grijs",
+    engineStips: [],
+    findingsBySeverity: { afhaker: [], misleider: [], verwarring: [] },
+    instable: [],
+    criteriaNotFound: [],
   };
 }
 

@@ -2,7 +2,7 @@
  * Dutch, human wording for fact keys and normalised claim values.
  * Used by the correction emails, the reports and the proof cards.
  */
-import { NOT_FOUND_LABEL, NOT_FOUND_VALUE, type FactKey, type Finding } from "../types.js";
+import { ABSENT_LABEL, ABSENT_VALUE, NOT_FOUND_LABEL, NOT_FOUND_VALUE, PRESENT_VALUE, type FactKey, type Finding } from "../types.js";
 
 const DAYS = ["maandag", "dinsdag", "woensdag", "donderdag", "vrijdag", "zaterdag", "zondag"];
 
@@ -28,6 +28,14 @@ export function factLabelNl(factKey: FactKey, subject: string | null): string {
       return subject ? `de afspraak over ${subject}` : "de afspraken";
     case "payment":
       return "de betaalmogelijkheden";
+    case "area":
+      return subject ? `of ${subject} in het werkgebied ligt` : "het werkgebied";
+    case "urgency":
+      return "de spoeddienst";
+    case "credential":
+      return subject ? `de erkenning ${subject}` : "de erkenningen";
+    case "identity":
+      return subject ? `of dit hetzelfde bedrijf is als ${subject}` : "of dit hetzelfde bedrijf is";
     default:
       return "de gegevens";
   }
@@ -57,6 +65,14 @@ export function factFieldNl(factKey: FactKey, subject: string | null): string {
       return subject ? `Beleid: ${subject}` : "Beleid";
     case "payment":
       return "Betalen";
+    case "area":
+      return subject ? `Werkgebied: ${subject}` : "Werkgebied";
+    case "urgency":
+      return "Spoed";
+    case "credential":
+      return subject ? `Erkenning: ${subject}` : "Erkenningen";
+    case "identity":
+      return "Naamgenoot";
     default:
       return "Gegevens";
   }
@@ -66,7 +82,13 @@ export function factFieldNl(factKey: FactKey, subject: string | null): string {
 export function valueNl(factKey: FactKey, value: string): string {
   const v = value.trim();
   if (v === NOT_FOUND_LABEL || v === NOT_FOUND_VALUE) return NOT_FOUND_LABEL;
+  if (v === ABSENT_LABEL || v === ABSENT_VALUE) return ABSENT_LABEL;
+  if (v === PRESENT_VALUE) return "genoemd";
   const lower = v.toLowerCase();
+  if (factKey === "identity") {
+    if (lower === "no" || lower === "nee") return "een ander bedrijf";
+    if (lower === "yes" || lower === "ja") return "hetzelfde bedrijf";
+  }
   if (factKey === "existence") {
     if (["closed", "permanently_closed", "permanent gesloten", "permanently closed"].includes(lower)) return "definitief gesloten";
     if (["temporarily_closed", "temporarily closed"].includes(lower)) return "tijdelijk gesloten";
@@ -91,19 +113,23 @@ export interface FindingWordsNl {
   notFound: boolean;
   /** "ChatGPT vond niets over de openingstijden op zondag" style line for not_found; empty otherwise */
   notFoundLine: string;
+  /** true when the finding comes from a recommendation question (the business was not named) */
+  recommendation: boolean;
 }
 
-export function findingWordsNl(f: Pick<Finding, "factKey" | "subject" | "wrongValue" | "correctValue" | "frequency" | "sampleCount"> & Partial<Pick<Finding, "verdict">>): FindingWordsNl {
+export function findingWordsNl(f: Pick<Finding, "factKey" | "subject" | "wrongValue" | "correctValue" | "frequency" | "sampleCount"> & Partial<Pick<Finding, "verdict" | "evidenceKind">>): FindingWordsNl {
   const notFound = f.verdict === "not_found" || f.wrongValue === NOT_FOUND_LABEL || f.wrongValue === NOT_FOUND_VALUE;
+  const recommendation = f.evidenceKind === "recommendation" || f.wrongValue === ABSENT_LABEL || f.wrongValue === ABSENT_VALUE;
   const what = factLabelNl(f.factKey, f.subject);
   return {
     what,
     field: factFieldNl(f.factKey, f.subject),
-    wrong: notFound ? NOT_FOUND_LABEL : valueNl(f.factKey, f.wrongValue),
+    wrong: notFound ? NOT_FOUND_LABEL : recommendation ? ABSENT_LABEL : valueNl(f.factKey, f.wrongValue),
     correct: valueNl(f.factKey, f.correctValue),
     frequency: `${f.frequency} van de ${f.sampleCount} keer`,
     notFound,
     notFoundLine: notFound ? `vond niets over ${what}` : "",
+    recommendation,
   };
 }
 

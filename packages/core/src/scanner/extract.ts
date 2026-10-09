@@ -11,7 +11,7 @@
  *    LLM call fails.
  */
 import { z } from "zod";
-import { NOT_FOUND_VALUE, type Claim, type FactKey, type Facts, type Prompt } from "../types";
+import { ABSENT_VALUE, FACT_KEYS, NOT_FOUND_VALUE, PRESENT_VALUE, type Claim, type FactKey, type Facts, type Prompt } from "../types";
 import {
   DAY_NAMES_NL,
   normalizeAddress,
@@ -29,7 +29,66 @@ export interface ExtractOptions {
   mode?: ExtractMode;
 }
 
-export type PromptLike = Pick<Prompt, "category" | "probes" | "textNl">;
+export type PromptLike = Pick<Prompt, "category" | "probes" | "textNl"> & Partial<Pick<Prompt, "kind" | "criterium">>;
+
+export function isRecommendationPrompt(prompt: PromptLike): boolean {
+  return prompt.kind === "recommendation";
+}
+
+// ---------------------------------------------------------------------------
+// Recommendation answers: is the business named at all?
+// ---------------------------------------------------------------------------
+
+const NAME_STOPWORDS = new Set(["de", "het", "een", "van", "der", "den", "en", "bv", "b.v.", "vof", "v.o.f.", "nv", "the", "&", "in", "te", "op", "aan", "bij"]);
+
+/** Lowercase, strip diacritics, punctuation and legal suffixes. */
+export function normalizeName(raw: string): string {
+  return raw
+    .toLowerCase()
+    .normalize("NFD")
+    .replace(/[̀-ͯ]/g, "")
+    .replace(/\b(b\.?v\.?|v\.?o\.?f\.?|n\.?v\.?|cv|eenmanszaak)\b/g, " ")
+    .replace(/[^a-z0-9]+/g, " ")
+    .replace(/\s+/g, " ")
+    .trim();
+}
+
+function nameTokens(name: string): string[] {
+  return normalizeName(name)
+    .split(" ")
+    .filter((t) => t.length >= 3 && !NAME_STOPWORDS.has(t));
+}
+
+/**
+ * Does the answer name this business? Exact match on the normalised name, or
+ * most of its distinctive words (and, when the name is a single common word,
+ * the place as well). Never looks at position or count.
+ */
+export function mentionsBusiness(answerText: string, facts: Pick<Facts, "name" | "place">): boolean {
+  const answer = ` ${normalizeName(answerText)} `;
+  const full = normalizeName(facts.name);
+  if (!full) return false;
+  const tokens = nameTokens(facts.name);
+  // One distinctive word only ("Jansen"): ask for the place too so a namesake elsewhere does not count.
+  const placeOk = tokens.length > 1 || answer.includes(` ${normalizeName(facts.place)} `);
+  if (answer.includes(` ${full} `)) return placeOk;
+  if (!tokens.length) return false;
+  const hits = tokens.filter((t) => answer.includes(` ${t} `) || answer.includes(` ${t}s `)).length;
+  const needed = Math.max(1, Math.ceil(tokens.length * 0.6));
+  return hits >= needed && placeOk;
+}
+
+/**
+ * The single claim for a recommendation answer: PRESENT_VALUE when the
+ * business is named, ABSENT_VALUE otherwise, keyed to the prompt's probe so
+ * compare.ts can hang the finding on the linked criterium.
+ */
+export function extractRecommendation(answerText: string, facts: Facts, prompt: PromptLike, sampleId = ""): Claim[] {
+  const first = prompt.probes[0] ?? prompt.category;
+  const { factKey, subject } = parseProbe(first);
+  const present = mentionsBusiness(answerText, facts);
+  return [{ sampleId, factKey, subject, value: present ? PRESENT_VALUE : ABSENT_VALUE, confidence: 0.8, otherEntity: false, rawQuote: answerText.trim().slice(0, 300) }];
+}
 
 /** Pick the extraction mode from the environment. */
 export function defaultExtractMode(): ExtractMode {
@@ -118,8 +177,9 @@ export function detectOtherEntity(answer: string, facts: Facts): boolean {
   const place = facts.place.toLowerCase();
   const lower = answer.toLowerCase();
   if (/dit gaat over .+ in [A-Z]/.test(answer) && !lower.includes(`dit gaat over ${facts.name.toLowerCase()} in ${place}`)) return true;
+  const area = new Set((facts.serviceArea?.places ?? []).map((p) => p.toLowerCase()));
   for (const city of NL_CITIES) {
-    if (city.toLowerCase() === place) continue;
+    if (city.toLowerCase() === place || area.has(city.toLowerCase())) continue;
     const re = new RegExp(`\\bin ${city.replace(/[-'. ]/g, (c) => `\\${c}`)}\\b`, "i");
     if (re.test(answer) && !lower.includes(`niet in ${city.toLowerCase()}`)) return true;
   }
@@ -160,9 +220,11 @@ function yesNo(answer: string): "yes" | "no" | null {
 }
 
 export function extractClaimsRules(answerText: string, facts: Facts, prompt: PromptLike, sampleId = ""): Claim[] {
+  if (isRecommendationPrompt(prompt)) return extractRecommendation(answerText, facts, prompt, sampleId);
   if (looksNotFound(answerText)) return [notFoundClaim(prompt, sampleId, 0.9, answerText)];
   const claims: Claim[] = [];
-  const otherEntity = detectOtherEntity(answerText, facts);
+  // An identity question ("is X in Y hetzelfde als X in Z?") names the other place by design.
+  const otherEntity = prompt.category === "identity" || prompt.category === "area" ? false : detectOtherEntity(answerText, facts);
   const lower = answerText.toLowerCase();
   const push = (factKey: FactKey, subject: string | null, value: string, rawQuote: string, confidence = 0.7) => {
     if (claims.some((c) => c.factKey === factKey && c.subject === subject)) return;
@@ -226,9 +288,17 @@ export function extractClaimsRules(answerText: string, facts: Facts, prompt: Pro
       }
       case "service":
       case "policy":
-      case "payment": {
+      case "payment":
+      case "area":
+      case "credential":
+      case "identity": {
         const v = yesNo(answerText);
         if (v && subject) push(factKey, subject, v, answerText);
+        break;
+      }
+      case "urgency": {
+        const v = yesNo(answerText);
+        if (v) push("urgency", null, v, answerText);
         break;
       }
       case "price": {
@@ -247,7 +317,7 @@ export function extractClaimsRules(answerText: string, facts: Facts, prompt: Pro
 // ---------------------------------------------------------------------------
 
 const ClaimSchema = z.object({
-  factKey: z.enum(["existence", "hours", "phone", "address", "website", "service", "price", "policy", "payment"]),
+  factKey: z.enum(FACT_KEYS as [FactKey, ...FactKey[]]),
   subject: z.string().nullable(),
   value: z.string(),
   confidence: z.number().min(0).max(1),
@@ -269,12 +339,12 @@ const EXTRACTION_JSON_SCHEMA = {
         additionalProperties: false,
         required: ["factKey", "subject", "value", "confidence", "otherEntity", "rawQuote"],
         properties: {
-          factKey: { type: "string", enum: ["existence", "hours", "phone", "address", "website", "service", "price", "policy", "payment"] },
-          subject: { type: ["string", "null"], description: 'Sub-key: day index "0".."6" (0 = maandag) for hours, service/price/policy name, "pin" for payment, else null.' },
+          factKey: { type: "string", enum: FACT_KEYS },
+          subject: { type: ["string", "null"], description: 'Sub-key: day index "0".."6" (0 = maandag) for hours, service/price/policy/credential name, "pin" for payment, place name for area, the other business for identity, else null.' },
           value: {
             type: "string",
             description:
-              'Normalised: existence open|temporarily_closed|permanently_closed; hours "HH:MM-HH:MM" or "closed"; phone "+31XXXXXXXXX"; address "straat nummer postcode plaats"; website hostname; service/policy/payment yes|no; price decimal number.',
+              'Normalised: existence open|temporarily_closed|permanently_closed; hours "HH:MM-HH:MM" or "closed"; phone "+31XXXXXXXXX"; address "straat nummer postcode plaats"; website hostname; service/policy/payment/area/urgency/credential yes|no; identity yes (same business) | no (different business); price decimal number.',
           },
           confidence: { type: "number" },
           otherEntity: { type: "boolean", description: "True when the answer is about a business with the same name in a different place." },
@@ -359,7 +429,11 @@ function postNormalise(factKey: FactKey, value: string): string {
     }
     case "service":
     case "policy":
-    case "payment": {
+    case "payment":
+    case "area":
+    case "urgency":
+    case "credential":
+    case "identity": {
       const v = value.toLowerCase().trim();
       return v === "ja" ? "yes" : v === "nee" ? "no" : v;
     }
@@ -375,6 +449,8 @@ function postNormalise(factKey: FactKey, value: string): string {
 export async function extractClaims(answerText: string, facts: Facts, prompt: PromptLike, opts: ExtractOptions = {}): Promise<Claim[]> {
   const sampleId = opts.sampleId ?? "";
   if (!answerText.trim()) return [];
+  // A recommendation answer is judged on one thing (is the business named); no model needed.
+  if (isRecommendationPrompt(prompt)) return extractRecommendation(answerText, facts, prompt, sampleId);
   const mode = opts.mode ?? defaultExtractMode();
   if (mode === "llm") {
     try {

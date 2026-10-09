@@ -7,11 +7,12 @@
  * Mock mode (MAICRO_MOCK=1 or no keys) runs the whole pipeline offline with
  * deterministic synthetic answers.
  */
-import { ENGINES, visibilityFor, type Engine, type Facts, type Finding, type Prompt, type ScanKind, type ScanReport, type Sample } from "../types";
+import { ENGINES, visibilityFor, type Engine, type Facts, type Finding, type InstableFinding, type Prompt, type ScanKind, type ScanReport, type Sample, type SectorSlug } from "../types";
 import { db as defaultDb, type Db, type FindingInput } from "../db";
 import { generatePrompts, selectFreeScanPrompts } from "../prompts";
 import { attributeAll, type AttributionContext } from "./attribute";
 import { compare, groupKey, type ComparableSample, type CompareResult } from "./compare";
+import { computeStip, groupBySeverity } from "./stip";
 import { getEngines, type EngineClient } from "./engines";
 import { ENGINE_TIMEOUT_MS } from "./engines/types";
 import { defaultExtractMode, extractClaims } from "./extract";
@@ -26,6 +27,7 @@ export { getEngines, getEngine, availableEngines, createMockEngine, setCopilotAd
 export type { EngineClient, AskContext, EngineAnswer } from "./engines";
 export * from "./resolve";
 export * from "./onboard";
+export * from "./stip";
 
 /** Defaults per scan kind (ARCHITECTURE.md workflows A and C). */
 export const SCAN_DEFAULTS: Record<ScanKind, { engines: Engine[]; samplesPerPrompt: number }> = {
@@ -68,15 +70,15 @@ interface Asked {
 }
 
 /** Load prompts for a scan, generating + storing them when the business has none yet. */
-async function loadPrompts(db: Db, businessId: string, facts: Facts, kind: ScanKind, promptIds?: string[]): Promise<Prompt[]> {
+async function loadPrompts(db: Db, businessId: string, facts: Facts, kind: ScanKind, sector: SectorSlug | null, promptIds?: string[]): Promise<Prompt[]> {
   let prompts = await db.listPrompts(businessId, { activeOnly: true });
-  if (!prompts.length) prompts = await db.insertPrompts(businessId, generatePrompts(facts));
+  if (!prompts.length) prompts = await db.insertPrompts(businessId, generatePrompts(facts, { sector }));
   if (promptIds?.length) {
     const set = new Set(promptIds);
     return prompts.filter((p) => set.has(p.id));
   }
   if (kind === "free") {
-    const free = selectFreeScanPrompts(prompts, facts);
+    const free = selectFreeScanPrompts(prompts, facts, { sector });
     return free.length ? free : prompts.slice(0, 6);
   }
   return prompts;
@@ -162,7 +164,7 @@ export async function runScan(opts: RunScanOptions): Promise<ScanReport> {
   if (!business) throw new Error(`business ${opts.businessId} not found`);
   const facts = await db.latestFacts(business.id);
   if (!facts) throw new Error(`business ${business.id} has no facts yet`);
-  const prompts = await loadPrompts(db, business.id, facts, opts.kind, opts.promptIds);
+  const prompts = await loadPrompts(db, business.id, facts, opts.kind, business.sector, opts.promptIds);
   if (!prompts.length) throw new Error(`business ${business.id} has no prompts to scan`);
 
   const clients = opts.clients?.length ? opts.clients.filter((c) => engines.includes(c.engine)) : getEngines(engines);
@@ -223,14 +225,16 @@ export async function runScan(opts: RunScanOptions): Promise<ScanReport> {
       sourceUrl: f.sourceUrl,
       sourceType: f.sourceType,
       evidenceBefore: f.wrongSampleIds[0] ?? null,
+      evidenceKind: f.evidenceKind,
+      criterium: f.criterium,
     }));
     const findings = await db.upsertFindings(inputs);
 
     // Diff vs previous open findings: anything we re-checked and no longer saw wrong is resolved.
-    const stillWrong = new Set(findings.map((f) => `${groupKey(f.factKey, f.subject, f.engine)}|${f.verdict}`));
+    const stillWrong = new Set(findings.map((f) => `${groupKey(f.factKey, f.subject, f.engine, f.evidenceKind)}|${f.verdict}`));
     const resolved: Finding[] = [];
     for (const prev of previousOpen) {
-      const key = groupKey(prev.factKey, prev.subject, prev.engine);
+      const key = groupKey(prev.factKey, prev.subject, prev.engine, prev.evidenceKind);
       if (!result.checkedKeys.has(key) || stillWrong.has(`${key}|${prev.verdict}`)) continue;
       const after = result.correct.find((c) => c.engine === prev.engine && comparable.some((s) => s.sampleId === c.sampleId && s.prompt.probes.some((p) => p.startsWith(prev.factKey))));
       resolved.push(await db.markFindingResolved(prev.id, after?.sampleId ?? null));
@@ -244,7 +248,7 @@ export async function runScan(opts: RunScanOptions): Promise<ScanReport> {
       notFound: findings.filter((f) => f.verdict === "not_found").length,
       newFindings: findings.filter((f) => f.scanRunId === scanRun.id && !previousOpen.some((p) => p.id === f.id)).length,
       resolved: resolved.length,
-      unstable: result.unstable.length,
+      unstable: result.instable.length,
       costCents,
     });
     opts.onProgress?.({ type: "phase", phase: "done" });
@@ -270,6 +274,26 @@ function assembleReport(args: {
   const verdictOf = (s: Sample) => result.verdicts.get(s.id);
   const wrongAnswers = samples.filter((s) => verdictOf(s) === "wrong" || verdictOf(s) === "other_entity").length;
   const notFoundAnswers = samples.filter((s) => verdictOf(s) === "not_found").length;
+  const instable: InstableFinding[] = result.instable.map((c) => ({
+    businessId: business.id,
+    scanRunId: scanRun.id,
+    factKey: c.factKey,
+    subject: c.subject,
+    engine: c.engine,
+    verdict: c.verdict,
+    wrongValue: c.wrongValue,
+    correctValue: c.correctValue,
+    frequency: c.frequency,
+    sampleCount: c.sampleCount,
+    sourceUrl: null,
+    sourceType: c.sourceType ?? "none",
+    evidenceBefore: c.wrongSampleIds[0] ?? null,
+    evidenceKind: c.evidenceKind,
+    criterium: c.criterium,
+    instable: true,
+  }));
+  const criteriaNotFound = result.criteriaNotFound.map((c) => ({ ...c }));
+  const { stip, engineStips } = computeStip({ engines, samples, verdicts: result.verdicts, findings, instable, criteriaNotFound, unavailable });
   return {
     business: { id: business.id, slug: business.slug, name: business.name, place: business.place },
     scanRunId: scanRun.id,
@@ -282,6 +306,11 @@ function assembleReport(args: {
     engines: engineStats(engines, samples, result.verdicts, unavailable),
     findings,
     correct: result.correct.map(({ prompt, engine, value }) => ({ prompt, engine, value })),
+    stip,
+    engineStips,
+    findingsBySeverity: groupBySeverity(findings),
+    instable,
+    criteriaNotFound,
   };
 }
 

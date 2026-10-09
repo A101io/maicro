@@ -107,13 +107,36 @@ export const NOT_FOUND_PATH: FixPath = {
   unfixableNoteNl: "AI noemt je na 60 dagen nog steeds niet. Je feitenpagina en profielen staan goed; we blijven elke maand controleren.",
 };
 
-export function fixPathFor(sourceType: SourceType, verdict?: Finding["verdict"]): FixPath {
+/**
+ * Not named in a recommendation ("welke loodgieter in Zwolle met spoed") while
+ * the facts say the business belongs there, and no cited page carries the
+ * fact. Same remedy as not found: put the fact on the facts page and in every
+ * profile, then recheck after 21 days.
+ */
+export const RECOMMENDATION_PATH: FixPath = {
+  sourceType: "none",
+  action: "republish",
+  recheckDays: 21,
+  escalation: "resync",
+  followUpDays: [45],
+  unfixableAfterDays: 60,
+  labelNl: "Niet genoemd: we zetten dit gegeven op je feitenpagina en in je profielen, en controleren na 3 weken opnieuw.",
+  unfixableNoteNl: "AI noemt je na 60 dagen nog steeds niet bij deze vraag. Je gegevens staan goed; we blijven elke maand controleren.",
+};
+
+export function fixPathFor(sourceType: SourceType, verdict?: Finding["verdict"], evidenceKind?: Finding["evidenceKind"]): FixPath {
   if (verdict === "not_found") return NOT_FOUND_PATH;
+  if (evidenceKind === "recommendation" && sourceType === "none") return RECOMMENDATION_PATH;
   return FIX_PATHS[sourceType] ?? FIX_PATHS.none;
 }
 
-export function fixPathForFinding(finding: Pick<Finding, "sourceType" | "verdict">): FixPath {
-  return fixPathFor(finding.sourceType, finding.verdict);
+export function fixPathForFinding(finding: Pick<Finding, "sourceType" | "verdict"> & Partial<Pick<Finding, "evidenceKind">>): FixPath {
+  return fixPathFor(finding.sourceType, finding.verdict, finding.evidenceKind);
+}
+
+/** Does this finding take the "make it findable" route (facts page + channels)? */
+export function isFindabilityFinding(finding: Pick<Finding, "sourceType" | "verdict"> & Partial<Pick<Finding, "evidenceKind">>): boolean {
+  return finding.verdict === "not_found" || (finding.evidenceKind === "recommendation" && finding.sourceType === "none");
 }
 
 export function addDays(from: Date | string, days: number): Date {

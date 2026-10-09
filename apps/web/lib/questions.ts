@@ -27,6 +27,14 @@ export function questionFor(factKey: FactKey, subject: string | null, name: stri
       return subject ? `Geldt bij ${who}: ${subject}?` : `Welke afspraken gelden bij ${who}?`;
     case "payment":
       return subject === "pin" || !subject ? `Kan ik pinnen bij ${who}?` : `Kan ik met ${subject} betalen bij ${who}?`;
+    case "area":
+      return subject ? `Komt ${who} ook in ${subject}?` : `Waar werkt ${who}?`;
+    case "urgency":
+      return `Heeft ${who} een spoeddienst?`;
+    case "credential":
+      return subject ? `Is ${who} erkend voor ${subject}?` : `Welke erkenningen heeft ${who}?`;
+    case "identity":
+      return subject ? `Is ${who} hetzelfde als ${subject}?` : `Is ${who} hetzelfde als het bedrijf met die naam elders?`;
   }
 }
 
