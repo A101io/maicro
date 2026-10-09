@@ -1,23 +1,23 @@
 import { copy } from "@maicro/core/copy";
 
+/** Section 13: Vragen. Plain <details> so it works without JavaScript. */
 export function Faq() {
-  const f = copy.landing.faq;
+  const V = copy.landing.vragen;
   return (
-    <section id="vragen" className="section rule-top">
-      <div className="container grid grid-cols-1 gap-8 lg:grid-cols-12">
-        <h2 className="h2 lg:col-span-4">{f.h2}</h2>
-        <div className="divide-y divide-rule border-y border-rule lg:col-span-8">
-          {f.items.map((item) => (
-            <details key={item.q} className="group">
-              <summary className="flex items-center justify-between gap-4 py-4 text-[17px] font-medium">
-                <span>{item.q}</span>
-                <span aria-hidden className="font-mono text-secondary group-open:hidden">+</span>
-                <span aria-hidden className="hidden font-mono text-secondary group-open:inline">–</span>
-              </summary>
-              <p className="max-w-[60ch] pb-5 text-[16px] text-ink">{item.a}</p>
-            </details>
-          ))}
-        </div>
+    <section id="vragen" className="wrap section grid grid-cols-1 gap-8 lg:grid-cols-12 lg:gap-12">
+      <h2 className="h2 lg:col-span-4">{V.h2}</h2>
+      <div className="flex flex-col lg:col-span-8">
+        {V.items.map((it, i) => (
+          <details key={it.q} className={`border-t-[1.5px] border-line py-[18px] ${i === V.items.length - 1 ? "border-b-[1.5px]" : ""}`}>
+            <summary className="flex justify-between gap-4 text-[17px] font-bold">
+              <span>{it.q}</span>
+              <span aria-hidden className="text-muted">
+                +
+              </span>
+            </summary>
+            <p className="mt-3 max-w-[60ch] text-[16px] leading-[1.6] text-ink-2">{it.a}</p>
+          </details>
+        ))}
       </div>
     </section>
   );

@@ -1,0 +1,31 @@
+import type { Severity } from "@maicro/core/types";
+import { CRITERIA } from "@maicro/core/criteria";
+import { copy } from "@maicro/core/copy";
+import { Stip, type Tone } from "./Stip";
+
+export const severityTone: Record<Severity, Tone> = { afhaker: "rood", misleider: "oranje", verwarring: "grijs" };
+
+/** One of the three criteria cards: afhakers / misleiders / verwarring, rows from `CRITERIA` in core. */
+export function CriteriumCard({ severity, children }: { severity: Severity; children?: React.ReactNode }) {
+  const C = copy.landing.criteria;
+  const group = C.groups[severity];
+  const rows = CRITERIA.filter((c) => c.severity === severity);
+  return (
+    <div className="card flex flex-col gap-3.5 rounded-[20px] p-6">
+      <div className="flex items-center gap-2.5">
+        <Stip tone={severityTone[severity]} size={14} />
+        <span className="text-[19px] font-extrabold">{group.title}</span>
+      </div>
+      <p className="text-[15px] leading-[1.5] text-ink-2">{group.body}</p>
+      <div className="flex flex-col gap-2 text-[14px]">
+        {rows.map((c) => (
+          <div key={c.id} className="flex justify-between gap-3 border-t-[1.5px] border-panel pt-2">
+            <span className="font-semibold">{C.labels[c.id]}</span>
+            <span className="text-right text-muted">{C.questions[c.id]}</span>
+          </div>
+        ))}
+      </div>
+      {children}
+    </div>
+  );
+}

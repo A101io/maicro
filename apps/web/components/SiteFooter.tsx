@@ -1,27 +1,48 @@
 import Link from "next/link";
 import { copy } from "@maicro/core/copy";
-import { Wordmark } from "./Wordmark";
 
-export function SiteFooter() {
+/**
+ * Footer. `variant="full"`: four columns + legal line (landing, result).
+ * `variant="short"`: one line, legal left and a note right (sector pages, grey result).
+ */
+export function SiteFooter({ variant = "full", note, tagline }: { variant?: "full" | "short"; note?: string; tagline?: string }) {
   const f = copy.landing.footer;
-  return (
-    <footer className="border-t border-rule">
-      <div className="container flex flex-col gap-6 py-10 sm:flex-row sm:items-start sm:justify-between">
-        <div className="space-y-2">
-          <Wordmark />
-          <p className="max-w-[40ch] text-[14px] text-secondary">{copy.tagline}</p>
+  if (variant === "short") {
+    return (
+      <footer className="border-t-[1.5px] border-line bg-panel-2">
+        <div className="wrap flex flex-wrap justify-between gap-x-6 gap-y-2 py-10 text-[13px] text-muted">
+          <span>{f.legal}</span>
+          <span>{note ?? f.copyright}</span>
         </div>
-        <dl className="mono grid grid-cols-1 gap-x-8 gap-y-1 text-ink sm:grid-cols-2">
-          <div><dd>{f.person}</dd></div>
-          <div><dd>{f.kvk}</dd></div>
-          <div><dd>{f.address}</dd></div>
-          <div><dd>{f.vat}</dd></div>
-          <div><dd>{f.exclVat}</dd></div>
-          <div className="flex gap-4">
-            <Link href="/privacy">{f.privacy}</Link>
-            <Link href="/voorwaarden">{f.terms}</Link>
+      </footer>
+    );
+  }
+  return (
+    <footer className="border-t-[1.5px] border-line bg-panel-2">
+      <div className="wrap flex flex-col gap-10 pb-10 pt-14">
+        <div className="grid grid-cols-1 gap-8 sm:grid-cols-2 lg:grid-cols-[1.4fr_1fr_1fr_1fr]">
+          <div className="flex flex-col items-start gap-2.5">
+            <span className="text-[22px] font-extrabold" style={{ letterSpacing: "-0.5px" }}>
+              {copy.nav.wordmark}
+            </span>
+            <span className="max-w-[28ch] text-[14px] leading-[1.5] text-muted">{tagline ?? f.tagline}</span>
+            {note ? <span className="text-[13px] text-muted">{note}</span> : <span className="rounded-lg border-[1.5px] border-line bg-white px-2.5 py-1 text-[13px] text-muted">{f.lang}</span>}
           </div>
-        </dl>
+          {f.columns.map((c) => (
+            <div key={c.title} className="flex flex-col gap-2.5 text-[14px]">
+              <span className="font-bold">{c.title}</span>
+              {c.links.map((l) => (
+                <Link key={l.label} href={l.href} className="text-ink-2">
+                  {l.label}
+                </Link>
+              ))}
+            </div>
+          ))}
+        </div>
+        <div className="flex flex-col gap-1.5 border-t-[1.5px] border-line pt-6 text-[13px] leading-[1.5] text-muted">
+          <span>{f.legal}</span>
+          <span>{f.copyright}</span>
+        </div>
       </div>
     </footer>
   );

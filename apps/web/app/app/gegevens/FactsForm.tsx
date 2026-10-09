@@ -2,6 +2,7 @@
 
 import { useState } from "react";
 import type { Facts, Hours, PriceItem } from "@maicro/core/types";
+import { SECTOR_LIST } from "@maicro/core/prompts";
 import { copy } from "@maicro/core/copy";
 import { saveFacts } from "./actions";
 
@@ -18,15 +19,15 @@ function ChipInput({ name, label, hint, initial }: { name: string; label: string
   };
   return (
     <div>
-      <label htmlFor={`chip-${name}`} className="label">
+      <label htmlFor={`chip-${name}`} className="field-label">
         {label}
       </label>
-      <div className="flex min-h-11 flex-wrap items-center gap-2 rounded-btn border border-rule bg-white p-2 focus-within:border-ink">
+      <div className="flex min-h-11 flex-wrap items-center gap-2 rounded-[10px] border-[1.5px] border-line bg-white p-2 focus-within:border-ink">
         {items.map((it) => (
-          <span key={it} className="chip-neutral font-sans text-[14px]">
+          <span key={it} className="inline-flex items-center gap-1 rounded-pill bg-panel px-2.5 py-0.5 text-[14px]">
             {it}
             <input type="hidden" name={name} value={it} />
-            <button type="button" aria-label={`${F.fields.remove}: ${it}`} onClick={() => setItems(items.filter((x) => x !== it))} className="ml-1 text-secondary hover:text-ink">
+            <button type="button" aria-label={`${F.fields.remove}: ${it}`} onClick={() => setItems(items.filter((x) => x !== it))} className="ml-1 text-muted hover:text-ink">
               ×
             </button>
           </span>
@@ -44,7 +45,7 @@ function ChipInput({ name, label, hint, initial }: { name: string; label: string
           }}
           onBlur={add}
           placeholder={hint ?? F.fields.addItem}
-          className="min-w-[160px] flex-1 bg-transparent px-1 text-[15px] outline-none placeholder:text-secondary/70"
+          className="min-w-[160px] flex-1 bg-transparent px-1 text-[15px] outline-none placeholder:text-muted"
         />
       </div>
     </div>
@@ -60,7 +61,7 @@ function HoursRows({ initial }: { initial: Hours[] }) {
     <table className="w-full text-[15px]">
       <tbody>
         {rows.map((r, i) => (
-          <tr key={r.day} className="border-t border-rule">
+          <tr key={r.day} className="border-t-[1.5px] border-line">
             <th scope="row" className="w-[90px] py-2 pr-3 text-left align-top font-medium sm:w-[110px]">
               {F.days[r.day]}
             </th>
@@ -72,9 +73,9 @@ function HoursRows({ initial }: { initial: Hours[] }) {
                 </label>
                 {!r.closed && (
                   <>
-                    <input type="time" name={`hours.${r.day}.open`} value={r.open ?? ""} onChange={(e) => update(i, { open: e.target.value })} className="field-sm w-[112px] px-2 font-mono text-[13px]" aria-label={`${F.days[r.day]} ${F.fields.open}`} />
-                    <span className="text-secondary">–</span>
-                    <input type="time" name={`hours.${r.day}.close`} value={r.close ?? ""} onChange={(e) => update(i, { close: e.target.value })} className="field-sm w-[112px] px-2 font-mono text-[13px]" aria-label={`${F.days[r.day]} ${F.fields.close}`} />
+                    <input type="time" name={`hours.${r.day}.open`} value={r.open ?? ""} onChange={(e) => update(i, { open: e.target.value })} className="field-sm w-[112px] px-2 text-[14px]" aria-label={`${F.days[r.day]} ${F.fields.open}`} />
+                    <span className="text-muted">–</span>
+                    <input type="time" name={`hours.${r.day}.close`} value={r.close ?? ""} onChange={(e) => update(i, { close: e.target.value })} className="field-sm w-[112px] px-2 text-[14px]" aria-label={`${F.days[r.day]} ${F.fields.close}`} />
                   </>
                 )}
               </div>
@@ -91,27 +92,48 @@ function PriceRows({ initial }: { initial: PriceItem[] }) {
   return (
     <div className="space-y-2">
       {rows.map((p, i) => (
-        <div key={i} className="grid grid-cols-[1fr_110px_120px_auto] items-center gap-2">
+        <div key={i} className="grid grid-cols-[1fr_auto] items-center gap-2 sm:grid-cols-[1fr_110px_120px_auto]">
           <input name={`price.${i}.label`} defaultValue={p.label} placeholder={F.fields.priceLabel} className="field-sm" aria-label={F.fields.priceLabel} />
-          <input name={`price.${i}.amount`} type="number" step="0.01" min="0" defaultValue={p.amount} placeholder="0,00" className="field-sm font-mono" aria-label={F.fields.priceAmount} />
+          <input name={`price.${i}.amount`} type="number" step="0.01" min="0" defaultValue={p.amount} placeholder="0,00" className="field-sm" aria-label={F.fields.priceAmount} />
           <input name={`price.${i}.unit`} defaultValue={p.unit ?? ""} placeholder={F.fields.priceUnit} className="field-sm" aria-label={F.fields.priceUnit} />
-          <button type="button" className="text-[14px] text-secondary hover:text-ink" onClick={() => setRows(rows.filter((_, idx) => idx !== i))} aria-label={F.fields.remove}>
+          <button type="button" className="text-[14px] text-muted hover:text-ink" onClick={() => setRows(rows.filter((_, idx) => idx !== i))} aria-label={F.fields.remove}>
             ×
           </button>
         </div>
       ))}
-      <button type="button" className="text-[14px]" onClick={() => setRows([...rows, { label: "", amount: 0 }])}>
+      <button type="button" className="btn-link" onClick={() => setRows([...rows, { label: "", amount: 0 }])}>
         + {F.fields.addItem}
       </button>
     </div>
   );
 }
 
+function UrgencyFields({ initial }: { initial: Facts["urgency"] }) {
+  const [available, setAvailable] = useState(Boolean(initial?.available));
+  return (
+    <div className="grid gap-4 sm:grid-cols-2">
+      <div>
+        <label htmlFor="urgencyAvailable" className="field-label">{F.fields.urgencyAvailable}</label>
+        <select id="urgencyAvailable" name="urgencyAvailable" value={available ? "true" : "false"} onChange={(e) => setAvailable(e.target.value === "true")} className="field-sm">
+          <option value="false">{F.fields.no}</option>
+          <option value="true">{F.fields.yes}</option>
+        </select>
+      </div>
+      {available && (
+        <div>
+          <label htmlFor="urgencyHours" className="field-label">{F.fields.urgencyHours}</label>
+          <input id="urgencyHours" name="urgencyHours" defaultValue={initial?.hoursNl ?? ""} placeholder={F.fields.urgencyHoursHint} className="field-sm" />
+        </div>
+      )}
+    </div>
+  );
+}
+
 function Group({ title, children }: { title: string; children: React.ReactNode }) {
   return (
-    <fieldset className="card p-5">
+    <fieldset className="card p-5 sm:p-6">
       <legend className="sr-only">{title}</legend>
-      <h2 className="mb-4 font-sans text-[18px] font-semibold tracking-normal">{title}</h2>
+      <h2 className="h3 mb-4">{title}</h2>
       <div className="space-y-4">{children}</div>
     </fieldset>
   );
@@ -124,23 +146,23 @@ export function FactsForm({ facts }: { facts: Facts }) {
       <Group title={F.groups.basics}>
         <div className="grid gap-4 sm:grid-cols-2">
           <div>
-            <label htmlFor="name" className="label">{f.name}</label>
+            <label htmlFor="name" className="field-label">{f.name}</label>
             <input id="name" name="name" required defaultValue={facts.name} className="field-sm" />
           </div>
           <div>
-            <label htmlFor="place" className="label">{f.place}</label>
+            <label htmlFor="place" className="field-label">{f.place}</label>
             <input id="place" name="place" required defaultValue={facts.place} className="field-sm" />
           </div>
           <div>
-            <label htmlFor="address" className="label">{f.address}</label>
+            <label htmlFor="address" className="field-label">{f.address}</label>
             <input id="address" name="address" defaultValue={facts.address ?? ""} className="field-sm" />
           </div>
           <div>
-            <label htmlFor="postcode" className="label">{f.postcode}</label>
-            <input id="postcode" name="postcode" defaultValue={facts.postcode ?? ""} className="field-sm font-mono" />
+            <label htmlFor="postcode" className="field-label">{f.postcode}</label>
+            <input id="postcode" name="postcode" defaultValue={facts.postcode ?? ""} className="field-sm" />
           </div>
           <div>
-            <label htmlFor="openStatus" className="label">{f.openStatus}</label>
+            <label htmlFor="openStatus" className="field-label">{f.openStatus}</label>
             <select id="openStatus" name="openStatus" defaultValue={facts.openStatus} className="field-sm">
               {Object.entries(f.openStatusOptions).map(([k, v]) => (
                 <option key={k} value={k}>{v}</option>
@@ -153,16 +175,16 @@ export function FactsForm({ facts }: { facts: Facts }) {
       <Group title={F.groups.contact}>
         <div className="grid gap-4 sm:grid-cols-3">
           <div>
-            <label htmlFor="phone" className="label">{f.phone}</label>
-            <input id="phone" name="phone" type="tel" defaultValue={facts.phone ?? ""} className="field-sm font-mono" />
+            <label htmlFor="phone" className="field-label">{f.phone}</label>
+            <input id="phone" name="phone" type="tel" defaultValue={facts.phone ?? ""} className="field-sm" />
           </div>
           <div>
-            <label htmlFor="email" className="label">{f.email}</label>
+            <label htmlFor="email" className="field-label">{f.email}</label>
             <input id="email" name="email" type="email" defaultValue={facts.email ?? ""} className="field-sm" />
           </div>
           <div>
-            <label htmlFor="website" className="label">{f.website}</label>
-            <input id="website" name="website" type="url" defaultValue={facts.website ?? ""} className="field-sm font-mono" />
+            <label htmlFor="website" className="field-label">{f.website}</label>
+            <input id="website" name="website" type="url" defaultValue={facts.website ?? ""} className="field-sm" />
           </div>
         </div>
       </Group>
@@ -192,8 +214,37 @@ export function FactsForm({ facts }: { facts: Facts }) {
         <ChipInput name="notConfusedWith" label={f.notConfusedWith} hint={f.notConfusedWithHint} initial={facts.notConfusedWith} />
       </Group>
 
+      <Group title={F.groups.area}>
+        <ChipInput name="serviceAreaPlaces" label={f.serviceAreaPlaces} hint={f.serviceAreaPlacesHint} initial={facts.serviceArea?.places ?? []} />
+        <div className="max-w-[220px]">
+          <label htmlFor="serviceAreaRadiusKm" className="field-label">{f.serviceAreaRadiusKm}</label>
+          <input id="serviceAreaRadiusKm" name="serviceAreaRadiusKm" type="number" min="1" step="1" defaultValue={facts.serviceArea?.radiusKm ?? ""} className="field-sm" />
+        </div>
+      </Group>
+
+      <Group title={F.groups.urgency}>
+        <UrgencyFields initial={facts.urgency} />
+      </Group>
+
+      <Group title={F.groups.credentials}>
+        <ChipInput name="credentials" label={f.credentials} hint={f.credentialsHint} initial={facts.credentials ?? []} />
+      </Group>
+
+      <Group title={F.groups.sector}>
+        <div className="max-w-[420px]">
+          <label htmlFor="sector" className="field-label">{f.sector}</label>
+          <select id="sector" name="sector" defaultValue={facts.sector ?? ""} className="field-sm">
+            <option value="">{copy.sectorNone}</option>
+            {SECTOR_LIST.map((p) => (
+              <option key={p.slug} value={p.slug}>{copy.sectors[p.slug]}</option>
+            ))}
+          </select>
+          <p className="mt-1.5 text-[13px] text-muted">{copy.sectorHint}</p>
+        </div>
+      </Group>
+
       <div className="flex justify-end">
-        <button type="submit" className="btn-primary">
+        <button type="submit" className="btn-primary h-[52px]">
           {F.submit}
         </button>
       </div>

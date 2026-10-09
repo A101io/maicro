@@ -12,26 +12,26 @@ export default async function WelcomePage({ searchParams }: { searchParams: Prom
   const w = copy.welcome;
   return (
     <>
-      <SiteHeader minimal />
-      <main className="container max-w-[720px] py-12 sm:py-16">
-        {sp.mock === "1" && <p className="mono mb-4">{copy.checkout.mockNotice}</p>}
+      <SiteHeader variant="minimal" />
+      <main className="wrap max-w-[760px] py-12 sm:py-16">
+        {sp.mock === "1" && <p className="mb-4 text-[14px] text-muted">{copy.checkout.mockNotice}</p>}
         <h1 className="h2">{w.h1}</h1>
-        <p className="mt-3 text-[17px]">{w.body}</p>
-        <ol className="mt-8 divide-y divide-rule border-y border-rule">
+        <p className="lead mt-3">{w.body}</p>
+        <ol className="mt-8 divide-y-[1.5px] divide-line border-y-[1.5px] border-line">
           {w.steps.map((s, i) => (
-            <li key={s.title} className="grid gap-2 py-5 sm:grid-cols-[40px_1fr_auto] sm:items-center sm:gap-4">
-              <span className="font-mono text-[13px] text-secondary">0{i + 1}</span>
+            <li key={s.title} className="grid gap-3 py-5 sm:grid-cols-[44px_1fr_auto] sm:items-center sm:gap-4">
+              <span className="flex h-9 w-9 items-center justify-center rounded-full bg-ink text-[14px] font-extrabold text-white">{i + 1}</span>
               <div>
-                <h2 className="font-sans text-[18px] font-semibold tracking-normal">{s.title}</h2>
-                <p className="mt-1 text-[15px] text-secondary">{s.body}</p>
+                <h2 className="h3">{s.title}</h2>
+                <p className="mt-1 text-[15px] text-ink-2">{s.body}</p>
               </div>
-              <Link href={session ? s.href : `/inloggen?next=${encodeURIComponent(s.href)}${sp.business ? `&business=${sp.business}` : ""}`} className={i === 0 ? "btn-primary no-underline hover:no-underline" : "btn-small no-underline hover:no-underline"}>
+              <Link href={session ? s.href : `/inloggen?next=${encodeURIComponent(s.href)}${sp.business ? `&business=${sp.business}` : ""}`} className={i === 0 ? "btn-primary h-[52px]" : "btn-sm"}>
                 {s.cta}
               </Link>
             </li>
           ))}
         </ol>
-        {!session && <p className="mono mt-6">{w.loginHint}</p>}
+        {!session && <p className="mt-6 text-[14px] text-muted">{w.loginHint}</p>}
       </main>
       <SiteFooter />
     </>

@@ -58,3 +58,9 @@ export function hostOf(url: string | null | undefined): string {
 export function isEmail(s: string): boolean {
   return /^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/.test(s);
 }
+
+/** "7 oktober 2026, 14:32" */
+export function dateTimeLong(iso: string | Date): string {
+  const p = parts(iso);
+  return `${p.day} ${MONTHS_NL_LONG[p.month - 1]} ${p.year}, ${p.hour}:${p.minute}`;
+}

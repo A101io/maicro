@@ -1,30 +1,35 @@
 /**
- * Demo content. Two things live here:
- *  1. `demoReport()`: a static, fictional ScanReport for the landing page example
- *     (never touches the database).
- *  2. `seedDemo(db)`: in mock mode, creates the fictional owner business
+ * Demo content. Three things live here:
+ *  1. `demoReport()`: a static, fictional ScanReport (Bakkerij De Vries, red)
+ *     for /r/voorbeeld, matching docs/design-g/ResultG.dc.html.
+ *  2. `demoGreyReport()`: the grey state (Polyvale Installatie: AI kent je
+ *     niet) for /r/voorbeeld-grijs, matching ResultGGrey.dc.html.
+ *  3. `seedDemo(db)`: in mock mode, creates the fictional owner business
  *     (login: eigenaar@bakkerijdevries.nl) with a finished free scan so the
- *     dashboard and `/r/voorbeeld` (→ latest run) have content.
+ *     dashboard has content.
  */
 import type { Db } from "@maicro/core/db";
-import type { Engine, EngineStip, Finding, ScanReport } from "@maicro/core/types";
-import { prepareBusiness, runScan } from "@maicro/core/scanner";
+import type { CriteriumId, Engine, EngineStip, Finding, ScanReport } from "@maicro/core/types";
+import { ABSENT_LABEL, NOT_FOUND_LABEL } from "@maicro/core/types";
+import { prepareBusiness, runScan, groupBySeverity } from "@maicro/core/scanner";
+import type { SourceRowData } from "./report";
 
 export const DEMO_OWNER_EMAIL = "eigenaar@bakkerijdevries.nl";
 export const DEMO_SLUG = "bakkerij-de-vries-haarlem";
+export const DEMO_IDS = { red: "voorbeeld", grey: "voorbeeld-grijs" } as const;
 
-const checkedAt = new Date().toISOString();
-const base = { businessId: "demo", scanRunId: "demo", sampleCount: 3, verdict: "wrong" as const, resolvedAt: null, evidenceBefore: null, evidenceAfter: null, status: "open" as const, firstSeenAt: checkedAt };
+const checkedAt = "2026-10-07T12:32:00.000Z";
+const base = { businessId: "demo", scanRunId: DEMO_IDS.red, sampleCount: 3, verdict: "wrong" as const, resolvedAt: null, evidenceBefore: null, evidenceAfter: null, status: "open" as const, firstSeenAt: checkedAt };
 
+/** Seven questions: four wrong, one not found, two correct (ResultG board). */
 export const demoFindings: Finding[] = [
-  { ...base, id: "f-demo-1", factKey: "hours", subject: "6", engine: "chatgpt", wrongValue: "zondag geopend van 9:00 tot 17:00", correctValue: "zondag gesloten", frequency: 3, sourceUrl: "https://openingstijden.nl/haarlem/bakkerij-de-vries", sourceType: "directory_form", evidenceKind: "about", criterium: 3 },
-  { ...base, id: "f-demo-2", factKey: "phone", subject: null, engine: "copilot", wrongValue: "023 532 00 41", correctValue: "023 531 22 18", frequency: 2, sourceUrl: "https://www.telefoonboek.nl/bedrijven/haarlem/bakkerij-de-vries", sourceType: "third_party", evidenceKind: "about", criterium: 2 },
-  { ...base, id: "f-demo-3", factKey: "service", subject: "bezorgen", engine: "google_ai", wrongValue: "bezorgt in heel Haarlem", correctValue: "bezorgt niet", frequency: 3, sourceUrl: "https://bakkerijdevries.nl/corona-bezorgservice", sourceType: "owned_website", evidenceKind: "about", criterium: 7 },
-  { ...base, id: "f-demo-4", factKey: "address", subject: null, engine: "chatgpt", wrongValue: "Kruisstraat 8, Hoofddorp", correctValue: "Grote Houtstraat 112, Haarlem", frequency: 1, sourceUrl: null, sourceType: "other_entity", evidenceKind: "about", criterium: 11 },
-  { ...base, id: "f-demo-5", factKey: "service", subject: "glutenvrij brood", engine: "google_ai", wrongValue: "niet genoemd", correctValue: "ja", frequency: 2, sourceUrl: null, sourceType: "none", evidenceKind: "recommendation", criterium: 6 },
+  { ...base, id: "f-demo-1", factKey: "hours", subject: "6", engine: "chatgpt", wrongValue: "09:00-17:00", correctValue: "closed", frequency: 3, sourceUrl: "https://openingstijden.nl/haarlem/bakkerij-de-vries", sourceType: "directory_form", evidenceKind: "about", criterium: 3 },
+  { ...base, id: "f-demo-2", factKey: "phone", subject: null, engine: "copilot", wrongValue: "023 532 00 41", correctValue: "023 535 22 18", frequency: 2, sourceUrl: "https://www.telefoonboek.nl/bedrijven/haarlem/bakkerij-de-vries", sourceType: "third_party", evidenceKind: "about", criterium: 2 },
+  { ...base, id: "f-demo-3", factKey: "payment", subject: "pin", engine: "google_ai", wrongValue: "alleen contant", correctValue: "yes", frequency: 3, sourceUrl: "https://bakkerijdevries.nl/praktisch", sourceType: "owned_website", evidenceKind: "about", criterium: 10 },
+  { ...base, id: "f-demo-4", factKey: "existence", subject: null, engine: "chatgpt", wrongValue: "permanently_closed", correctValue: "open", frequency: 1, sourceUrl: "https://www.haarlemsdagblad.nl/heemstede/bakkerij-de-vries-sluit", sourceType: "other_entity", evidenceKind: "about", criterium: 11 },
+  { ...base, id: "f-demo-5", factKey: "service", subject: "glutenvrij brood", engine: "google_ai", verdict: "not_found", wrongValue: NOT_FOUND_LABEL, correctValue: "ja, op bestelling", frequency: 3, sourceUrl: null, sourceType: "none", evidenceKind: "about", criterium: 6 },
 ];
 
-/** Demo colours: ChatGPT and Copilot carry afhakers (hours, phone), Google AI only misleiders. */
 export const demoEngineStips: EngineStip[] = [
   { engine: "chatgpt", stip: "rood", usage: 0.83, counts: true },
   { engine: "google_ai", stip: "oranje", usage: 0.6, counts: true },
@@ -32,41 +37,110 @@ export const demoEngineStips: EngineStip[] = [
 ];
 
 export const demoCorrect: ScanReport["correct"] = [
-  { prompt: "Is Bakkerij De Vries in Haarlem op zondag open?", engine: "google_ai", value: "zondag gesloten" },
-  { prompt: "Is Bakkerij De Vries in Haarlem op zondag open?", engine: "copilot", value: "zondag gesloten" },
-  { prompt: "Wat is het telefoonnummer van Bakkerij De Vries in Haarlem?", engine: "chatgpt", value: "023 531 22 18" },
-  { prompt: "Wat is het telefoonnummer van Bakkerij De Vries in Haarlem?", engine: "google_ai", value: "023 531 22 18" },
-  { prompt: "Bezorgt Bakkerij De Vries in Haarlem ook?", engine: "chatgpt", value: "bezorgt niet" },
-  { prompt: "Bezorgt Bakkerij De Vries in Haarlem ook?", engine: "copilot", value: "bezorgt niet" },
-  { prompt: "Wat is het adres van Bakkerij De Vries in Haarlem?", engine: "google_ai", value: "Grote Houtstraat 112, Haarlem" },
-  { prompt: "Wat is het adres van Bakkerij De Vries in Haarlem?", engine: "copilot", value: "Grote Houtstraat 112, Haarlem" },
+  { prompt: "Is Bakkerij De Vries in Haarlem op zondag open?", engine: "google_ai", value: "zondag gesloten", factKey: "hours", subject: "6" },
+  { prompt: "Is Bakkerij De Vries in Haarlem op zondag open?", engine: "copilot", value: "zondag gesloten", factKey: "hours", subject: "6" },
+  { prompt: "Wat is het telefoonnummer van Bakkerij De Vries in Haarlem?", engine: "chatgpt", value: "023 535 22 18", factKey: "phone", subject: null },
+  { prompt: "Wat is het telefoonnummer van Bakkerij De Vries in Haarlem?", engine: "google_ai", value: "023 535 22 18", factKey: "phone", subject: null },
+  { prompt: "Kan ik pinnen bij Bakkerij De Vries in Haarlem?", engine: "chatgpt", value: "ja", factKey: "payment", subject: "pin" },
+  { prompt: "Kan ik pinnen bij Bakkerij De Vries in Haarlem?", engine: "copilot", value: "ja", factKey: "payment", subject: "pin" },
+  { prompt: "Bestaat Bakkerij De Vries in Haarlem nog?", engine: "google_ai", value: "open", factKey: "existence", subject: null },
+  { prompt: "Bestaat Bakkerij De Vries in Haarlem nog?", engine: "copilot", value: "open", factKey: "existence", subject: null },
+  { prompt: "Wat is het adres van Bakkerij De Vries in Haarlem?", engine: "chatgpt", value: "Grote Houtstraat 112", factKey: "address", subject: null },
+  { prompt: "Wat is het adres van Bakkerij De Vries in Haarlem?", engine: "google_ai", value: "Grote Houtstraat 112", factKey: "address", subject: null },
+  { prompt: "Wat is het adres van Bakkerij De Vries in Haarlem?", engine: "copilot", value: "Grote Houtstraat 112", factKey: "address", subject: null },
+  { prompt: "Kan ik bij Bakkerij De Vries in Haarlem taarten bestellen?", engine: "chatgpt", value: "ja", factKey: "service", subject: "taarten op bestelling" },
+  { prompt: "Kan ik bij Bakkerij De Vries in Haarlem taarten bestellen?", engine: "google_ai", value: "ja", factKey: "service", subject: "taarten op bestelling" },
+  { prompt: "Kan ik bij Bakkerij De Vries in Haarlem taarten bestellen?", engine: "copilot", value: "ja", factKey: "service", subject: "taarten op bestelling" },
 ];
 
 export function demoReport(): ScanReport {
-  const engines: Engine[] = ["chatgpt", "google_ai", "copilot"];
+  const findings = demoFindings;
   return {
     business: { id: "demo", slug: DEMO_SLUG, name: "Bakkerij De Vries", place: "Haarlem" },
-    scanRunId: "voorbeeld",
+    scanRunId: DEMO_IDS.red,
     kind: "free",
     checkedAt,
-    totalAnswers: demoFindings.length + demoCorrect.length,
-    wrongAnswers: demoFindings.length,
-    notFoundAnswers: 0,
+    totalAnswers: 7 * 3 * 3,
+    wrongAnswers: 9,
+    notFoundAnswers: 3,
     visibility: "found",
-    engines: engines.map((engine) => ({ engine, correct: demoCorrect.filter((c) => c.engine === engine).length, wrong: demoFindings.filter((f) => f.engine === engine).length, notFound: 0, skipped: false })),
-    findings: demoFindings,
+    engines: [
+      { engine: "chatgpt", correct: 2, wrong: 4, notFound: 1, skipped: false },
+      { engine: "google_ai", correct: 5, wrong: 1, notFound: 1, skipped: false },
+      { engine: "copilot", correct: 4, wrong: 2, notFound: 1, skipped: false },
+    ],
+    findings,
     correct: demoCorrect,
     stip: "rood",
     engineStips: demoEngineStips,
-    findingsBySeverity: {
-      afhaker: demoFindings.filter((f) => f.criterium != null && f.criterium <= 5),
-      misleider: demoFindings.filter((f) => f.criterium != null && f.criterium >= 6 && f.criterium <= 10),
-      verwarring: demoFindings.filter((f) => f.criterium != null && f.criterium >= 11),
-    },
+    findingsBySeverity: groupBySeverity(findings),
     instable: [],
-    criteriaNotFound: [],
+    criteriaNotFound: [{ criterium: 6, engine: "google_ai", frequency: 3, sampleCount: 3 }],
   };
 }
+
+export const DEMO_DOMAIN = "bakkerijdevries.nl";
+
+// ---------------------------------------------------------------------------
+// Grey: AI kent je niet (Polyvale Installatie, Haarlem)
+// ---------------------------------------------------------------------------
+
+const greyBase = { ...base, businessId: "demo-grijs", scanRunId: DEMO_IDS.grey, sourceUrl: null, sourceType: "none" as const, evidenceKind: "about" as const };
+const nf = (id: string, factKey: Finding["factKey"], subject: string | null, engine: Engine, criterium: CriteriumId, correctValue: string, frequency = 3): Finding => ({ ...greyBase, id, factKey, subject, engine, verdict: "not_found", wrongValue: NOT_FOUND_LABEL, correctValue, frequency, criterium });
+
+const demoGreyFindings: Finding[] = [
+  { ...greyBase, id: "g-1", factKey: "service", subject: "warmtepompen", engine: "chatgpt", wrongValue: ABSENT_LABEL, correctValue: "yes", frequency: 3, evidenceKind: "recommendation", criterium: 6 },
+  nf("g-2", "phone", null, "copilot", 2, "023 528 10 10"),
+  { ...greyBase, id: "g-3", factKey: "identity", subject: "Polyvale in Polen", engine: "google_ai", wrongValue: "een bedrijf in Polen", correctValue: "een ander bedrijf", frequency: 2, sourceType: "other_entity", criterium: 11 },
+  nf("g-4", "area", "Heemstede", "chatgpt", 4, "ja"),
+  nf("g-5", "urgency", null, "google_ai", 5, "ja"),
+  nf("g-6", "credential", "warmtepompen", "copilot", 12, "ja"),
+  nf("g-8", "phone", null, "chatgpt", 2, "023 528 10 10"),
+  nf("g-9", "area", "Heemstede", "copilot", 4, "ja"),
+  nf("g-10", "urgency", null, "copilot", 5, "ja"),
+  nf("g-11", "credential", "warmtepompen", "chatgpt", 12, "ja"),
+];
+
+export function demoGreyReport(): ScanReport {
+  const findings = demoGreyFindings;
+  return {
+    business: { id: "demo-grijs", slug: "polyvale-installatie-haarlem", name: "Polyvale Installatie", place: "Haarlem" },
+    scanRunId: DEMO_IDS.grey,
+    kind: "free",
+    checkedAt: "2026-10-07T13:10:00.000Z",
+    totalAnswers: 18,
+    wrongAnswers: 2,
+    notFoundAnswers: 16,
+    visibility: "unknown",
+    engines: [
+      { engine: "chatgpt", correct: 0, wrong: 0, notFound: 6, skipped: false },
+      { engine: "google_ai", correct: 0, wrong: 2, notFound: 4, skipped: false },
+      { engine: "copilot", correct: 0, wrong: 0, notFound: 6, skipped: false },
+    ],
+    findings,
+    correct: [],
+    stip: "grijs",
+    engineStips: [
+      { engine: "chatgpt", stip: "grijs", usage: 0.83, counts: true },
+      { engine: "google_ai", stip: "grijs", usage: 0.6, counts: true },
+      { engine: "copilot", stip: "grijs", usage: 0.15, counts: true },
+    ],
+    findingsBySeverity: groupBySeverity(findings),
+    instable: [],
+    criteriaNotFound: ([2, 4, 5, 12] as CriteriumId[]).flatMap((criterium) => (["chatgpt", "google_ai", "copilot"] as Engine[]).map((engine) => ({ criterium, engine, frequency: 3, sampleCount: 3 }))),
+  };
+}
+
+export const DEMO_GREY_DOMAIN = "polyvale.nl";
+
+/** Source audit rows for the grey demo (ResultGGrey board). Real scans use the facts/business instead. */
+export const demoGreySources: SourceRowData[] = [
+  { label: "Eigen website", status: "1 pagina, geen adres, geen diensten", tone: "muted" },
+  { label: "Google-bedrijfsprofiel", status: "niet geclaimd", tone: "rood" },
+  { label: "Bing, Apple", status: "ontbreekt", tone: "rood" },
+  { label: "Nederlandse gidsen (12)", status: "in 1 van 12, zonder diensten", tone: "muted" },
+  { label: "KvK", status: "klopt", tone: "groen" },
+];
 
 /** Mock-mode owner business with one finished free scan. Idempotent. */
 export async function seedDemo(db: Db): Promise<void> {

@@ -1,130 +1,192 @@
 import type { Metadata } from "next";
 import { notFound } from "next/navigation";
-import { copy, PRICES } from "@maicro/core/copy";
+import type { ScanReport } from "@maicro/core/types";
+import { copy } from "@maicro/core/copy";
 import { SiteHeader } from "@/components/SiteHeader";
 import { SiteFooter } from "@/components/SiteFooter";
-import { ReportHeader, ReportFindingCard, EnginesRow, CorrectAnswers } from "@/components/report";
+import { StipHero, Stip } from "@/components/Stip";
+import { AnswerCard } from "@/components/AnswerCard";
+import { ReportHeaderRow, ReportRow } from "@/components/ReportRow";
+import { SourceRow } from "@/components/SourceRow";
 import { getScanReport, latestScanReport } from "@/lib/core";
 import { ready } from "@/lib/db";
-import { env } from "@/lib/env";
-import { hostOf } from "@/lib/format";
-import { ENGINE_LABEL } from "@maicro/core/types";
-import { questionFor, wrongText, correctText } from "@/lib/questions";
-import { ShareLink } from "./ShareLink";
+import { dateTimeLong } from "@/lib/format";
+import { buildReportView, type BuildViewOptions } from "@/lib/report";
+import { DEMO_IDS, DEMO_DOMAIN, DEMO_GREY_DOMAIN, demoGreySources, demoGreyReport, demoReport } from "@/lib/demo";
 import { EmailCapture } from "./EmailCapture";
-import { ShowAll } from "./ShowAll";
 
 export const dynamic = "force-dynamic";
 
-export async function generateMetadata({ params }: { params: Promise<{ id: string }> }): Promise<Metadata> {
-  const { id } = await params;
+async function load(id: string): Promise<{ report: ScanReport; opts: BuildViewOptions; demo: boolean } | null> {
+  if (id === DEMO_IDS.red) return { report: demoReport(), opts: { domain: DEMO_DOMAIN }, demo: true };
+  if (id === DEMO_IDS.grey) return { report: demoGreyReport(), opts: { domain: DEMO_GREY_DOMAIN, sources: demoGreySources }, demo: true };
   const report = (await getScanReport(id)) ?? (await latestScanReport(id));
-  if (!report) return { title: copy.result.notFound };
-  return { title: copy.email.subjects.report(report.business.name), robots: { index: false } };
+  if (!report) return null;
+  const db = await ready();
+  const business = await db.getBusiness(report.business.id);
+  const facts = await db.latestFacts(report.business.id);
+  return { report, opts: { domain: business?.domain ?? null, website: facts?.website ?? null, googlePlaceId: business?.googlePlaceId ?? null, kvk: business?.kvk ?? null }, demo: false };
 }
 
-export default async function ResultPage({ params, searchParams }: { params: Promise<{ id: string }>; searchParams: Promise<{ mail?: string; alle?: string }> }) {
+export async function generateMetadata({ params }: { params: Promise<{ id: string }> }): Promise<Metadata> {
+  const { id } = await params;
+  const loaded = await load(id);
+  if (!loaded) return { title: copy.result.notFound };
+  return { title: copy.email.subjects.report(loaded.report.business.name), robots: { index: false } };
+}
+
+export default async function ResultPage({ params, searchParams }: { params: Promise<{ id: string }>; searchParams: Promise<{ mail?: string }> }) {
   const { id } = await params;
   const sp = await searchParams;
-  const report = (await getScanReport(id)) ?? (await latestScanReport(id));
-  if (!report) notFound();
-  const business = await (await ready()).getBusiness(report.business.id);
+  const loaded = await load(id);
+  if (!loaded) notFound();
+  const { report, opts, demo } = loaded;
+  const v = buildReportView(report, opts);
   const R = copy.result;
-  const findings = report.findings;
-  const shareUrl = `${env.baseUrl}/r/${report.scanRunId}`;
+  const grey = v.state === "grijs";
+  const ownerEmail = demo ? null : (await (await ready()).getBusiness(report.business.id))?.ownerEmail ?? null;
 
   return (
     <>
-      <SiteHeader minimal />
-      <main className="container max-w-[960px] py-10 sm:py-14">
-        <ReportHeader report={report} />
-
-        {findings.length > 0 && (
-          <section className="mt-8">
-            <ShowAll initial={5} total={findings.length} label={R.showAll(findings.length)}>
-              {findings.map((f) => (
-                <ReportFindingCard key={f.id} finding={f} business={report.business} checkedAt={report.checkedAt} />
+      <SiteHeader variant="minimal" right={R.checkedAt(dateTimeLong(report.checkedAt))} />
+      <main className="wrap flex flex-col gap-14 pb-20 pt-4 sm:gap-16 sm:pt-6">
+        {/* Hero: the dot */}
+        <section className="grid grid-cols-1 items-center gap-8 lg:grid-cols-12 lg:gap-12">
+          <div className="flex justify-center lg:col-span-4">
+            <StipHero tone={report.stip} number={v.hero.number} label={v.hero.label} />
+          </div>
+          <div className="flex flex-col gap-4 lg:col-span-8">
+            <h1 className="h1-sm">{v.h1}</h1>
+            <p className="lead max-w-[56ch]">{v.intro}</p>
+            <div className="flex flex-wrap gap-x-6 gap-y-1 text-[14px] text-muted">
+              {v.engineLines.map((e) => (
+                <span key={e.name}>
+                  <span className="font-bold text-ink">{e.name}</span> {e.text}
+                </span>
               ))}
-            </ShowAll>
+            </div>
+          </div>
+        </section>
+
+        {/* Three answers */}
+        {v.cards.length > 0 && (
+          <section className="grid grid-cols-1 gap-4 md:grid-cols-3">
+            {v.cards.map((c, i) => (
+              <AnswerCard key={i} {...c} />
+            ))}
           </section>
         )}
 
-        <section className="mt-8 space-y-4">
-          <CorrectAnswers items={report.correct} />
-          <EnginesRow engines={report.engines} />
+        {/* Per question */}
+        <section className="flex flex-col">
+          <ReportHeaderRow />
+          {v.rows.map((row) => (
+            <ReportRow key={row.question + row.tone} row={row} />
+          ))}
+          {v.instable.length > 0 && (
+            <div className="mt-6 flex flex-col gap-2">
+              <span className="text-[13px] font-semibold text-muted">{R.table.instableTitle}</span>
+              {v.instable.map((f, i) => (
+                <div key={i} className="row-grey flex-wrap">
+                  <span>
+                    <span className="font-semibold">{f.question}</span>{" "}
+                    <span className="text-muted">
+                      {f.engine}: {f.value}
+                    </span>
+                  </span>
+                  <span className="text-[13px] text-muted">{f.note}</span>
+                </div>
+              ))}
+            </div>
+          )}
+          <details id="alle" className="mt-4 self-start">
+            <summary className="btn-link">{R.table.showAll(report.totalAnswers)}</summary>
+            <ul className="mt-3 flex flex-col divide-y-[1px] divide-line rounded-2xl border-[1.5px] border-line text-[14px]">
+              {v.all.map((a, i) => (
+                <li key={i} className="flex flex-wrap items-center gap-x-3 gap-y-1 px-4 py-2.5">
+                  <Stip tone={a.tone} />
+                  <span className="min-w-0 flex-1 text-ink-2">{a.question}</span>
+                  <span className="font-semibold">{a.engine}</span>
+                  <span className={a.tone === "rood" ? "text-rood" : a.tone === "grijs" ? "text-muted" : "text-groen"}>{a.value}</span>
+                </li>
+              ))}
+            </ul>
+          </details>
         </section>
 
-        {findings.length > 0 && <p className="mt-10 max-w-[52ch] font-serif text-[26px] leading-[1.2]">{R.consequence}</p>}
+        {/* Where it comes from */}
+        {v.sources.length > 0 && (
+          <section className="grid grid-cols-1 items-center gap-6 lg:grid-cols-12 lg:gap-12">
+            <div className="flex flex-col gap-3.5 lg:col-span-6">
+              <h2 className="h2-sm">{v.sourcesTitle}</h2>
+              <p className="max-w-[48ch] text-[16px] leading-[1.55] text-ink-2">{v.sourcesBody}</p>
+            </div>
+            <div className="flex flex-col gap-2 lg:col-span-6">
+              {v.sources.map((s) => (
+                <SourceRow key={s.label} {...s} />
+              ))}
+            </div>
+          </section>
+        )}
 
-        {/* CTA */}
-        <section className="card mt-10 p-6 sm:p-8">
-          <h2 className="font-sans text-[22px] font-semibold tracking-normal">{R.cta.h3}</h2>
-          <p className="mt-2 max-w-[60ch] text-[16px]">{R.cta.body}</p>
-          <div className="mt-6 flex flex-col gap-3 sm:flex-row">
+        {/* Plan + CTA */}
+        <section className="panel grid grid-cols-1 items-center gap-8 p-6 sm:p-10 lg:grid-cols-12 lg:gap-10">
+          <div className="flex flex-col gap-3.5 lg:col-span-7">
+            <h2 className="h2-sm">{v.plan.h2}</h2>
+            <ol className="flex flex-col gap-2 text-[16px] leading-[1.5] text-ink-2">
+              {v.plan.steps.map((s, i) => (
+                <li key={i} className="flex gap-3">
+                  <Stip tone={s.tone} size={22} className="mt-[3px]" />
+                  <span>{s.text}</span>
+                </li>
+              ))}
+            </ol>
+            {v.plan.note && <p className="text-[13px] text-muted">{v.plan.note}</p>}
+          </div>
+          <div className="flex flex-col gap-3 lg:col-span-5">
             <form action="/api/checkout" method="post">
               <input type="hidden" name="business" value={report.business.id} />
               <input type="hidden" name="scan" value={report.scanRunId} />
               <input type="hidden" name="plan" value="monitor" />
-              <button type="submit" className="btn-primary h-auto min-h-[52px] w-full whitespace-normal py-3 sm:w-auto">
-                {R.cta.monitor}
+              <button type="submit" className="btn-primary h-auto w-full whitespace-normal py-4">
+                {v.plan.monitor}
               </button>
             </form>
             <form action="/api/checkout" method="post">
               <input type="hidden" name="business" value={report.business.id} />
               <input type="hidden" name="scan" value={report.scanRunId} />
               <input type="hidden" name="plan" value="setup" />
-              <button type="submit" className="btn-secondary h-auto min-h-[52px] w-full whitespace-normal py-3 sm:w-auto">
-                {R.cta.setup}
+              <button type="submit" className="btn-outline h-auto w-full whitespace-normal py-4">
+                {v.plan.setup}
               </button>
             </form>
+            <p className="text-center text-[13px] text-muted">{v.plan.excl}</p>
           </div>
-          <p className="mono mt-4">
-            {R.cta.exclVat} {copy.landing.pricing.footnote}
-          </p>
-          <p className="sr-only">
-            {PRICES.setupEur} / {PRICES.monitorEurPerMonth}
-          </p>
         </section>
 
-        {/* Zelf oplossen (not-found findings have no source to fix) */}
-        {findings.some((f) => f.verdict !== "not_found") && (
-          <details className="card mt-4">
-            <summary className="flex items-center justify-between px-5 py-4 text-[15px] font-medium">
-              <span>{R.selfFix.summary}</span>
-              <span aria-hidden className="font-mono text-secondary">+</span>
-            </summary>
-            <div className="border-t border-rule px-5 py-4">
-              <p className="text-[15px] text-secondary">{R.selfFix.intro}</p>
-              <ul className="mt-3 divide-y divide-rule">
-                {findings.filter((f) => f.verdict !== "not_found").map((f) => (
-                  <li key={f.id} className="grid gap-1 py-3 text-[14px] sm:grid-cols-[200px_1fr] sm:gap-4">
-                    <span className="font-mono text-[13px] break-all">
-                      {f.sourceUrl ? (
-                        <a href={f.sourceUrl} target="_blank" rel="nofollow noopener">
-                          {hostOf(f.sourceUrl)}
-                        </a>
-                      ) : (
-                        copy.sourceType[f.sourceType]
-                      )}
-                    </span>
-                    <span>
-                      <span className="text-secondary">{questionFor(f.factKey, f.subject, report.business.name, report.business.place)}</span>
-                      <br />
-                      {ENGINE_LABEL[f.engine]}: <span className="mark-wrong">{wrongText(f)}</span> → {correctText(f)}
-                    </span>
-                  </li>
-                ))}
-              </ul>
-            </div>
-          </details>
-        )}
-
-        <div className="mt-10 grid grid-cols-1 gap-8 border-t border-rule pt-8 md:grid-cols-2">
-          <ShareLink url={shareUrl} />
-          <EmailCapture scanRunId={report.scanRunId} businessId={report.business.id} sent={sp.mail === "ok" || Boolean(business?.ownerEmail)} invalid={sp.mail === "fout"} />
-        </div>
+        {/* Email + self */}
+        <section className="grid grid-cols-1 gap-8 md:grid-cols-2">
+          <EmailCapture scanRunId={report.scanRunId} businessId={report.business.id} sent={sp.mail === "ok" || Boolean(ownerEmail)} invalid={sp.mail === "fout"} />
+          <div className="flex flex-col gap-2.5">
+            <h3 className="text-[16px] font-bold">{v.self.h3}</h3>
+            <details id="zelf">
+              <summary className="text-[15px] leading-[1.5] text-ink-2">
+                {v.self.body} <span className="font-bold text-blue">{R.self.link}</span>
+              </summary>
+              {v.self.steps.length > 0 && (
+                <ol className="mt-3 flex flex-col gap-2 text-[14px] leading-[1.5] text-ink-2">
+                  {v.self.steps.map((s, i) => (
+                    <li key={i} className="rounded-xl bg-panel px-4 py-3">
+                      {s}
+                    </li>
+                  ))}
+                </ol>
+              )}
+            </details>
+          </div>
+        </section>
       </main>
-      <SiteFooter />
+      {grey ? <SiteFooter variant="short" note={copy.landing.footer.reportNote} /> : <SiteFooter tagline={copy.landing.footer.resultTagline} note={copy.landing.footer.reportNote} />}
     </>
   );
 }

@@ -34,15 +34,15 @@ export default async function FactsPage({ searchParams }: { searchParams: Promis
     <div className="space-y-6">
       <header>
         <h1 className="h2">{F.h1}</h1>
-        <p className="mt-2 text-[17px]">{F.intro}</p>
+        <p className="mt-2 text-[17px] text-ink-2">{F.intro}</p>
         {sp.opgeslagen === "1" ? (
-          <p className="mt-3 rounded-card border border-rule bg-white px-4 py-3 text-[15px]">{F.saved}</p>
+          <p className="mt-3 rounded-xl bg-groen-bg px-4 py-3 text-[15px] text-groen-ink">{F.saved}</p>
         ) : initial.provisional ? (
-          <p className="mono mt-3">{F.provisionalNotice}</p>
+          <p className="mt-3 text-[14px] text-muted">{F.provisionalNotice}</p>
         ) : (
-          <p className="mono mt-3">{F.verifiedNotice(dateShort(initial.verifiedAt ?? new Date()))}</p>
+          <p className="mt-3 text-[14px] text-muted">{F.verifiedNotice(dateShort(initial.verifiedAt ?? new Date()))}</p>
         )}
-        {sp.fout === "1" && <p className="mt-3 text-[14px] text-wrong">{copy.errors.generic}</p>}
+        {sp.fout === "1" && <p className="mt-3 text-[14px] text-rood">{copy.errors.generic}</p>}
       </header>
       <FactsForm facts={initial} />
     </div>

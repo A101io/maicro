@@ -1,27 +1,33 @@
 import type { Config } from "tailwindcss";
 
+/** Design G tokens (docs/DESIGN_G.md). Colours are CSS variables in globals.css. */
 export default {
   content: ["./app/**/*.{ts,tsx}", "./components/**/*.{ts,tsx}", "./lib/**/*.{ts,tsx}"],
   theme: {
-    container: { center: true, padding: "1rem", screens: { xl: "1200px" } },
+    container: { center: true, padding: { DEFAULT: "16px", lg: "40px" }, screens: { "2xl": "1168px" } },
     extend: {
       colors: {
-        paper: "#F6F4EE",
-        ink: "#15202B",
-        secondary: "#5B6672",
-        rule: "#D9D4C7",
-        accent: "#1F4FD8",
-        wrong: { DEFAULT: "#B42318", bg: "#FDECEA" },
-        doubt: { DEFAULT: "#A15C07", bg: "#FFF3DD" },
-        ok: { DEFAULT: "#1B6B3A", bg: "#E6F3EA" },
+        bg: "var(--bg)",
+        ink: "var(--ink)",
+        "ink-2": "var(--ink-2)",
+        muted: "var(--muted)",
+        line: "var(--line)",
+        panel: "var(--panel)",
+        "panel-2": "var(--panel-2)",
+        rood: { DEFAULT: "var(--red)", bg: "var(--red-bg)" },
+        groen: { DEFAULT: "var(--green)", bg: "var(--green-bg)", ink: "var(--green-ink)" },
+        grijs: "var(--grey)",
+        oranje: "var(--amber)",
+        blue: { DEFAULT: "var(--blue)", light: "#BFDBFE" },
+        dark: { DEFAULT: "#111827", panel: "#1F2937", text: "#D1D5DB", line: "#374151" },
       },
       fontFamily: {
-        serif: ['"Instrument Serif"', "Georgia", "serif"],
-        sans: ['"IBM Plex Sans"', "system-ui", "sans-serif"],
-        mono: ['"IBM Plex Mono"', "ui-monospace", "monospace"],
+        sans: ["var(--font-manrope)", "Manrope", "system-ui", "sans-serif"],
       },
-      boxShadow: { hairline: "0 1px 2px rgba(21,32,43,.08)" },
-      borderRadius: { card: "8px", btn: "6px" },
+      borderRadius: { card: "18px", panel: "24px", btn: "12px", pill: "999px" },
+      borderWidth: { DEFAULT: "1.5px", 1: "1px" },
+      boxShadow: { float: "0 12px 40px rgba(17, 24, 39, 0.08)" },
+      maxWidth: { site: "1168px" },
     },
   },
   plugins: [],

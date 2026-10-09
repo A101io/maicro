@@ -7,7 +7,7 @@ Maicro checks what AI assistants say about a Dutch business, finds wrong facts a
 - `docs/ARCHITECTURE.md` — workflows A–E and the fix-path table.
 - `docs/CRITERIA.md` — the twelve criteria, severities, thresholds, the stipregel and the sector question sets (the scanner follows this literally).
 - `docs/MESSAGING.md` — every customer-facing rule and the Dutch copy. All strings live in `packages/core/src/copy/index.ts`.
-- `docs/DESIGN_RESEARCH.md` §3–4 — the visual spec (Instrument Serif + IBM Plex, paper/ink/one blue accent, 1px borders, no gradients, status colours only inside report cards).
+- `docs/DESIGN_G.md` — the visual spec (design G: Manrope, white/ink/one blue accent, 1.5px borders, status colours only in dots, pills and report rows; reference boards in `docs/design-g/*.html` are the source of truth for copy, order and layout). `docs/DESIGN_RESEARCH.md` §3–4 (serif/paper) is superseded.
 
 ## Commands
 ```
@@ -17,10 +17,11 @@ pnpm e2e:mock                              # whole pipeline in one process, no k
 MAICRO_MOCK=1 pnpm dev                     # web on :3000 (demo owner eigenaar@bakkerijdevries.nl)
 MAICRO_MOCK=1 pnpm worker                  # job loop + cron + facts pages on :8787
 MAICRO_MOCK=1 pnpm scan --name "X" --place Y --kind free
+pnpm --filter web build                    # needs fonts.googleapis.com (next/font/google Manrope); offline: NEXT_FONT_GOOGLE_MOCKED_RESPONSES=<mock.js>
 ```
 
 ## State (v0.1)
-Done and verified in mock mode: scanner core (5 engines, extraction, compare, attribute, CLI), web (landing, free scan, result, Stripe checkout, auth, dashboard, facts form, CNAME, Google OAuth), workers (publisher, 13 NL directories, GBP sync, fixer paths + rechecks, Dutch emails, queue + cron), "niet gevonden" state (finding `verdict: not_found`, report `notFoundAnswers` + `visibility`, own fix path, grey result-page hero; migration `0002_not_found.sql`), criteria + sector layer from `docs/CRITERIA.md` (12 criteria with severity + thresholds in `packages/core/src/criteria.ts`, 11 sector packs with recommendation questions in `packages/core/src/prompts/sectors.ts`, `inferSector`, facts fields `serviceArea` / `urgency` / `credentials` / `sector`, recommendation absence detection, stipregel with `ScanReport.stip` + per-engine colours + `findingsBySeverity` + `instable`, colour in emails and CLI markdown; migration `0003_sectors.sql`). The web facts form does not yet have inputs for the new facts fields (the server action parses `serviceAreaPlaces`, `serviceAreaRadiusKm`, `urgencyAvailable`, `urgencyHours`, `credentials`, `sector` when present). `PgDb` has not been run against a real Postgres yet.
+Done and verified in mock mode: scanner core (5 engines, extraction, compare, attribute, CLI), web (landing, free scan, result, Stripe checkout, auth, dashboard, facts form, CNAME, Google OAuth), workers (publisher, 13 NL directories, GBP sync, fixer paths + rechecks, Dutch emails, queue + cron), "niet gevonden" state (finding `verdict: not_found`, report `notFoundAnswers` + `visibility`, own fix path, grey result-page hero; migration `0002_not_found.sql`), criteria + sector layer from `docs/CRITERIA.md` (12 criteria with severity + thresholds in `packages/core/src/criteria.ts`, 11 sector packs with recommendation questions in `packages/core/src/prompts/sectors.ts`, `inferSector`, facts fields `serviceArea` / `urgency` / `credentials` / `sector`, recommendation absence detection, stipregel with `ScanReport.stip` + per-engine colours + `findingsBySeverity` + `instable`, colour in emails and CLI markdown; migration `0003_sectors.sql`). Web re-skinned to design G (`docs/DESIGN_G.md`): landing with the 14 sections and anchors, result page in three states (rood/oranje, groen, grijs) built by `apps/web/lib/report.ts` from `ScanReport` (one row per question, answer cards, source rows, plan steps, never a score), demo reports at `/r/voorbeeld` (red) and `/r/voorbeeld-grijs` (grey) from `apps/web/lib/demo.ts`, static sector pages `/vak/[slug]` for the 11 packs (questions rendered from the pack templates with placeholder facts, `apps/web/lib/sector.ts`), sitemap, facts form with the sector-layer inputs, dashboard shell in G. All copy in `packages/core/src/copy/index.ts` (`landing`, `result`, `sector`, `sectorPages`). Screenshots in `out/screenshots/` (gitignored). `PgDb` has not been run against a real Postgres yet.
 
 Not built: Bing/Apple/form-directory adapters (fall to operator queue), Copilot browser adapter (`setCopilotAdapter`), WordPress plugin, quarterly plan.
 
@@ -35,4 +36,4 @@ Not built: Bing/Apple/form-directory adapters (fall to operator queue), Copilot 
 - Customer-facing text: Dutch, informal "je", calm verbs, no exclamation marks, never GEO/AEO/LLM/prompt/credits/zichtbaarheid/platform/agent in UI.
 - Facts are versioned; a new version only via the owner's confirmation. Samples are evidence; findings are the diff.
 - Keep `pnpm -r typecheck`, `pnpm -r test` and `pnpm e2e:mock` green before committing.
-- One primary button per view. No dark mode. No emoji.
+- One primary (blue) button per view. No dark mode. No emoji. Never show a score; only counts and the colour of the dot.

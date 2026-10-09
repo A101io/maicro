@@ -13,16 +13,16 @@ export default async function DomainPage({ searchParams }: { searchParams: Promi
     <div className="space-y-6">
       <header>
         <h1 className="h2">{D.h1}</h1>
-        <p className="mt-2 max-w-[60ch] text-[17px]">{D.intro}</p>
+        <p className="mt-2 max-w-[60ch] text-[17px] text-ink-2">{D.intro}</p>
       </header>
 
-      <section className="card p-5">
-        <h2 className="font-sans text-[18px] font-semibold tracking-normal">{D.optionA}</h2>
+      <section className="card p-5 sm:p-6">
+        <h2 className="h3">{D.optionA}</h2>
         {host ? (
           <>
             <p className="mt-2 text-[15px]">{D.optionAHint}</p>
-            <table className="mt-3 w-full font-mono text-[14px]">
-              <thead className="text-left text-secondary">
+            <table className="mt-3 w-full text-[14px]">
+              <thead className="text-left text-muted">
                 <tr>
                   <th className="py-1 pr-4 font-normal">{D.recordType}</th>
                   <th className="py-1 pr-4 font-normal">{D.recordName}</th>
@@ -30,7 +30,7 @@ export default async function DomainPage({ searchParams }: { searchParams: Promi
                 </tr>
               </thead>
               <tbody>
-                <tr className="border-t border-rule">
+                <tr className="border-t-[1.5px] border-line">
                   <td className="py-2 pr-4">CNAME</td>
                   <td className="py-2 pr-4 break-all">{host}</td>
                   <td className="py-2 break-all">{cnameTarget()}</td>
@@ -41,10 +41,10 @@ export default async function DomainPage({ searchParams }: { searchParams: Promi
               <p className="mt-4 text-[15px]">{D.verified(host)}</p>
             ) : (
               <>
-                {sp.dns === "nee" && <p className="mt-4 text-[15px] text-secondary">{D.notYet}</p>}
+                {sp.dns === "nee" && <p className="mt-4 text-[15px] text-muted">{D.notYet}</p>}
                 <form action="/api/domain/verify" method="post" className="mt-4">
                   <input type="hidden" name="host" value={host} />
-                  <button type="submit" className="btn-primary">
+                  <button type="submit" className="btn-primary h-[52px]">
                     {D.checkButton}
                   </button>
                 </form>
@@ -52,18 +52,18 @@ export default async function DomainPage({ searchParams }: { searchParams: Promi
             )}
           </>
         ) : (
-          <p className="mt-2 text-[15px] text-secondary">{D.noDomain}</p>
+          <p className="mt-2 text-[15px] text-muted">{D.noDomain}</p>
         )}
       </section>
 
-      <section className="card p-5">
-        <h2 className="font-sans text-[18px] font-semibold tracking-normal">{D.optionB}</h2>
+      <section className="card p-5 sm:p-6">
+        <h2 className="h3">{D.optionB}</h2>
         <p className="mt-2 text-[15px]">{D.optionBHint(`${business.slug}.nl`)}</p>
         {sp.registreren === "ingepland" ? (
           <p className="mt-3 text-[15px]">{D.optionBQueued}</p>
         ) : (
           <form action={registerDomain} className="mt-4">
-            <button type="submit" className="btn-small">
+            <button type="submit" className="btn-sm">
               {D.optionBButton}
             </button>
           </form>

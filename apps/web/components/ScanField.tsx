@@ -1,29 +1,60 @@
 import { copy } from "@maicro/core/copy";
 
-/** The single hero field. Plain form POST so it works without JavaScript. */
-export function ScanField({ defaultValue = "", compact = false }: { defaultValue?: string; compact?: boolean }) {
-  const h = copy.landing.hero;
+/**
+ * Name + place in one bordered field, blue button underneath (docs/DESIGN_G.md).
+ * Plain form POST to /api/scan so it works without JavaScript.
+ */
+export function ScanField({
+  defaultName = "",
+  defaultPlace = "",
+  namePlaceholder,
+  button,
+  note = true,
+  id = "scan",
+  className = "",
+}: {
+  defaultName?: string;
+  defaultPlace?: string;
+  namePlaceholder?: string;
+  button?: string;
+  note?: boolean;
+  id?: string;
+  className?: string;
+}) {
+  const s = copy.scanField;
   return (
-    <form action="/api/scan" method="post" className="w-full">
-      <label htmlFor="scan-q" className="label">
-        {h.fieldLabel}
-      </label>
-      <div className="flex flex-col gap-2 sm:flex-row sm:gap-0">
+    <form action="/api/scan" method="post" className={`flex w-full flex-col gap-2.5 ${className}`}>
+      <div className="flex overflow-hidden rounded-btn border-[1.5px] border-ink bg-white">
+        <label htmlFor={`${id}-q`} className="sr-only">
+          {s.nameLabel}
+        </label>
         <input
-          id="scan-q"
+          id={`${id}-q`}
           name="q"
           type="text"
           required
           autoComplete="organization"
-          defaultValue={defaultValue}
-          placeholder={h.placeholder}
-          className="field sm:rounded-r-none sm:border-r-0"
+          defaultValue={defaultName}
+          placeholder={namePlaceholder ?? s.namePlaceholder}
+          className="h-[58px] min-w-0 flex-1 border-0 bg-white px-4 text-[16px] placeholder:text-muted focus:outline-none"
         />
-        <button type="submit" className="btn-primary sm:rounded-l-none">
-          {h.button}
-        </button>
+        <label htmlFor={`${id}-place`} className="sr-only">
+          {s.placeLabel}
+        </label>
+        <input
+          id={`${id}-place`}
+          name="place"
+          type="text"
+          autoComplete="address-level2"
+          defaultValue={defaultPlace}
+          placeholder={s.placePlaceholder}
+          className="h-[58px] w-[110px] border-0 border-l-[1.5px] border-ink bg-white px-4 text-[16px] placeholder:text-muted focus:outline-none sm:w-[130px]"
+        />
       </div>
-      {!compact && <p className="mono mt-3">{h.mechanism}</p>}
+      <button type="submit" className="btn-primary h-14">
+        {button ?? s.button}
+      </button>
+      {note && <p className="text-[14px] text-muted">{s.note}</p>}
     </form>
   );
 }

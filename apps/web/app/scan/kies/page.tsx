@@ -16,13 +16,13 @@ export default async function ChoosePage({ searchParams }: { searchParams: Promi
   const c = copy.scan.choose;
   return (
     <>
-      <SiteHeader minimal />
-      <main className="container max-w-[720px] py-12 sm:py-16">
+      <SiteHeader variant="minimal" />
+      <main className="wrap max-w-[760px] py-12 sm:py-16">
         {candidates.length > 0 ? (
           <>
             <h1 className="h2">{needsPlace ? c.placeHint : c.title}</h1>
-            {!needsPlace && <p className="mt-3 text-[17px]">{c.body}</p>}
-            <ul className="mt-8 divide-y divide-rule border-y border-rule">
+            {!needsPlace && <p className="lead mt-3">{c.body}</p>}
+            <ul className="mt-8 divide-y-[1.5px] divide-line border-y-[1.5px] border-line">
               {candidates.map((cand, i) => (
                 <li key={i} className="flex flex-col gap-3 py-4 sm:flex-row sm:items-center sm:justify-between">
                   <div>
@@ -30,7 +30,7 @@ export default async function ChoosePage({ searchParams }: { searchParams: Promi
                       {cand.name}
                       {cand.place ? `, ${cand.place}` : ""}
                     </p>
-                    <p className="mono">{[cand.address, cand.website?.replace(/^https?:\/\/(www\.)?/, ""), cand.kvk ? `KvK ${cand.kvk}` : null].filter(Boolean).join(" · ")}</p>
+                    <p className="text-[14px] text-muted">{[cand.address, cand.website?.replace(/^https?:\/\/(www\.)?/, ""), cand.kvk ? `KvK ${cand.kvk}` : null].filter(Boolean).join(" · ")}</p>
                   </div>
                   <form action="/api/scan" method="post" className="flex items-end gap-2">
                     <input type="hidden" name="q" value={q} />
@@ -39,13 +39,13 @@ export default async function ChoosePage({ searchParams }: { searchParams: Promi
                       <input type="hidden" name="place" value={cand.place} />
                     ) : (
                       <div>
-                        <label htmlFor={`place-${i}`} className="label">
+                        <label htmlFor={`place-${i}`} className="field-label">
                           {c.placeLabel}
                         </label>
                         <input id={`place-${i}`} name="place" required defaultValue={place ?? ""} className="field-sm w-[180px]" />
                       </div>
                     )}
-                    <button type="submit" className="btn-small">
+                    <button type="submit" className="btn-sm">
                       {c.button}
                     </button>
                   </form>
@@ -53,14 +53,14 @@ export default async function ChoosePage({ searchParams }: { searchParams: Promi
               ))}
             </ul>
             <p className="mt-6 text-[14px]">
-              <Link href="/">{c.back}</Link>
+              <Link href="/" className="btn-link">{c.back}</Link>
             </p>
           </>
         ) : (
           <>
             <h1 className="h2">{c.none}</h1>
             <div className="mt-8">
-              <ScanField defaultValue={q} compact />
+              <ScanField defaultName={parsed.query} defaultPlace={place ?? ""} note={false} />
             </div>
           </>
         )}

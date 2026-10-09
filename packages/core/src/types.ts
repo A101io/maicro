@@ -338,7 +338,8 @@ export interface ScanReport {
   visibility: Visibility;
   engines: { engine: Engine; correct: number; wrong: number; notFound: number; skipped: boolean }[];
   findings: Finding[];
-  correct: { prompt: string; engine: Engine; value: string }[];
+  /** Answers that matched the facts; factKey/subject identify the question (absent on reports stored before the G redesign). */
+  correct: { prompt: string; engine: Engine; value: string; factKey?: FactKey; subject?: string | null }[];
   /** Overall colour: worst colour among the engines that count (>= 10% NL usage). */
   stip: Stip;
   engineStips: EngineStip[];

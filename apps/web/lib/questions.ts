@@ -1,5 +1,6 @@
 import type { FactKey, Finding } from "@maicro/core/types";
 import { describeValue } from "@maicro/core/scanner";
+import { copy } from "@maicro/core/copy";
 
 const DAYS = ["maandag", "dinsdag", "woensdag", "donderdag", "vrijdag", "zaterdag", "zondag"];
 
@@ -35,6 +36,29 @@ export function questionFor(factKey: FactKey, subject: string | null, name: stri
       return subject ? `Is ${who} erkend voor ${subject}?` : `Welke erkenningen heeft ${who}?`;
     case "identity":
       return subject ? `Is ${who} hetzelfde als ${subject}?` : `Is ${who} hetzelfde als het bedrijf met die naam elders?`;
+  }
+}
+
+/** The recommendation question ("Welk bedrijf in Haarlem doet warmtepompen?") behind a not-named finding. */
+export function recommendationQuestionFor(factKey: FactKey, subject: string | null, place: string): string {
+  const q = copy.recommendation.question;
+  switch (factKey) {
+    case "service":
+      return subject ? q.service(subject, place) : q.other(place);
+    case "area":
+      return subject ? q.area(subject) : q.other(place);
+    case "urgency":
+      return q.urgency(place);
+    case "hours": {
+      const day = subject != null && /^\d$/.test(subject) ? DAYS[Number(subject)] : null;
+      return day ? q.hours(day, place) : q.other(place);
+    }
+    case "credential":
+      return subject ? q.credential(subject, place) : q.other(place);
+    case "policy":
+      return subject ? q.policy(subject, place) : q.other(place);
+    default:
+      return q.other(place);
   }
 }
 

@@ -17,10 +17,9 @@ export default async function ScanWaitingPage({ params }: { params: Promise<{ id
   const business = await db.getBusiness(state.businessId);
   return (
     <>
-      <SiteHeader minimal />
-      <main className="container max-w-[720px] py-12 sm:py-16">
-        <p className="eyebrow">{business ? `${business.name}, ${business.place}` : ""}</p>
-        <h1 className="h2 mt-3">{copy.scan.title}</h1>
+      <SiteHeader variant="minimal" right={business ? `${business.name}, ${business.place}` : undefined} />
+      <main className="wrap max-w-[760px] py-12 sm:py-16">
+        <h1 className="h2">{copy.scan.title}</h1>
         <ScanProgress scanRunId={state.token} initialSteps={state.steps} initialStatus={state.status} />
       </main>
       <SiteFooter />

@@ -43,14 +43,12 @@ export function ScanProgress({ scanRunId, initialSteps, initialStatus }: { scanR
 
   return (
     <div className="mt-8">
-      <ol className="card divide-y divide-rule font-mono text-[14px]" aria-live="polite">
+      <ol className="card divide-y-[1px] divide-line text-[15px]" aria-live="polite">
         {steps.map((s, i) => {
           const active = i === firstOpen && status !== "failed";
           return (
-            <li key={s.key} className={`flex items-center gap-3 px-5 py-3 ${s.done ? "text-ink" : active ? "text-ink" : "text-secondary"}`}>
-              <span className="inline-block w-4 text-center" aria-hidden>
-                {s.done ? "✓" : active ? "…" : "·"}
-              </span>
+            <li key={s.key} className={`flex items-center gap-3 px-5 py-3.5 ${s.done ? "text-ink" : active ? "font-semibold text-ink" : "text-muted"}`}>
+              <span aria-hidden className={`inline-block h-3 w-3 shrink-0 rounded-full ${s.done ? "bg-groen" : active ? "bg-oranje" : "bg-line"}`} />
               <span>{s.label}</span>
             </li>
           );
@@ -59,14 +57,14 @@ export function ScanProgress({ scanRunId, initialSteps, initialStatus }: { scanR
       {status === "failed" ? (
         <p className="mt-4 text-[15px]">
           {copy.scan.failed}{" "}
-          <Link href="/#controle">{copy.scan.retry}</Link>
+          <Link href="/#top" className="btn-link">{copy.scan.retry}</Link>
         </p>
       ) : status === "done" ? (
         <p className="mt-4 text-[15px]">
-          <Link href={reportUrl ?? `/scan/${scanRunId}`}>{copy.scan.toReport}</Link>
+          <Link href={reportUrl ?? `/scan/${scanRunId}`} className="btn-link">{copy.scan.toReport}</Link>
         </p>
       ) : (
-        <p className="mono mt-4">{copy.scan.waiting}</p>
+        <p className="mt-4 text-[14px] text-muted">{copy.scan.waiting}</p>
       )}
     </div>
   );
