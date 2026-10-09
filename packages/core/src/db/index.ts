@@ -7,6 +7,8 @@
  * `db` is chosen at import time:
  *   - MAICRO_MOCK=1 or no DATABASE_URL  -> MemDb (in-memory, zero infrastructure)
  *   - otherwise                          -> PgDb (postgres.js against DATABASE_URL)
+ *   - MAICRO_DB=pg forces PgDb even under MAICRO_MOCK=1, so the mock engines
+ *     can drive a real Postgres (`pnpm e2e:pg`).
  *
  * `withMockDb()` returns a fresh MemDb regardless of env (tests, dry runs).
  * `createDb(url)` builds a PgDb for an explicit connection string.
@@ -34,6 +36,10 @@ export function createDb(databaseUrl: string): PgDb {
 }
 
 function pickDb(): Db {
+  if (process.env.MAICRO_DB === "pg") {
+    if (!process.env.DATABASE_URL) throw new Error("MAICRO_DB=pg needs DATABASE_URL");
+    return new PgDb(process.env.DATABASE_URL);
+  }
   if (isMockMode()) return new MemDb();
   return new PgDb(process.env.DATABASE_URL!);
 }

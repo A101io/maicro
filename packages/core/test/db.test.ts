@@ -1,14 +1,47 @@
-import { describe, expect, it } from "vitest";
-import { withMockDb, isMockMode } from "../src/db";
+import { afterAll, beforeEach, describe, expect, it } from "vitest";
+import postgres from "postgres";
+import { withMockDb, isMockMode, createDb, type Db } from "../src/db";
 import { sampleFacts } from "./scanner-fixtures";
 
-describe("MemDb round trip", () => {
-  it("is selected in mock mode", () => {
+/**
+ * Every scenario below runs against MemDb and, when TEST_DATABASE_URL points
+ * at a database carrying supabase/migrations, against PgDb too. The two must
+ * behave identically; MemDb alone proves nothing about the SQL.
+ */
+const PG_URL = process.env.TEST_DATABASE_URL;
+const TABLES = "claim, sample, fix, finding, channel, event, scan_run, prompt, facts, job, business";
+
+let pg: Db | undefined;
+const backends: [string, () => Promise<Db>][] = [["MemDb", async () => withMockDb()]];
+if (PG_URL) {
+  backends.push([
+    "PgDb",
+    async () => {
+      const raw = postgres(PG_URL, { max: 1, onnotice: () => {} });
+      await raw.unsafe(`truncate ${TABLES} restart identity cascade`);
+      await raw.end();
+      pg ??= createDb(PG_URL);
+      return pg;
+    },
+  ]);
+}
+afterAll(async () => {
+  await pg?.close();
+});
+
+describe("db selection", () => {
+  it("is MemDb in mock mode", () => {
     expect(isMockMode()).toBe(true);
+  });
+});
+
+describe.each(backends)("%s", (_name, makeDb) => {
+  let db: Db;
+  beforeEach(async () => {
+    db = await makeDb();
   });
 
   it("stores business, facts, prompts, scan runs, samples, claims and findings", async () => {
-    const db = withMockDb();
     const b = await db.upsertBusiness({ name: "Bakkerij De Vries", place: "Haarlem", domain: "bakkerijdevries.nl" });
     expect(b.slug).toBe("bakkerij-de-vries-haarlem");
     expect(await db.getBusiness(b.slug)).toMatchObject({ id: b.id, domain: "bakkerijdevries.nl" });
@@ -56,7 +89,6 @@ describe("MemDb round trip", () => {
   });
 
   it("job queue: claim, complete, fail with backoff", async () => {
-    const db = withMockDb();
     await db.enqueueJob("scan", { businessId: "x" });
     const later = await db.enqueueJob("report", {}, new Date(Date.now() + 60_000));
     const job = await db.claimJob();
@@ -72,14 +104,17 @@ describe("MemDb round trip", () => {
   });
 
   it("fixes, channels and events", async () => {
-    const db = withMockDb();
     const b = await db.upsertBusiness({ name: "X", place: "Y" });
     const ch = await db.upsertChannel({ businessId: b.id, type: "gbp", name: "Google Bedrijfsprofiel", externalId: null, url: null });
     const ch2 = await db.upsertChannel({ businessId: b.id, type: "gbp", name: "Google Bedrijfsprofiel", externalId: "abc", url: null, status: "synced" });
     expect(ch2.id).toBe(ch.id);
     expect((await db.listChannels(b.id))[0]).toMatchObject({ externalId: "abc", status: "synced" });
 
-    const fix = await db.insertFix({ findingId: "f", action: "email", target: "info@x.nl", recheckAt: new Date(Date.now() - 1000).toISOString() });
+    const run = await db.createScanRun({ businessId: b.id, kind: "free", engines: ["chatgpt"], samplesPerPrompt: 1 });
+    const [finding] = await db.upsertFindings([
+      { businessId: b.id, scanRunId: run.id, factKey: "phone", subject: null, engine: "chatgpt", wrongValue: "1", correctValue: "2", frequency: 1, sampleCount: 1, sourceUrl: null, sourceType: "none", evidenceBefore: null },
+    ]);
+    const fix = await db.insertFix({ findingId: finding!.id, action: "email", target: "info@x.nl", recheckAt: new Date(Date.now() - 1000).toISOString() });
     expect(await db.listDueRechecks()).toHaveLength(1);
     await db.updateFix(fix.id, { resolvedAt: new Date().toISOString() });
     expect(await db.listDueRechecks()).toHaveLength(0);
@@ -87,11 +122,8 @@ describe("MemDb round trip", () => {
     await db.logEvent(b.id, "test", { a: 1 });
     expect((await db.listEvents(b.id))[0]?.type).toBe("test");
   });
-});
 
-describe("MemDb sector layer", () => {
   it("keeps sector, prompt kind/criterium and separates recommendation findings from about findings", async () => {
-    const db = withMockDb();
     const b = await db.upsertBusiness({ name: "Loodgieter Bos", place: "Zwolle", sector: "loodgieters-installateurs" });
     expect((await db.getBusiness(b.id))?.sector).toBe("loodgieters-installateurs");
     const [p] = await db.insertPrompts(b.id, [{ category: "service", textNl: "Wie installeert warmtepompen in Zwolle?", probes: ["service:warmtepompen"], active: true, kind: "recommendation", criterium: 6 }]);

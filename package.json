@@ -9,7 +9,8 @@
     "test": "pnpm -r test",
     "worker": "pnpm --filter @maicro/worker start",
     "scan": "pnpm --filter @maicro/core scan",
-    "e2e:mock": "MAICRO_MOCK=1 tsx scripts/e2e-mock.mts"
+    "e2e:mock": "MAICRO_MOCK=1 tsx scripts/e2e-mock.mts",
+    "verify:pg": "bash scripts/verify-pg.sh"
   },
   "devDependencies": {
     "typescript": "^5.6.3",

@@ -21,6 +21,7 @@ scripts/        e2e-mock.mts (whole pipeline in one process, no keys needed)
 pnpm install
 cp .env.example .env            # leave keys empty; MAICRO_MOCK=1 is the default
 pnpm -r typecheck && pnpm -r test
+pnpm verify:pg                  # same pipeline on a real local Postgres (needs psql + PG_ADMIN_URL)
 pnpm e2e:mock                   # scan → checkout → setup → publish → fixes → mails, asserts the result
 MAICRO_MOCK=1 pnpm scan --name "Bakkerij De Vries" --place Haarlem --kind free
 MAICRO_MOCK=1 pnpm scan --list packages/core/examples/businesses.csv --kind free --out out/scans   # 20 businesses
