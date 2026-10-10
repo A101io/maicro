@@ -33,7 +33,7 @@ Mock mode uses deterministic fake engine answers (≈35 % contain an injected wr
 
 ## Preview site (GitHub Pages)
 
-`.github/workflows/site.yml` builds the web app in mock mode, saves every page as static HTML with `scripts/site/snapshot.mjs`, and deploys it to GitHub Pages on every push to `main` (pull requests only build and check it). The copy has no JavaScript and saves nothing: links work, forms go to the page a visitor would land on, and every page is `noindex` with a "Preview" bar. Locally: start the web app with `MAICRO_MOCK=1 PUBLIC_BASE_URL=http://localhost:3000`, then `pnpm site` and open `out/site/index.html` through any static server.
+`.github/workflows/site.yml` builds the web app in mock mode, saves every page as static HTML with `scripts/site/snapshot.mjs`, and deploys it to GitHub Pages on every push to `main` (pull requests only build and check it). The site root is the landing page as the app renders it; `pages.html` lists every page. The copy has no JavaScript and saves nothing: links work, forms go to the page a visitor would land on, and every page is `noindex`. Locally: start the web app with `MAICRO_MOCK=1 PUBLIC_BASE_URL=http://localhost:3000`, then `pnpm site` and serve `out/site` with any static server.
 
 ## Going live — what needs real keys
 

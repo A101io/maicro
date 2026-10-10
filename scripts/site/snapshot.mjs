@@ -15,7 +15,9 @@
  *   the example report, checkout at the welcome page).
  * - The dashboard is captured as the demo owner, once before and once after
  *   proving ownership through the mock Google flow.
- * - Every page carries noindex and a bar saying it is a preview.
+ * - The landing page is the site root (`index.html`), exactly as the app
+ *   renders it. A list of every page lives at `pages.html`.
+ * - Every page carries noindex, so the preview stays out of search results.
  *
  * Exits non-zero when a saved page links to a file that was not saved, so a
  * broken copy never deploys.
@@ -51,16 +53,10 @@ const START = [
   "/app", "/app/gegevens", "/app/domein", "/app/google",
 ];
 
-const BANNER =
-  '<div style="position:sticky;top:0;z-index:50;background:#111827;color:#fff;font:600 13px/1.4 system-ui,sans-serif;' +
-  'padding:8px 16px;display:flex;gap:12px;flex-wrap:wrap;justify-content:space-between">' +
-  "<span>Preview: a fixed copy of the site in demo mode. Links work; forms go to an example page.</span>" +
-  '<a href="index.html" style="color:#BFDBFE">All pages</a></div>';
-
 function fileFor(href) {
   const u = new URL(href, base);
   const route = ROUTE_TO_PAGE[u.pathname] ?? u.pathname;
-  if (route === "/") return "home.html";
+  if (route === "/") return "index.html";
   let name = route.replace(/^\/+|\/+$/g, "").replaceAll("/", "-");
   if (route === "/eigenaar" && u.searchParams.get("fout")) name += `-${u.searchParams.get("fout")}`;
   return `${name.replace(/[^a-zA-Z0-9_.-]/g, "-")}.html`;
@@ -126,16 +122,15 @@ function rewrite(html) {
     const routeOnly = (p || "/").split("?")[0];
     const isPage = !SKIP.some((s) => routeOnly.startsWith(s)) || routeOnly in ROUTE_TO_PAGE;
     const file = isPage ? fileFor(p || "/") : null;
-    const target = file && pages.has(file) ? file : "index.html";
+    const target = file && pages.has(file) ? file : "pages.html";
     return `href="${target}${frag ? `#${frag}` : ""}"`;
   });
   html = html.replace(/<form\b[^>]*>/g, (tag) => {
     const action = tag.match(/action="([^"]*)"/)?.[1] ?? "";
-    const dest = FORM_TO_PAGE[action] ? fileFor(FORM_TO_PAGE[action]) : "index.html";
+    const dest = FORM_TO_PAGE[action] ? fileFor(FORM_TO_PAGE[action]) : "pages.html";
     return tag.replace(/\s(action|method)="[^"]*"/g, "").replace(/>$/, ` action="${dest}" method="get">`);
   });
   html = html.replace(/<head>/, '<head><meta name="robots" content="noindex, nofollow"/>');
-  html = html.replace(/(<body[^>]*>)/, `$1${BANNER}`);
   return html;
 }
 
@@ -169,7 +164,7 @@ async function main() {
   await writeFile(path.join(out, ".nojekyll"), "");
   await writeFile(path.join(out, "robots.txt"), "User-agent: *\nDisallow: /\n");
 
-  // 4. The index page.
+  // 4. The list of every page, and a 404 that is the app's own.
   const title = (html) => html.match(/<title>([^<:·]*)/)?.[1]?.trim() ?? "";
   const sectors = [...pages.keys()].filter((f) => f.startsWith("vak-")).sort();
   const scanReport = [...pages.keys()].find((f) => /^r-[0-9a-f]{8}-/.test(f));
@@ -185,12 +180,15 @@ async function main() {
     .replace("{{DATE}}", date)
     .replace("{{SCAN_REPORT}}", scanReport ?? "r-voorbeeld.html")
     .replace("{{SECTORS}}", sectors.map((f) => `      <a href="${f}">${title(pages.get(f))}</a>`).join("\n"));
-  await writeFile(path.join(out, "index.html"), index);
+  await writeFile(path.join(out, "pages.html"), index);
+  const missing = await get("/deze-pagina-bestaat-niet");
+  await writeFile(path.join(out, "404.html"), rewrite(missing.html).replaceAll('href="', 'href="/maicro/').replaceAll('href="/maicro/http', 'href="http').replaceAll('href="/maicro/#', 'href="#'));
 
   // 5. No link may point at a file that is not there.
   const files = new Set(await readdir(out));
   const broken = [];
-  for (const f of [...files].filter((x) => x.endsWith(".html"))) {
+  // 404.html is served at any path, so its links are absolute (/maicro/…) and checked by name instead.
+  for (const f of [...files].filter((x) => x.endsWith(".html") && x !== "404.html")) {
     const html = await readFile(path.join(out, f), "utf8");
     for (const [, href] of html.matchAll(/(?:href|action)="([^"#?:]+\.html)/g)) if (!files.has(href)) broken.push(`${f} → ${href}`);
   }
@@ -198,7 +196,7 @@ async function main() {
     console.error(`broken links:\n  ${broken.join("\n  ")}`);
     process.exit(1);
   }
-  console.log(`${pages.size} pages + index written to ${out}`);
+  console.log(`${pages.size} pages + pages.html + 404.html written to ${out}`);
 }
 
 main().catch((err) => {
