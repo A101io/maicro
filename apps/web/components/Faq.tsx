@@ -8,10 +8,10 @@ export function Faq() {
       <h2 className="h2 lg:col-span-4">{V.h2}</h2>
       <div className="flex flex-col lg:col-span-8">
         {V.items.map((it, i) => (
-          <details key={it.q} className={`border-t-[1.5px] border-line py-[18px] ${i === V.items.length - 1 ? "border-b-[1.5px]" : ""}`}>
+          <details key={it.q} className={`faq border-t-[1.5px] border-line py-[18px] ${i === V.items.length - 1 ? "border-b-[1.5px]" : ""}`}>
             <summary className="flex justify-between gap-4 text-[17px] font-bold">
               <span>{it.q}</span>
-              <span aria-hidden className="text-muted">
+              <span aria-hidden className="faq-plus text-muted">
                 +
               </span>
             </summary>
