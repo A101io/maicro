@@ -34,7 +34,7 @@ Not done yet: `DATABASE_URL` / service-role key in a secret store, and a run of 
 
 ## Next steps, in order
 1. Real database: project and migrations done (see Supabase above). Remaining: put `DATABASE_URL` (pooler, service role) in `.env`, run `MAICRO_DB=pg pnpm e2e:mock` against it once, then clear the rows it wrote.
-2. First real engine: `OPENAI_API_KEY` (ChatGPT sampling + extraction). Run `pnpm scan --list <20 businesses in one town>` and read `out/scans/*.md`. This validates the idea before anything else.
+2. First real engine (runbook: `docs/FIRST-REAL-SCAN.md`): `OPENAI_API_KEY` (ChatGPT sampling + extraction). Run `pnpm scan --list <20 businesses in one town>` and read `out/scans/*.md`. This validates the idea before anything else.
 3. `GOOGLE_PLACES_API_KEY` so business resolution and the `/scan/kies` step work.
 4. Stripe test keys + prices; Resend; deploy web (Vercel) and worker (Fly/Railway); Cloudflare for SaaS for facts hosts.
 5. Then Gemini, Perplexity, SerpAPI.
@@ -42,5 +42,6 @@ Not done yet: `DATABASE_URL` / service-role key in a secret store, and a run of 
 ## Conventions
 - Customer-facing text: Dutch, informal "je", calm verbs, no exclamation marks, never GEO/AEO/LLM/prompt/credits/zichtbaarheid/platform/agent in UI.
 - Facts are versioned; a new version only via the owner's confirmation. Samples are evidence; findings are the diff.
+- **Ownership is proven, never claimed.** An e-mail address (report capture, magic link) only says who asked. `business.owner_verified_at` is set by `/api/google/callback` when the signed-in Google account holds a Business Profile location whose place id equals `google_place_id` (`packages/core/src/shared/ownership.ts`); proof replaces any earlier claim. Saving facts, the domain, on-demand scans (`requireVerifiedOwner`) and every setup/publish/sync/fix/recheck job (`apps/worker/src/jobs/paid.ts`: paying AND verified) wait for it. A business without a place id cannot be verified automatically; that goes to hallo@maicro.nl.
 - Keep `pnpm -r typecheck`, `pnpm -r test` and `pnpm e2e:mock` green before committing.
 - One primary (blue) button per view. No dark mode. No emoji. Never show a score; only counts and the colour of the dot.

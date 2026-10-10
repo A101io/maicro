@@ -88,6 +88,8 @@ export class MemDb implements Db {
       factsHost: null,
       factsHostVerifiedAt: null,
       anniversaryDay: null,
+      ownerVerifiedAt: null,
+      ownerVerifiedVia: null,
       createdAt: nowIso(),
     };
     const merged: BusinessRecord = { ...base };
@@ -363,6 +365,10 @@ export class MemDb implements Db {
 
   async listEvents(businessId: string, limit = 100): Promise<EventRow[]> {
     return this.events.filter((e) => e.businessId === businessId).slice(-limit).reverse();
+  }
+
+  async countEventsSince(type: string, since: Date): Promise<number> {
+    return this.events.filter((e) => e.type === type && new Date(e.at).getTime() >= since.getTime()).length;
   }
 
   // --- channels ---

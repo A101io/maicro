@@ -7,6 +7,8 @@ import { resolveBusiness, prepareBusiness, parseQuery, createScanState, startFre
 export const runtime = "nodejs";
 export const dynamic = "force-dynamic";
 
+const DAY_MS = 24 * 60 * 60 * 1000;
+
 async function readInput(req: Request): Promise<{ q: string; pick: number | null; place: string | null }> {
   const ct = req.headers.get("content-type") ?? "";
   if (ct.includes("application/json")) {
@@ -44,8 +46,22 @@ export async function POST(req: Request) {
   const finalPlace = candidate.place ?? place;
   if (!finalPlace) return NextResponse.redirect(`${kies}&plaats=1`, 303);
 
-  const { business, created } = await prepareBusiness({ name: candidate.name, place: finalPlace, candidate });
   const db = await ready();
+  const dayAgo = new Date(Date.now() - DAY_MS);
+  if (env.realEngines && (await db.countEventsSince("scan.requested", dayAgo)) >= env.freeScansPerDay) {
+    await db.logEvent(null, "scan.refused", { reason: "daily_cap", cap: env.freeScansPerDay });
+    return NextResponse.redirect(`${base}/scan/druk`, 303);
+  }
+
+  const { business, created } = await prepareBusiness({ name: candidate.name, place: finalPlace, candidate });
+
+  // Asked again within a day: show the report we already paid for.
+  const recent = (await db.listScanRuns(business.id, 5)).find((r) => r.kind === "free" && r.status === "done" && r.finishedAt && new Date(r.finishedAt) >= dayAgo);
+  if (recent) {
+    await db.logEvent(business.id, "scan.reused", { scanRunId: recent.id, via: "web" });
+    return NextResponse.redirect(`${base}/r/${recent.id}`, 303);
+  }
+
   await db.logEvent(business.id, "scan.requested", { q, created, via: "web" });
 
   const state = await createScanState(business.id, FREE_SCAN_ENGINES);

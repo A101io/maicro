@@ -27,6 +27,9 @@ export interface BusinessRecord extends Business {
   factsHost: string | null;
   factsHostVerifiedAt: string | null;
   anniversaryDay: number | null;
+  /** Set when the owner proved ownership (see shared/ownership.ts); null = only claimed. */
+  ownerVerifiedAt: string | null;
+  ownerVerifiedVia: string | null;
 }
 
 export type BusinessUpsert = Partial<Omit<BusinessRecord, "createdAt">> & { name: string; place: string };
@@ -135,6 +138,8 @@ export interface Db {
   // --- events ---
   logEvent(businessId: string | null, type: string, payload?: Record<string, unknown>): Promise<EventRow>;
   listEvents(businessId: string, limit?: number): Promise<EventRow[]>;
+  /** Events of one type since a moment, across every business (rate limits). */
+  countEventsSince(type: string, since: Date): Promise<number>;
 
   // --- channels ---
   listChannels(businessId: string): Promise<Channel[]>;

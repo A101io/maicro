@@ -308,6 +308,47 @@ export const copy = {
     },
   },
 
+  /**
+   * Terms and privacy. DRAFT: written from what the code does, not reviewed by
+   * a lawyer. `draft` renders a visible notice on both pages until it is false.
+   */
+  legal: {
+    draft: true,
+    draftNotice: "Concept. Deze tekst is nog niet juridisch gecontroleerd en kan veranderen.",
+    updated: "Laatst bijgewerkt: 9 oktober 2026",
+    contact: "Vragen? Mail ons op hallo@maicro.nl.",
+    terms: {
+      title: "Algemene voorwaarden",
+      intro: "Deze voorwaarden gelden voor elke controle en elk abonnement van Maicro, een handelsnaam van A101 B.V.",
+      sections: [
+        { h: "Wat we doen", p: ["We vragen AI-assistenten zoals ChatGPT, Google AI en Copilot wat ze over je bedrijf zeggen, vergelijken dat met de gegevens die jij bevestigt en laten zien waar een fout vandaan komt.", "Met een betaald plan publiceren we een feitenpagina, zetten we je gegevens in Google, Bing, Apple en Nederlandse gidsen, en vragen we bronnen met een fout om die te herstellen."] },
+        { h: "Wat we niet beloven", p: ["Niemand bepaalt wat een AI-assistent antwoordt. We herstellen de bronnen waar die antwoorden uit komen. Antwoorden uit het geheugen van een model veranderen pas bij een nieuwe modelversie.", "Herstel bij een andere website of gids hangt af van die partij en kan tot 14 dagen of langer duren."] },
+        { h: "Jouw gegevens, jouw verantwoordelijkheid", p: ["Je bevestigt zelf de gegevens van je bedrijf. Wij publiceren en versturen alleen wat jij bevestigd hebt.", "Je geeft ons toestemming om namens je bedrijf correctieverzoeken te sturen naar websites en gidsen, en om je Google-bedrijfsprofiel bij te werken als je dat koppelt."] },
+        { h: "Prijs en betalen", p: ["Goed zetten kost eenmalig €149. Goed houden kost €49 per maand. Alle prijzen zijn exclusief btw.", "Je betaalt via Stripe met iDEAL, kaart of SEPA-incasso. Je ontvangt een factuur per betaling."] },
+        { h: "Opzeggen", p: ["Er is geen opzegtermijn. Je zegt maandelijks op via ‘Facturen en abonnement’ in je account; de lopende maand loopt af.", "Als je abonnement afloopt, stoppen we met controleren en bijwerken, en verwijst je feitenpagina door naar je eigen website."] },
+        { h: "Aansprakelijkheid", p: ["We doen ons werk zorgvuldig, maar zijn niet aansprakelijk voor wat AI-assistenten of andere partijen over je bedrijf zeggen. Onze aansprakelijkheid is beperkt tot het bedrag dat je ons in de laatste twaalf maanden betaalde."] },
+        { h: "Toepasselijk recht", p: ["Op deze voorwaarden is Nederlands recht van toepassing."] },
+      ],
+    },
+    privacy: {
+      title: "Privacybeleid",
+      intro: "Maicro is een handelsnaam van A101 B.V. Hier staat welke gegevens we gebruiken, waarom, en met wie we ze delen.",
+      sections: [
+        { h: "Welke gegevens", p: ["Over je bedrijf: naam, plaats, adres, telefoonnummer, website, openingstijden, diensten en andere gegevens die je bevestigt. Dit zijn meestal geen persoonsgegevens, behalve als je bedrijf je eigen naam draagt.", "Over jou: je e-mailadres, om in te loggen en je rapporten te sturen. Bij betalen verwerkt Stripe je betaalgegevens; wij zien die niet.", "Over de controle: de vragen die we stellen, de antwoorden van AI-assistenten en de bronnen die ze noemen."] },
+        { h: "Waarom", p: ["Om de controle uit te voeren, fouten te herstellen, je te mailen over je rapport en je abonnement te factureren. Na een gratis controle sturen we je na 7 en na 21 dagen nog een herinnering; wil je die niet, mail ons dan. De grondslag is de overeenkomst met jou, en voor een gratis controle ons gerechtvaardigd belang om je een rapport te kunnen geven."] },
+        { h: "Met wie we gegevens delen", p: ["Supabase (database en inloggen, opslag in de EU). OpenAI, Google, Perplexity en SerpAPI om de vragen te stellen; we sturen alleen bedrijfsgegevens, geen e-mailadressen. Google en de KvK om je bedrijf te vinden. Stripe voor betalingen. Resend voor e-mail. Cloudflare voor je feitenpagina.", "Sommige van deze partijen verwerken gegevens buiten de EU. Dat gebeurt op basis van de standaardcontractbepalingen van de Europese Commissie of het EU-VS-gegevensprivacykader."] },
+        { h: "Hoe lang", p: ["Een rapport van een gratis controle is 30 dagen via de link te zien. Gegevens van een betaald plan bewaren we zolang je klant bent. 90 dagen na het einde van je abonnement doen we nog één gratis controle; daarna bewaren we alleen wat de wet voor facturen vraagt."] },
+        { h: "Jouw rechten", p: ["Je mag je gegevens inzien, laten verbeteren of laten verwijderen, en bezwaar maken. Mail ons; we reageren binnen een maand. Ben je het niet met ons eens, dan kun je een klacht indienen bij de Autoriteit Persoonsgegevens."] },
+      ],
+    },
+  },
+
+  scanBusy: {
+    title: "Even geen gratis controles",
+    body: "We doen elke dag een beperkt aantal gratis controles en die zijn voor vandaag op. Probeer het morgen opnieuw.",
+    back: "Terug naar de voorpagina",
+  },
+
   scan: {
     title: "We controleren je bedrijf",
     steps: {
@@ -1028,9 +1069,9 @@ export const copy = {
     h1: "Welkom bij Maicro",
     body: "Je betaling is gelukt. Vier dingen, dan zijn we binnen 48 uur live.",
     steps: [
+      { title: "Log één keer in bij Google", body: "Met het account van je Google-bedrijfsprofiel. Zo weten we dat jij de eigenaar bent.", href: "/app/google", cta: "Inloggen bij Google" },
       { title: "Bevestig je gegevens", body: "Controleer adres, telefoon, openingstijden en wat je wel en niet doet.", href: "/app/gegevens", cta: "Gegevens bevestigen" },
       { title: "Kies je domein", body: "Eén DNS-regel op je eigen domein, of laat Maicro een domein registreren.", href: "/app/domein", cta: "Domein instellen" },
-      { title: "Log één keer in bij Google", body: "Zo kunnen we je Google-bedrijfsprofiel lezen en bijwerken.", href: "/app/google", cta: "Inloggen bij Google" },
       { title: "Wacht op de eerste controle", body: "Daarna krijg je elke maand een rapport. Je hoeft niets te installeren.", href: "/app", cta: "Naar je overzicht" },
     ],
     loginHint: "Je ontvangt een inloglink per e-mail. Geen wachtwoord nodig.",
@@ -1161,12 +1202,31 @@ export const copy = {
 
   google: {
     h1: "Google-bedrijfsprofiel",
-    intro: "Log één keer in bij Google. Dan kunnen we je openingstijden, telefoonnummer en website lezen en bijwerken.",
+    intro: "Log één keer in met het Google-account van je bedrijfsprofiel. Zo weten we zeker dat jij de eigenaar bent, en kunnen we je openingstijden, telefoonnummer en website lezen en bijwerken.",
     button: "Inloggen bij Google",
+    verified: (date: string) => `Eigenaar bevestigd op ${date}.`,
+    needsVerification: "Bevestig eerst met Google dat jij de eigenaar bent. Daarna kun je je gegevens en domein instellen.",
     connected: (date: string) => `Gekoppeld op ${date}.`,
     disconnected: "Nog niet gekoppeld.",
     mockHint: "Geen Google-sleutels ingesteld: de koppeling wordt gesimuleerd.",
     permissions: "We vragen alleen toegang tot je bedrijfsprofiel, niet tot je e-mail of andere Google-diensten.",
+  },
+
+  owner: {
+    claimLink: "Ben jij de eigenaar? Bevestig het met Google",
+    claimH1: (name: string) => `Ben jij de eigenaar van ${name}?`,
+    claimBody: "Log in met het Google-account waarmee je je Google-bedrijfsprofiel beheert. Daarmee weten we zeker dat jij de eigenaar bent; een e-mailadres alleen is niet genoeg.",
+    claimButton: "Bevestig met Google",
+    claimLogin: "Log eerst in met je e-mailadres",
+    h1: "We konden je bedrijf niet koppelen",
+    reasons: {
+      no_place_id: "We hebben je bedrijf nog niet in Google gevonden, dus we kunnen het niet automatisch koppelen.",
+      no_locations: "Bij dit Google-account hoort geen bedrijfsprofiel. Log in met het account waarmee je je Google-bedrijfsprofiel beheert.",
+      no_match: "Het bedrijfsprofiel bij dit Google-account is een ander bedrijf. Log in met het account waarmee je dit bedrijf beheert.",
+      error: "Er ging iets mis bij Google. Probeer het nog een keer.",
+    },
+    retry: "Opnieuw proberen",
+    contact: "Lukt het niet? Mail ons op hallo@maicro.nl, dan koppelen we het samen.",
   },
 
   factsPage: {

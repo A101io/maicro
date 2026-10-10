@@ -41,6 +41,8 @@ assert.ok(freePrompts.some((p) => p.kind === "recommendation"), "stored prompts 
 // 2. Result page e-mail capture + checkout (what /api/report-email, /api/checkout and the Stripe webhook do).
 step("email capture + checkout");
 await db.upsertBusiness({ id: business.id, slug: business.slug, name: business.name, place: business.place, ownerEmail: "eigenaar@bakkerijdevries.nl", plan: "monitor" });
+// What /api/google/callback does once the owner's Business Profile matches the place id.
+await db.upsertBusiness({ id: business.id, slug: business.slug, name: business.name, place: business.place, ownerVerifiedAt: new Date().toISOString(), ownerVerifiedVia: "google_business_profile" });
 await db.enqueueJob("email", { template: "baseline", scanRunId: free.scanRunId, businessId: business.id });
 await setBusinessStatus(business.id, "trial", { via: "e2e" });
 await db.enqueueJob("setup", { businessId: business.id });

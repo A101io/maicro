@@ -5,7 +5,7 @@ import { redirect } from "next/navigation";
 import type { Facts, Hours, PriceItem, SectorSlug } from "@maicro/core/types";
 import { SECTOR_SLUGS } from "@maicro/core/types";
 import { ready } from "@/lib/db";
-import { requireOwner } from "@/lib/owner";
+import { requireVerifiedOwner } from "@/lib/owner";
 
 const str = (form: FormData, k: string): string | null => {
   const v = String(form.get(k) ?? "").trim();
@@ -57,7 +57,7 @@ function parseFacts(form: FormData, businessId: string): Omit<Facts, "businessId
 
 /** Confirm facts: new version, provisional=false, verified_at=now; then publish + sync jobs. */
 export async function saveFacts(form: FormData) {
-  const { business } = await requireOwner("/app/gegevens");
+  const { business } = await requireVerifiedOwner("/app/gegevens");
   const db = await ready();
   const data = parseFacts(form, business.id);
   if (!data.name || !data.place) redirect("/app/gegevens?fout=1");
