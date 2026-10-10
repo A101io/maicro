@@ -11,6 +11,7 @@ import { SectorCard } from "@/components/SectorCard";
 import { PriceBlock } from "@/components/PriceBlock";
 import { Faq } from "@/components/Faq";
 import { ReportHeaderRow, ReportRow } from "@/components/ReportRow";
+import { CountUp } from "@/components/CountUp";
 
 const L = copy.landing;
 const severities: Severity[] = ["afhaker", "misleider", "verwarring"];
@@ -40,7 +41,7 @@ export default function LandingPage() {
             <ScanField id="hero" className="enter max-w-[440px]" style={{ "--d": "180ms" } as React.CSSProperties} />
           </div>
           <div className="enter flex flex-col gap-4 lg:col-span-7" style={{ "--d": "120ms" } as React.CSSProperties}>
-            <div className="grid grid-cols-10 gap-2 rounded-[20px] bg-panel p-4 sm:gap-3 sm:p-[26px]">
+            <div className="scan-sweep grid grid-cols-10 gap-2 rounded-[20px] bg-panel p-4 sm:gap-3 sm:p-[26px]">
               {L.hero.grid.split("").map((c, i) => (
                 // Ripple from the top-left corner: delay by row + column.
                 <span key={i} aria-hidden className={`dot-in dot-hover aspect-square rounded-full ${c === "r" ? "bg-rood" : c === "g" ? "bg-groen" : "bg-grijs"}`} style={{ "--i": Math.floor(i / 10) + (i % 10) } as React.CSSProperties} />
@@ -69,19 +70,19 @@ export default function LandingPage() {
               <h2 className="h2 lg:col-span-6">{L.veranderd.h2}</h2>
               <p className="text-[17px] leading-[1.55] text-dark-text sm:text-[18px] lg:col-span-6">{L.veranderd.body}</p>
             </div>
-            <div className="grid grid-cols-1 gap-5 md:grid-cols-3">
+            <div data-motion="stagger" className="grid grid-cols-1 gap-5 md:grid-cols-3">
               {L.veranderd.panels.map((p, i) => (
                 <div key={p.year} className={`flex flex-col gap-4 rounded-[20px] p-7 ${i === 2 ? "bg-blue" : "bg-dark-panel"}`}>
                   <span className={`text-[13px] font-bold ${i === 2 ? "text-blue-light" : "text-grijs"}`}>{p.year}</span>
                   {i === 0 && (
-                    <div aria-hidden className="flex flex-col gap-2">
+                    <div aria-hidden data-motion="bars" className="flex flex-col gap-2">
                       {[92, 70, 84, 60, 78].map((w) => (
                         <span key={w} className="h-2.5 rounded-[3px] bg-dark-line" style={{ width: `${w}%` }} />
                       ))}
                     </div>
                   )}
                   {i === 1 && (
-                    <div aria-hidden className="flex flex-col gap-2">
+                    <div aria-hidden data-motion="bars" className="flex flex-col gap-2">
                       {[88, 55].map((w) => (
                         <span key={w} className="h-2.5 rounded-[3px] bg-white" style={{ width: `${w}%` }} />
                       ))}
@@ -98,11 +99,11 @@ export default function LandingPage() {
                 </div>
               ))}
             </div>
-            <div className="grid grid-cols-1 gap-8 border-t border-dark-line pt-10 sm:grid-cols-3 sm:gap-10">
+            <div data-motion="stagger" className="grid grid-cols-1 gap-8 border-t border-dark-line pt-10 sm:grid-cols-3 sm:gap-10">
               {L.veranderd.stats.map((s) => (
                 <div key={s.n}>
                   <div className="text-[36px] font-extrabold leading-none sm:text-[40px]" style={{ letterSpacing: "-1.5px" }}>
-                    {s.n}
+                    <CountUp value={s.n} />
                   </div>
                   <div className="mt-2 text-[15px] leading-[1.5] text-dark-text">{s.body}</div>
                   <div className="mt-1.5 text-[12px] text-muted">{s.source}</div>
@@ -115,7 +116,7 @@ export default function LandingPage() {
         {/* 3 Zo leest AI over je bedrijf */}
         <section id="leest" className="wrap section flex flex-col gap-10">
           <SectionHead h2={L.leest.h2} body={L.leest.body} />
-          <div className="grid grid-cols-1 items-center gap-6 lg:grid-cols-[260px_40px_1fr_40px_300px] lg:gap-0">
+          <div data-motion="stagger" className="grid grid-cols-1 items-center gap-6 lg:grid-cols-[260px_40px_1fr_40px_300px] lg:gap-0">
             <div className="flex flex-col gap-2">
               <span className="label mb-1">{L.leest.step1}</span>
               {L.leest.sources.map((s) => (
@@ -126,7 +127,7 @@ export default function LandingPage() {
               ))}
             </div>
             <div aria-hidden className="hidden justify-center lg:flex">
-              <span className="h-0.5 w-6 bg-grijs" />
+              <span data-motion="draw" className="h-0.5 w-6 bg-grijs" />
             </div>
             <div className="flex flex-col gap-2.5 rounded-[20px] bg-dark p-6 text-white">
               <span className="label text-grijs">{L.leest.step2}</span>
@@ -134,7 +135,7 @@ export default function LandingPage() {
               <span className="text-[15px] leading-[1.5] text-dark-text">{L.leest.step2Body}</span>
             </div>
             <div aria-hidden className="hidden justify-center lg:flex">
-              <span className="h-0.5 w-6 bg-grijs" />
+              <span data-motion="draw" className="h-0.5 w-6 bg-grijs" />
             </div>
             <div className="flex flex-col gap-2.5">
               <span className="label mb-1">{L.leest.step3}</span>
@@ -146,7 +147,7 @@ export default function LandingPage() {
               ))}
             </div>
           </div>
-          <div className="grid grid-cols-1 gap-6 border-t-[1.5px] border-line pt-8 md:grid-cols-3">
+          <div data-motion="stagger" className="grid grid-cols-1 gap-6 border-t-[1.5px] border-line pt-8 md:grid-cols-3">
             {L.leest.takeaways.map((t) => (
               <div key={t.title} className="flex flex-col gap-1.5">
                 <span className="text-[17px] font-extrabold">{t.title}</span>
@@ -161,7 +162,7 @@ export default function LandingPage() {
         <section className="bg-panel-2">
           <div className="wrap section flex flex-col gap-10">
             <SectionHead h2={L.snippers.h2} body={L.snippers.body} />
-            <div className="grid grid-cols-1 gap-3.5 sm:grid-cols-2 lg:grid-cols-4">
+            <div data-motion="stagger" className="grid grid-cols-1 gap-3.5 sm:grid-cols-2 lg:grid-cols-4">
               {L.snippers.examples.map((e) => (
                 <div key={e.where} className="card-sm flex flex-col gap-1.5 p-[18px]">
                   <span className="text-[12px] font-semibold text-muted">{e.where}</span>
@@ -173,17 +174,17 @@ export default function LandingPage() {
               ))}
             </div>
             <div className="grid grid-cols-1 items-center gap-8 lg:grid-cols-12 lg:gap-12">
-              <div className="grid grid-cols-1 gap-6 text-[15px] leading-[1.5] text-ink-2 sm:grid-cols-3 lg:col-span-7">
+              <div data-motion="stagger" className="grid grid-cols-1 gap-6 text-[15px] leading-[1.5] text-ink-2 sm:grid-cols-3 lg:col-span-7">
                 {L.snippers.shares.map((s) => (
                   <div key={s.n}>
                     <div className="text-[34px] font-extrabold text-ink" style={{ letterSpacing: "-1px" }}>
-                      {s.n}
+                      <CountUp value={s.n} />
                     </div>
                     {s.body}
                   </div>
                 ))}
               </div>
-              <div className="card-sm flex flex-col gap-2 p-[22px] lg:col-span-5">
+              <div data-motion="rise" className="card-sm flex flex-col gap-2 p-[22px] lg:col-span-5">
                 <span className="text-[14px] font-bold">{L.snippers.story.title}</span>
                 <span className="text-[15px] leading-[1.5] text-ink-2">{L.snippers.story.body}</span>
                 <span className="fine">{L.snippers.story.source}</span>
@@ -199,7 +200,7 @@ export default function LandingPage() {
             <h2 className="h2">{L.loket.h2}</h2>
             <p className="lead max-w-[46ch]">{L.loket.body}</p>
           </div>
-          <div className="flex flex-col gap-2.5 lg:col-span-6">
+          <div data-motion="timeline" className="flex flex-col gap-2.5 lg:col-span-6">
             {L.loket.timeline.map((t) => (
               <StipRow key={t.text} tone={t.stip as StipColour} text={t.text} meta={t.meta} />
             ))}
@@ -213,10 +214,10 @@ export default function LandingPage() {
               <h2 className="h2">{L.werkt.h2}</h2>
               <p className="max-w-[40ch] text-[15px] text-muted">{L.werkt.sub}</p>
             </div>
-            <ol className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-4">
+            <ol data-motion="stagger" className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-4">
               {L.werkt.steps.map((s) => (
                 <li key={s.n} className="card flex flex-col gap-3.5 rounded-[20px] p-6">
-                  <span className={`flex h-11 w-11 items-center justify-center rounded-full font-extrabold text-white ${stipBg[s.tone as Tone]}`}>{s.n}</span>
+                  <span data-pop className={`flex h-11 w-11 items-center justify-center rounded-full font-extrabold text-white ${stipBg[s.tone as Tone]}`}>{s.n}</span>
                   <span className="text-[20px] font-extrabold">{s.title}</span>
                   <span className="text-[15px] leading-[1.55] text-ink-2">{s.body}</span>
                   <span className="mt-auto rounded-[10px] bg-panel px-3 py-2 text-[13px] text-muted">{s.meta}</span>
@@ -225,7 +226,7 @@ export default function LandingPage() {
             </ol>
             <div className="grid grid-cols-1 items-center gap-6 border-t-[1.5px] border-line pt-10 lg:grid-cols-12 lg:gap-12">
               <p className="text-[15px] leading-[1.55] text-ink-2 lg:col-span-7">{L.werkt.note}</p>
-              <div className="flex flex-wrap gap-2.5 lg:col-span-5">
+              <div data-motion="stagger" className="flex flex-wrap gap-2.5 lg:col-span-5">
                 {L.werkt.engines.map((e) => (
                   <span key={e} className="pill">
                     {e}
@@ -239,7 +240,7 @@ export default function LandingPage() {
         {/* 7 Criteria */}
         <section id="criteria" className="wrap section flex flex-col gap-10">
           <SectionHead h2={L.criteria.h2} body={L.criteria.body} />
-          <div className="grid grid-cols-1 gap-5 md:grid-cols-3">
+          <div data-motion="stagger" className="grid grid-cols-1 gap-5 md:grid-cols-3">
             {severities.map((s) => (
               <CriteriumCard key={s} severity={s}>
                 {s === "verwarring" && (
@@ -250,7 +251,7 @@ export default function LandingPage() {
               </CriteriumCard>
             ))}
           </div>
-          <div className="flex flex-wrap gap-x-7 gap-y-3 border-t-[1.5px] border-line pt-6 text-[14px] text-muted">
+          <div data-motion="stagger" className="flex flex-wrap gap-x-7 gap-y-3 border-t-[1.5px] border-line pt-6 text-[14px] text-muted">
             {L.criteria.legend.map((l) => (
               <span key={l.stip} className="flex items-center gap-2">
                 <Stip tone={l.stip as StipColour} size={12} />
@@ -266,7 +267,7 @@ export default function LandingPage() {
         <section id="vak" className="bg-panel-2">
           <div className="wrap section flex flex-col gap-9">
             <SectionHead h2={L.vak.h2} body={L.vak.body} />
-            <div className="grid grid-cols-1 gap-3.5 sm:grid-cols-2 lg:grid-cols-4">
+            <div data-motion="stagger" className="grid grid-cols-1 gap-3.5 sm:grid-cols-2 lg:grid-cols-4">
               {SECTOR_LIST.map((p) => (
                 <SectorCard key={p.slug} slug={p.slug} />
               ))}
@@ -284,11 +285,11 @@ export default function LandingPage() {
             <h2 className="h2">{L.rapport.h2}</h2>
             <span className="text-[15px] text-muted">{L.rapport.meta}</span>
           </div>
-          <div className="grid grid-cols-1 items-center gap-8 rounded-panel border-[1.5px] border-line p-5 shadow-float sm:p-9 lg:grid-cols-12 lg:gap-10">
+          <div data-motion="rise" className="grid grid-cols-1 items-center gap-8 rounded-panel border-[1.5px] border-line p-5 shadow-float sm:p-9 lg:grid-cols-12 lg:gap-10">
             <div className="flex justify-center lg:col-span-3">
               <StipHero tone="rood" number={L.rapport.stipNumber} label={L.rapport.stipLabel} size={180} />
             </div>
-            <div className="flex min-w-0 flex-col lg:col-span-9">
+            <div data-motion="stagger" className="flex min-w-0 flex-col lg:col-span-9">
               <p className="mb-3.5 text-[20px] font-extrabold sm:text-[22px]" style={{ letterSpacing: "-0.5px" }}>
                 {L.rapport.title}
               </p>
@@ -307,7 +308,7 @@ export default function LandingPage() {
         <section className="bg-panel-2">
           <div className="wrap section flex flex-col gap-8">
             <h2 className="h2">{L.bewijs.h2}</h2>
-            <div className="grid grid-cols-1 gap-4 md:grid-cols-3">
+            <div data-motion="stagger" className="grid grid-cols-1 gap-4 md:grid-cols-3">
               {L.bewijs.cards.map((c) => (
                 <div key={c.business} className="card flex flex-col gap-3 rounded-[20px] p-6">
                   <div className="flex items-center justify-between gap-2">
@@ -335,7 +336,7 @@ export default function LandingPage() {
             <h2 className="h2">{L.missie.h2}</h2>
             <p className="lead max-w-[50ch]">{L.missie.body}</p>
           </div>
-          <div className="flex flex-col gap-2.5 lg:col-span-5">
+          <div data-motion="timeline" className="flex flex-col gap-2.5 lg:col-span-5">
             {L.missie.timeline.map((t) => (
               <StipRow key={t.text} tone={t.stip as StipColour} text={t.text} meta={t.meta} />
             ))}

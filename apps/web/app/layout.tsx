@@ -16,7 +16,11 @@ export const viewport: Viewport = { width: "device-width", initialScale: 1, colo
 export default function RootLayout({ children }: { children: React.ReactNode }) {
   return (
     <html lang="nl" className={manrope.variable}>
-      <body className="font-sans">{children}</body>
+      <body className="font-sans">
+        {children}
+        {/* Scroll motion; hides nothing on its own, so the page is whole without it. */}
+        <script src="/motion.js" defer />
+      </body>
     </html>
   );
 }

@@ -42,7 +42,9 @@ export function StipRow({ tone, text, meta, strong = false }: { tone: StipColour
   const green = tone === "groen";
   return (
     <div className={`flex items-center gap-3.5 rounded-[14px] px-4 py-3.5 ${green ? "bg-groen-bg" : "bg-panel"}`}>
-      <Stip tone={tone} size={12} />
+      <span data-stip className="flex">
+        <Stip tone={tone} size={12} />
+      </span>
       <span className={`flex-1 text-[15px] ${strong || green ? "font-bold" : ""}`}>{text}</span>
       {meta && <span className={`shrink-0 text-[13px] ${green ? "text-groen-ink" : "text-muted"}`}>{meta}</span>}
     </div>

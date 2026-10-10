@@ -21,7 +21,7 @@ export function PriceBlock() {
         </div>
         <span className="text-[14px] text-grijs">{P.exclVat}</span>
       </div>
-      <div className="grid grid-cols-1 gap-5 md:grid-cols-2">
+      <div data-motion="stagger" className="grid grid-cols-1 gap-5 md:grid-cols-2">
         <div className="hover-lift flex flex-col gap-4 rounded-[20px] bg-dark-panel p-7 sm:p-[30px]">
           <div className="flex flex-wrap items-center justify-between gap-2.5">
             <span className="text-[18px] font-extrabold">{P.setup.name}</span>
