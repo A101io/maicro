@@ -4,6 +4,7 @@ import { ready } from "@/lib/db";
 import { env } from "@/lib/env";
 import { getSession, getOwnedBusiness } from "@/lib/session";
 import { cnameTarget } from "@/lib/factsPage";
+import { isVerifiedOwner } from "@maicro/core/shared";
 
 export const runtime = "nodejs";
 
@@ -12,6 +13,7 @@ export async function POST(req: Request) {
   const session = await getSession();
   const business = session ? await getOwnedBusiness(session) : null;
   if (!business) return NextResponse.redirect(`${env.baseUrl}/inloggen?next=/app/domein`, 303);
+  if (!isVerifiedOwner(business, session!.userId)) return NextResponse.redirect(`${env.baseUrl}/app/google?eerst=1`, 303);
   const form = await req.formData();
   const host = String(form.get("host") ?? "").trim().toLowerCase();
   if (!host) return NextResponse.redirect(`${env.baseUrl}/app/domein`, 303);

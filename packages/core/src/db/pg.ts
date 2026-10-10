@@ -65,6 +65,8 @@ function mapBusiness(row: Row): BusinessRecord {
     factsHost: (r.factsHost as string | null) ?? null,
     factsHostVerifiedAt: (r.factsHostVerifiedAt as string | null) ?? null,
     anniversaryDay: (r.anniversaryDay as number | null) ?? null,
+    ownerVerifiedAt: (r.ownerVerifiedAt as string | null) ?? null,
+    ownerVerifiedVia: (r.ownerVerifiedVia as string | null) ?? null,
     createdAt: r.createdAt as string,
   };
 }
@@ -226,10 +228,11 @@ export class PgDb implements Db {
     const cols: Row = {};
     const keys: (keyof BusinessUpsert)[] = [
       "name", "place", "domain", "kvk", "googlePlaceId", "sector", "plan", "status", "ownerEmail", "ownerUserId",
-      "stripeCustomerId", "stripeSubscriptionId", "factsHost", "anniversaryDay",
+      "stripeCustomerId", "stripeSubscriptionId", "factsHost", "anniversaryDay", "ownerVerifiedVia",
     ];
     for (const k of keys) if (input[k] !== undefined) cols[k] = input[k];
     if (input.factsHostVerifiedAt !== undefined) cols.factsHostVerifiedAt = toDate(input.factsHostVerifiedAt);
+    if (input.ownerVerifiedAt !== undefined) cols.ownerVerifiedAt = toDate(input.ownerVerifiedAt);
     const insertRow = { ...cols, slug, ...(input.id ? { id: input.id } : {}) } as Row;
     const updateCols = Object.keys(cols) as string[];
     const rows = updateCols.length

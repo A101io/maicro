@@ -27,6 +27,9 @@ export interface BusinessRecord extends Business {
   factsHost: string | null;
   factsHostVerifiedAt: string | null;
   anniversaryDay: number | null;
+  /** Set when the owner proved ownership (see shared/ownership.ts); null = only claimed. */
+  ownerVerifiedAt: string | null;
+  ownerVerifiedVia: string | null;
 }
 
 export type BusinessUpsert = Partial<Omit<BusinessRecord, "createdAt">> & { name: string; place: string };

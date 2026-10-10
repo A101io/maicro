@@ -5,11 +5,12 @@ import { log } from "../log.js";
 import type { JobKind } from "./types.js";
 
 /**
- * Jobs that publish or send something in the business's name. Anyone can run
- * a free scan and, today, claim a business by e-mail without proving they own
- * it, so these must never run for a business that has not paid: otherwise a
- * stranger could push their own "facts" to the facts page, the directories
- * and third-party sites, for free and in Maicro's name.
+ * Jobs that publish or send something in the business's name. They run only
+ * for a business that has paid AND whose owner proved ownership through their
+ * Google Business Profile (shared/ownership.ts). Anyone can run a free scan
+ * and type an e-mail address into a report; without both checks a stranger
+ * could push their own "facts" to the facts page, the directories and
+ * third-party sites in Maicro's name.
  */
 export const PAID_ONLY: ReadonlySet<JobKind> = new Set<JobKind>(["setup", "publish", "sync", "fixes", "fix", "recheck"]);
 const PAYING: ReadonlySet<BusinessStatus> = new Set<BusinessStatus>(["trial", "active"]);
@@ -38,8 +39,16 @@ export async function paidOnlyBlock(kind: JobKind, payload: Record<string, unkno
     log.warn("job.skipped.no_business", { kind, payload });
     return "no_business";
   }
-  if (PAYING.has(business.status)) return null;
-  await getDb().logEvent(business.id, "job.skipped", { kind, reason: "not_paying", status: business.status });
-  log.warn("job.skipped.not_paying", { kind, businessId: business.id, status: business.status });
-  return `not_paying:${business.status}`;
+  if (!PAYING.has(business.status)) {
+    await getDb().logEvent(business.id, "job.skipped", { kind, reason: "not_paying", status: business.status });
+    log.warn("job.skipped.not_paying", { kind, businessId: business.id, status: business.status });
+    return `not_paying:${business.status}`;
+  }
+  if (!business.ownerVerifiedAt) {
+    // Paid but not yet proven: the Google callback enqueues setup once it is.
+    await getDb().logEvent(business.id, "job.skipped", { kind, reason: "owner_not_verified" });
+    log.warn("job.skipped.owner_not_verified", { kind, businessId: business.id });
+    return "owner_not_verified";
+  }
+  return null;
 }

@@ -2,25 +2,43 @@ import { NextResponse } from "next/server";
 import { randomBytes } from "node:crypto";
 import { cookies } from "next/headers";
 import { env } from "@/lib/env";
-import { getSession } from "@/lib/session";
+import { ready } from "@/lib/db";
+import { getSession, getOwnedBusiness } from "@/lib/session";
+import { GOOGLE_STATE_COOKIE } from "@/lib/google";
 
 const SCOPES = ["https://www.googleapis.com/auth/business.manage"];
 
-/** Starts Google OAuth for the Business Profile; in mock mode jumps straight to the callback. */
-export async function GET() {
+
+/**
+ * Starts Google OAuth for the Business Profile. This is also how ownership is
+ * proven: the callback checks that the account holds a location for the
+ * business. `?business=<id>` lets someone who is not (yet) the recorded owner
+ * claim a business from its report; otherwise the session's own business.
+ */
+export async function GET(req: Request) {
+  const url = new URL(req.url);
   const session = await getSession();
-  if (!session) return NextResponse.redirect(`${env.baseUrl}/inloggen?next=/app/google`);
-  const redirectUri = `${env.baseUrl}/api/google/callback`;
-  if (!env.hasGoogle) return NextResponse.redirect(`${redirectUri}?mock=1`);
+  const claimed = url.searchParams.get("business");
+  // Signed out: back to a page after login, never to this route (a server
+  // action's redirect cannot follow into a route handler).
+  if (!session) return NextResponse.redirect(`${env.baseUrl}${claimed ? `/eigenaar/bevestigen?business=${encodeURIComponent(claimed)}` : "/inloggen?next=/app/google"}`);
+
+  const db = await ready();
+  const business = claimed ? await db.getBusiness(claimed) : await getOwnedBusiness(session);
+  if (!business) return NextResponse.redirect(`${env.baseUrl}/inloggen?fout=geen`);
+
   const state = randomBytes(16).toString("hex");
-  (await cookies()).set("maicro_google_state", state, { httpOnly: true, sameSite: "lax", path: "/", maxAge: 600 });
-  const url = new URL("https://accounts.google.com/o/oauth2/v2/auth");
-  url.searchParams.set("client_id", env.googleClientId!);
-  url.searchParams.set("redirect_uri", redirectUri);
-  url.searchParams.set("response_type", "code");
-  url.searchParams.set("scope", SCOPES.join(" "));
-  url.searchParams.set("access_type", "offline");
-  url.searchParams.set("prompt", "consent");
-  url.searchParams.set("state", state);
-  return NextResponse.redirect(url.toString());
+  (await cookies()).set(GOOGLE_STATE_COOKIE, JSON.stringify({ state, businessId: business.id }), { httpOnly: true, sameSite: "lax", path: "/", maxAge: 600, secure: env.baseUrl.startsWith("https://") });
+  const redirectUri = `${env.baseUrl}/api/google/callback`;
+  if (!env.hasGoogle) return NextResponse.redirect(`${redirectUri}?mock=1&state=${state}`);
+
+  const auth = new URL("https://accounts.google.com/o/oauth2/v2/auth");
+  auth.searchParams.set("client_id", env.googleClientId!);
+  auth.searchParams.set("redirect_uri", redirectUri);
+  auth.searchParams.set("response_type", "code");
+  auth.searchParams.set("scope", SCOPES.join(" "));
+  auth.searchParams.set("access_type", "offline");
+  auth.searchParams.set("prompt", "consent");
+  auth.searchParams.set("state", state);
+  return NextResponse.redirect(auth.toString());
 }

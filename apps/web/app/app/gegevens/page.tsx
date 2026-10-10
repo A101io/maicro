@@ -1,12 +1,12 @@
 import { copy } from "@maicro/core/copy";
-import { requireOwner } from "@/lib/owner";
+import { requireVerifiedOwner } from "@/lib/owner";
 import { loadDashboard } from "@/lib/reads";
 import { dateShort } from "@/lib/format";
 import { FactsForm } from "./FactsForm";
 
 export default async function FactsPage({ searchParams }: { searchParams: Promise<{ opgeslagen?: string; fout?: string }> }) {
   const sp = await searchParams;
-  const { business } = await requireOwner("/app/gegevens");
+  const { business } = await requireVerifiedOwner("/app/gegevens");
   const { facts } = await loadDashboard(business.id);
   const F = copy.facts;
   const initial = facts ?? {

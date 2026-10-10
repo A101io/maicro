@@ -88,6 +88,8 @@ export class MemDb implements Db {
       factsHost: null,
       factsHostVerifiedAt: null,
       anniversaryDay: null,
+      ownerVerifiedAt: null,
+      ownerVerifiedVia: null,
       createdAt: nowIso(),
     };
     const merged: BusinessRecord = { ...base };

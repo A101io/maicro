@@ -1069,9 +1069,9 @@ export const copy = {
     h1: "Welkom bij Maicro",
     body: "Je betaling is gelukt. Vier dingen, dan zijn we binnen 48 uur live.",
     steps: [
+      { title: "Log één keer in bij Google", body: "Met het account van je Google-bedrijfsprofiel. Zo weten we dat jij de eigenaar bent.", href: "/app/google", cta: "Inloggen bij Google" },
       { title: "Bevestig je gegevens", body: "Controleer adres, telefoon, openingstijden en wat je wel en niet doet.", href: "/app/gegevens", cta: "Gegevens bevestigen" },
       { title: "Kies je domein", body: "Eén DNS-regel op je eigen domein, of laat Maicro een domein registreren.", href: "/app/domein", cta: "Domein instellen" },
-      { title: "Log één keer in bij Google", body: "Zo kunnen we je Google-bedrijfsprofiel lezen en bijwerken.", href: "/app/google", cta: "Inloggen bij Google" },
       { title: "Wacht op de eerste controle", body: "Daarna krijg je elke maand een rapport. Je hoeft niets te installeren.", href: "/app", cta: "Naar je overzicht" },
     ],
     loginHint: "Je ontvangt een inloglink per e-mail. Geen wachtwoord nodig.",
@@ -1202,12 +1202,31 @@ export const copy = {
 
   google: {
     h1: "Google-bedrijfsprofiel",
-    intro: "Log één keer in bij Google. Dan kunnen we je openingstijden, telefoonnummer en website lezen en bijwerken.",
+    intro: "Log één keer in met het Google-account van je bedrijfsprofiel. Zo weten we zeker dat jij de eigenaar bent, en kunnen we je openingstijden, telefoonnummer en website lezen en bijwerken.",
     button: "Inloggen bij Google",
+    verified: (date: string) => `Eigenaar bevestigd op ${date}.`,
+    needsVerification: "Bevestig eerst met Google dat jij de eigenaar bent. Daarna kun je je gegevens en domein instellen.",
     connected: (date: string) => `Gekoppeld op ${date}.`,
     disconnected: "Nog niet gekoppeld.",
     mockHint: "Geen Google-sleutels ingesteld: de koppeling wordt gesimuleerd.",
     permissions: "We vragen alleen toegang tot je bedrijfsprofiel, niet tot je e-mail of andere Google-diensten.",
+  },
+
+  owner: {
+    claimLink: "Ben jij de eigenaar? Bevestig het met Google",
+    claimH1: (name: string) => `Ben jij de eigenaar van ${name}?`,
+    claimBody: "Log in met het Google-account waarmee je je Google-bedrijfsprofiel beheert. Daarmee weten we zeker dat jij de eigenaar bent; een e-mailadres alleen is niet genoeg.",
+    claimButton: "Bevestig met Google",
+    claimLogin: "Log eerst in met je e-mailadres",
+    h1: "We konden je bedrijf niet koppelen",
+    reasons: {
+      no_place_id: "We hebben je bedrijf nog niet in Google gevonden, dus we kunnen het niet automatisch koppelen.",
+      no_locations: "Bij dit Google-account hoort geen bedrijfsprofiel. Log in met het account waarmee je je Google-bedrijfsprofiel beheert.",
+      no_match: "Het bedrijfsprofiel bij dit Google-account is een ander bedrijf. Log in met het account waarmee je dit bedrijf beheert.",
+      error: "Er ging iets mis bij Google. Probeer het nog een keer.",
+    },
+    retry: "Opnieuw proberen",
+    contact: "Lukt het niet? Mail ons op hallo@maicro.nl, dan koppelen we het samen.",
   },
 
   factsPage: {

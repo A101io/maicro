@@ -43,10 +43,11 @@ export default async function DashboardPage({ searchParams }: { searchParams: Pr
   const resolved = data.findings.filter((f) => f.status === "resolved");
   const report = lastRun ? await getScanReport(lastRun.id) : null;
 
+  // Google comes first: it is how ownership is proven, and facts and domain wait for it.
   const setup = [
+    { key: "google", label: d.setupSteps.google, done: Boolean(business.ownerVerifiedAt), href: "/app/google" },
     { key: "facts", label: d.setupSteps.facts, done: Boolean(data.facts && !data.facts.provisional), href: "/app/gegevens" },
     { key: "domain", label: d.setupSteps.domain, done: Boolean(business.factsHostVerifiedAt), href: "/app/domein" },
-    { key: "google", label: d.setupSteps.google, done: data.channels.some((c) => c.type === "gbp" && c.status !== "pending"), href: "/app/google" },
   ];
 
   return (

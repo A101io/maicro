@@ -44,7 +44,8 @@ export default async function ResultPage({ params, searchParams }: { params: Pro
   const v = buildReportView(report, opts);
   const R = copy.result;
   const grey = v.state === "grijs";
-  const ownerEmail = demo ? null : (await (await ready()).getBusiness(report.business.id))?.ownerEmail ?? null;
+  const business = demo ? null : await (await ready()).getBusiness(report.business.id);
+  const ownerEmail = business?.ownerEmail ?? null;
 
   return (
     <>
@@ -161,6 +162,11 @@ export default async function ResultPage({ params, searchParams }: { params: Pro
               </button>
             </form>
             <p className="text-center text-[13px] text-muted">{v.plan.excl}</p>
+            {!demo && !business?.ownerVerifiedAt && (
+              <a href={`/eigenaar/bevestigen?business=${encodeURIComponent(report.business.id)}`} className="text-center text-[14px] font-semibold text-blue">
+                {copy.owner.claimLink}
+              </a>
+            )}
           </div>
         </section>
 

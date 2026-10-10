@@ -15,8 +15,8 @@ describe("paid-only jobs", () => {
 
   const job = (kind: string, payload: Record<string, unknown>) => ({ id: 1, kind, payload }) as unknown as Job;
 
-  async function business(status: "scanned" | "trial" | "active" | "paused" | "churned") {
-    const b = await db.upsertBusiness({ name: "Bakkerij De Vries", place: "Haarlem", status });
+  async function business(status: "scanned" | "trial" | "active" | "paused" | "churned", verified = true) {
+    const b = await db.upsertBusiness({ name: "Bakkerij De Vries", place: "Haarlem", status, ownerVerifiedAt: verified ? new Date().toISOString() : null });
     const run = await db.createScanRun({ businessId: b.id, kind: "free", engines: ["chatgpt"], samplesPerPrompt: 1 });
     const [finding] = await db.upsertFindings([{ businessId: b.id, scanRunId: run.id, factKey: "phone", subject: null, engine: "chatgpt", wrongValue: "1", correctValue: "2", frequency: 1, sampleCount: 1, sourceUrl: null, sourceType: "none", evidenceBefore: null }]);
     const fix = await db.insertFix({ findingId: finding!.id, action: "republish", target: "facts_page" });
@@ -46,7 +46,13 @@ describe("paid-only jobs", () => {
     });
   }
 
-  it("runs them for a paying business", async () => {
+  it("skips them for a paying business whose owner has not proven ownership", async () => {
+    const { b } = await business("active", false);
+    expect(await handlerFor("publish")!({ businessId: b.id }, job("publish", { businessId: b.id }))).toEqual({ skipped: "owner_not_verified" });
+    expect(await handlerFor("setup")!({ businessId: b.id }, job("setup", { businessId: b.id }))).toEqual({ skipped: "owner_not_verified" });
+  });
+
+  it("runs them for a paying business with a verified owner", async () => {
     const { b } = await business("trial");
     // Past the guard, the real publish step runs and wants facts this fixture never gave it.
     await expect(handlerFor("publish")!({ businessId: b.id }, job("publish", { businessId: b.id }))).rejects.toThrow(/has no facts yet/);
