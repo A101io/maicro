@@ -11,6 +11,8 @@
  *   internal link is rewritten to its file, so it works under any base path
  *   (`https://<org>.github.io/maicro/`).
  * - The app's JavaScript is stripped: nothing hydrates, nothing is saved.
+ *   The one script kept is public/motion.js, the scroll motion, which works
+ *   on plain HTML and hides nothing if it fails.
  *   Forms are pointed at the page a visitor would land on (the scan form at
  *   the example report, checkout at the welcome page).
  * - The dashboard is captured as the demo owner, once before and once after
@@ -113,7 +115,7 @@ async function crawl(start) {
 }
 
 function rewrite(html) {
-  html = html.replace(/<script\b[^>]*>[\s\S]*?<\/script>/g, "");
+  html = html.replace(/<script\b[^>]*>[\s\S]*?<\/script>/g, (tag) => (tag.includes('src="/motion.js"') ? tag.replace('src="/motion.js"', 'src="motion.js"') : ""));
   html = html.replace(/<link\b[^>]*\bas="script"[^>]*\/?>/g, "");
   html = html.replaceAll('"/_next/static/', '"assets/');
   html = html.replace(/href="(\/[^"]*)"/g, (_, url) => {
@@ -161,6 +163,7 @@ async function main() {
     }
   }
   await copyFile(path.join(repo, "apps/web/app/icon.svg"), path.join(out, "icon.svg"));
+  await copyFile(path.join(repo, "apps/web/public/motion.js"), path.join(out, "motion.js"));
   await writeFile(path.join(out, ".nojekyll"), "");
   await writeFile(path.join(out, "robots.txt"), "User-agent: *\nDisallow: /\n");
 

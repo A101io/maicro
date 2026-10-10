@@ -220,25 +220,47 @@ a.pill:hover { background: var(--panel); }
   }
   .stip-hero { animation: stip-settle 0.6s var(--ease-out) both; }
 
-  /* (Keyframes move with translate/scale, never transform, so a hover lift
-     on the same element still works after the animation has filled.) */
+  /* Scroll-in motion lives in public/motion.js (Web Animations API), so it
+     also runs in Firefox, which has no scroll-driven CSS animations. */
+}
 
-  /* Scrolling: headings, cards and panels rise in as they enter the view.
-     Scroll-driven, so it needs no script; browsers without it show them still. */
-  @keyframes reveal {
-    from { opacity: 0; translate: 0 16px; }
-    to { opacity: 1; translate: none; }
+/* Counting numbers (public/motion.js animates --n). The real text stays in
+   the page; the counter is drawn over it only while it counts. */
+@property --n {
+  syntax: "<integer>";
+  inherits: true;
+  initial-value: 0;
+}
+[data-count] { position: relative; display: inline-block; }
+[data-count]::before {
+  content: counter(n) attr(data-suffix);
+  counter-reset: n var(--n);
+  position: absolute;
+  left: 0;
+  top: 0;
+  opacity: 0;
+  pointer-events: none;
+  white-space: nowrap;
+  font-variant-numeric: tabular-nums;
+}
+
+/* The hero's dot grid: a slow scanning light passes over it now and then,
+   the way a scan passes over the answers. */
+.scan-sweep { position: relative; overflow: hidden; isolation: isolate; }
+@media (prefers-reduced-motion: no-preference) {
+  .scan-sweep::after {
+    content: "";
+    position: absolute;
+    inset: -10% auto -10% 0;
+    width: 28%;
+    pointer-events: none;
+    background: linear-gradient(90deg, transparent, rgb(255 255 255 / 0.55), transparent);
+    mix-blend-mode: soft-light;
+    translate: -120% 0;
+    animation: scan-sweep 7s 2.2s var(--ease-out) infinite;
   }
-  @supports (animation-timeline: view()) {
-    main section .h2,
-    main section .h2-sm,
-    main section .card,
-    main section .card-sm,
-    main section .panel,
-    main section .row-grey {
-      animation: reveal linear both;
-      animation-timeline: view();
-      animation-range: entry 0% entry 55%;
-    }
+  @keyframes scan-sweep {
+    0% { translate: -120% 0; }
+    35%, 100% { translate: 480% 0; }
   }
 }
