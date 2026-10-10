@@ -100,8 +100,8 @@ const all: Record<string, Mail | { subject: string; text: string }> = {
   }),
   unfixableNotFound: unfixableNoticeEmail({ business, finding: notFoundFinding, note: "AI noemt je na 60 dagen nog steeds niet. Je feitenpagina en profielen staan goed; we blijven elke maand controleren.", triedDays: 61, links }),
   reportClean: monthlyReportEmail({ business, month: "oktober 2026", checkedAt: "2026-10-07T03:00:00Z", totalAnswers: 12, wrongAnswers: 0, resolved: 0, inProgress: 0, unfixable: 0, proofCards: [], openFindings: [], engines: ["chatgpt"], links }),
-  followup7: followUpEmail({ business, wrongAnswers: 3, totalAnswers: 12, example: finding, links, priceSetupEur: 149, priceMonitorEur: 49 }, 7),
-  followup21: followUpEmail({ business, wrongAnswers: 3, totalAnswers: 12, example: finding, links, priceSetupEur: 149, priceMonitorEur: 49 }, 21),
+  followup7: followUpEmail({ business, wrongAnswers: 3, totalAnswers: 12, example: finding, links: { ...links, unsubscribeUrl: "https://maicro.nl/afmelden?b=b1&t=tok" }, priceSetupEur: 149, priceMonitorEur: 49 }, 7),
+  followup21: followUpEmail({ business, wrongAnswers: 3, totalAnswers: 12, example: finding, links: { ...links, unsubscribeUrl: "https://maicro.nl/afmelden?b=b1&t=tok" }, priceSetupEur: 149, priceMonitorEur: 49 }, 21),
   unfixable: unfixableNoticeEmail({ business, finding: { ...finding, sourceType: "none", sourceUrl: null }, note: "Dit antwoord komt uit het geheugen van het model, niet van een bron die wij kunnen aanpassen.", triedDays: 45, links }),
   correction: correctionRequestEmail(finding, ctx),
   correctionFollowUp: correctionFollowUpEmail(finding, ctx, "2026-10-02T10:00:00Z"),
@@ -189,6 +189,8 @@ describe("email templates", () => {
     expect(all.followup7!.subject).toBe("3 antwoorden over Bakkerij Jansen kloppen niet");
     expect(all.followup21!.subject).toBe('Nog steeds "10:00 tot 14:00"');
     expect(all.followup7!.text).toContain("149 euro eenmalig");
+    // Commercial mail: both follow-ups carry the opt-out link.
+    for (const m of [all.followup7!, all.followup21!]) expect(m.text).toContain("Afmelden: https://maicro.nl/afmelden?b=b1&t=tok");
   });
 
   it("correction request carries wrong value, correct value, reference and one reason", () => {

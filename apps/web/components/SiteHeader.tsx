@@ -32,19 +32,19 @@ export function SiteHeader({ variant = "full", right }: { variant?: "full" | "sh
           ]
         : [];
   return (
-    <header>
-      <div className="wrap flex flex-wrap items-center justify-between gap-4 py-5 sm:py-6">
+    <header className="site-header">
+      <div className="wrap flex flex-wrap items-center justify-between gap-4 py-4 sm:py-5">
         <Wordmark />
         {variant === "minimal" ? (
           right && <span className="text-[14px] text-muted">{right}</span>
         ) : (
           <nav className="flex items-center gap-4 text-[15px] font-semibold sm:gap-7">
             {links.map((l) => (
-              <Link key={l.href} href={l.href} className="hidden md:inline">
+              <Link key={l.href} href={l.href} className="nav-link hidden md:inline">
                 {l.label}
               </Link>
             ))}
-            <Link href="/inloggen" className="rounded-pill border-[1.5px] border-ink px-[18px] py-[9px] hover:border-blue">
+            <Link href="/inloggen" className="rounded-pill border-[1.5px] border-ink px-[18px] py-[9px] transition-colors duration-200 hover:border-blue">
               {n.login}
             </Link>
           </nav>

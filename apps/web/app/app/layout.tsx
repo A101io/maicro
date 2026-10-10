@@ -16,7 +16,7 @@ export default async function AppLayout({ children }: { children: React.ReactNod
   ];
   return (
     <>
-      <header className="border-b-[1.5px] border-line bg-white">
+      <header className="site-header site-header--ruled">
         <div className="wrap flex flex-wrap items-center justify-between gap-x-6 gap-y-3 py-4 sm:py-5">
           <div className="flex items-center gap-4">
             <Wordmark href="/app" />

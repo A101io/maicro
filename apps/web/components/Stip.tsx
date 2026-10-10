@@ -22,7 +22,7 @@ export function StipHero({ tone, number, label, size = 220 }: { tone: StipColour
   const dim = size === 220 ? "h-[180px] w-[180px] sm:h-[220px] sm:w-[220px]" : "h-[150px] w-[150px] sm:h-[180px] sm:w-[180px]";
   const num = size === 220 ? "text-[46px] sm:text-[56px]" : "text-[40px] sm:text-[46px]";
   return (
-    <div className={`flex shrink-0 flex-col items-center justify-center rounded-full text-center text-white ${dim} ${stipBg[tone]}`}>
+    <div className={`stip-hero flex shrink-0 flex-col items-center justify-center rounded-full text-center text-white ${dim} ${stipBg[tone]}`}>
       <div className={`font-extrabold leading-none ${num}`} style={{ letterSpacing: "-2px" }}>
         {number}
       </div>

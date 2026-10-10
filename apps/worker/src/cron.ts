@@ -9,7 +9,7 @@
  *   5. follow-ups for scanned-but-not-purchased businesses at day 7 / day 21
  */
 import { pollFactsHost } from "@maicro/core/publisher";
-import { listBusinessesByStatus, setBusinessStatus } from "@maicro/core/shared";
+import { listBusinessesByStatus, setBusinessStatus, UNSUBSCRIBED_EVENT } from "@maicro/core/shared";
 import type { BusinessRecord, EventRow } from "@maicro/core/db";
 import { getDb } from "./compat.js";
 import { errorMessage, log } from "./log.js";
@@ -149,6 +149,7 @@ export async function enqueueFollowUps(now = new Date()): Promise<number> {
     const age = daysSince(b.createdAt, now);
     if (age < 7 || age > 90) continue;
     const evs = await events(b.id);
+    if (evs.some((e) => e.type === UNSUBSCRIBED_EVENT)) continue; // opted out of these mails
     const sent = (day: number) => lastEvent(evs, (e) => e.type === `email.followup_${day}` || (e.type === "followup.enqueued" && e.payload.day === day));
     const day: 7 | 21 | null = age >= 21 && !sent(21) ? 21 : age >= 7 && age < 21 && !sent(7) ? 7 : null;
     if (!day) continue;

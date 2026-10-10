@@ -9,7 +9,8 @@ import { log } from "../shared/log.js";
 import { findingWordsNl, hostOfUrl } from "../shared/facts-nl.js";
 import { fixPathForFinding, daysBetween } from "../fixer/paths.js";
 import { cnameTarget, isFallbackHost } from "../publisher/host.js";
-import { confirmFactsUrl, dashboardUrl, factsPageUrl, googleConnectUrl, resultUrl } from "./links.js";
+import { confirmFactsUrl, dashboardUrl, factsPageUrl, googleConnectUrl, resultUrl, unsubscribeOneClickUrl, unsubscribeUrl } from "./links.js";
+import { canSignUnsubscribe, isUnsubscribed } from "../shared/unsubscribe.js";
 import { sendMail, type MailResult } from "./mail.js";
 import {
   baselineSummaryEmail,
@@ -36,12 +37,12 @@ async function requireBusiness(businessId: string): Promise<BusinessRecord> {
   return b;
 }
 
-async function deliver(business: BusinessRecord, m: Mail, type: string, extra: Record<string, unknown> = {}): Promise<MailResult | null> {
+async function deliver(business: BusinessRecord, m: Mail, type: string, extra: Record<string, unknown> = {}, headers?: Record<string, string>): Promise<MailResult | null> {
   if (!business.ownerEmail) {
     log.warn("reporter.no_owner_email", { businessId: business.id, type });
     return null;
   }
-  const res = await sendMail({ to: business.ownerEmail, subject: m.subject, text: m.text, html: m.html, tags: { type, business: business.slug } });
+  const res = await sendMail({ to: business.ownerEmail, subject: m.subject, text: m.text, html: m.html, headers, tags: { type, business: business.slug } });
   await getDb().logEvent(business.id, `email.${type}`, { to: business.ownerEmail, subject: m.subject, mode: res.mode, id: res.id, ...extra });
   return res;
 }
@@ -263,6 +264,15 @@ export async function sendFollowUp(businessId: string, day: 7 | 21): Promise<Mai
     log.info("followup.skip", { businessId, status: business.status, day });
     return null;
   }
+  // Commercial mail: never without a working opt-out, never after one.
+  if (!canSignUnsubscribe()) {
+    log.warn("followup.skip", { businessId, reason: "UNSUBSCRIBE_SECRET not set", day });
+    return null;
+  }
+  if (await isUnsubscribed(db, business.id)) {
+    log.info("followup.skip", { businessId, reason: "unsubscribed", day });
+    return null;
+  }
   const findings = (await db.listFindings(business.id)).filter((f) => f.status !== "resolved");
   if (!findings.length) {
     log.info("followup.skip", { businessId, reason: "no findings", day });
@@ -277,11 +287,13 @@ export async function sendFollowUp(businessId: string, day: 7 | 21): Promise<Mai
       wrongAnswers: findings.length,
       totalAnswers,
       example,
-      links: { dashboardUrl: dashboardUrl(business), resultUrl: resultUrl(business) },
+      links: { dashboardUrl: dashboardUrl(business), resultUrl: resultUrl(business), unsubscribeUrl: unsubscribeUrl(business) },
       priceSetupEur: PRICE_SETUP,
       priceMonitorEur: PRICE_MONITOR,
     },
     day,
   );
-  return deliver(business, m, `followup_${day}`);
+  // RFC 8058: mail apps show their own "unsubscribe" button and POST here.
+  const headers = { "List-Unsubscribe": `<${unsubscribeOneClickUrl(business)}>`, "List-Unsubscribe-Post": "List-Unsubscribe=One-Click" };
+  return deliver(business, m, `followup_${day}`, {}, headers);
 }

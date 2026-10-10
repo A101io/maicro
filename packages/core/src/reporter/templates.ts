@@ -411,7 +411,7 @@ export interface FollowUpData {
   totalAnswers: number;
   /** the most striking wrong answer, used in the day-21 subject */
   example: Finding | null;
-  links: Links & { resultUrl: string };
+  links: Links & { resultUrl: string; unsubscribeUrl: string };
   priceSetupEur: number;
   priceMonitorEur: number;
 }
@@ -435,6 +435,8 @@ Zelf oplossen kan: de bronnen staan erbij. Liever dat wij het doen? Instellen ko
 
 Groet,
 Maicro
+
+Geen mails meer hierover? Afmelden: ${d.links.unsubscribeUrl}
 `;
     return mail(subject, text);
   }
@@ -449,6 +451,8 @@ Dit is de laatste mail hierover. Wil je dat wij de bronnen herstellen, dan regel
 
 Groet,
 Maicro
+
+Geen mails meer hierover? Afmelden: ${d.links.unsubscribeUrl}
 `;
   return mail(subject, text);
 }
