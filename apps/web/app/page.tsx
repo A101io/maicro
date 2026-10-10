@@ -43,7 +43,7 @@ export default function LandingPage() {
             <div className="grid grid-cols-10 gap-2 rounded-[20px] bg-panel p-4 sm:gap-3 sm:p-[26px]">
               {L.hero.grid.split("").map((c, i) => (
                 // Ripple from the top-left corner: delay by row + column.
-                <span key={i} aria-hidden className={`dot-in aspect-square rounded-full ${c === "r" ? "bg-rood" : c === "g" ? "bg-groen" : "bg-grijs"}`} style={{ "--i": Math.floor(i / 10) + (i % 10) } as React.CSSProperties} />
+                <span key={i} aria-hidden className={`dot-in dot-hover aspect-square rounded-full ${c === "r" ? "bg-rood" : c === "g" ? "bg-groen" : "bg-grijs"}`} style={{ "--i": Math.floor(i / 10) + (i % 10) } as React.CSSProperties} />
               ))}
             </div>
             <div className="flex flex-wrap justify-between gap-x-4 gap-y-2 text-[13px] text-muted">

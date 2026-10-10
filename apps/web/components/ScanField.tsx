@@ -26,7 +26,7 @@ export function ScanField({
   const s = copy.scanField;
   return (
     <form action="/api/scan" method="post" className={`flex w-full flex-col gap-2.5 ${className}`} style={style}>
-      <div className="flex overflow-hidden rounded-btn border-[1.5px] border-ink bg-white">
+      <div className="scan-box flex overflow-hidden rounded-btn border-[1.5px] border-ink bg-white">
         <label htmlFor={`${id}-q`} className="sr-only">
           {s.nameLabel}
         </label>

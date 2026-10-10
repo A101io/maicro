@@ -46,7 +46,7 @@ export function ReportRow({ row, compact = false }: { row: ReportRowData; compac
     row.source
   );
   return (
-    <div className={`flex flex-col gap-1.5 border-b-[1.5px] border-line ${compact ? "py-3 text-[14px]" : "py-4 text-[15px]"} ${grid} ${ok ? "text-muted" : ""}`}>
+    <div className={`row-hover flex flex-col gap-1.5 border-b-[1.5px] border-line ${compact ? "py-3 text-[14px]" : "py-4 text-[15px]"} ${grid} ${ok ? "text-muted" : ""}`}>
       <span className="hidden sm:block">
         <Stip tone={row.tone} size={10} />
       </span>

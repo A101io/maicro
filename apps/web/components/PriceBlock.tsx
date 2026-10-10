@@ -22,7 +22,7 @@ export function PriceBlock() {
         <span className="text-[14px] text-grijs">{P.exclVat}</span>
       </div>
       <div className="grid grid-cols-1 gap-5 md:grid-cols-2">
-        <div className="flex flex-col gap-4 rounded-[20px] bg-dark-panel p-7 sm:p-[30px]">
+        <div className="hover-lift flex flex-col gap-4 rounded-[20px] bg-dark-panel p-7 sm:p-[30px]">
           <div className="flex flex-wrap items-center justify-between gap-2.5">
             <span className="text-[18px] font-extrabold">{P.setup.name}</span>
             <span className="rounded-pill bg-groen-bg px-2.5 py-1 text-[12px] font-bold text-groen-ink">{P.setup.chip}</span>
@@ -40,11 +40,11 @@ export function PriceBlock() {
             ))}
           </ul>
           <p className="text-[13px] text-grijs">{P.setup.limit}</p>
-          <Link href="/#top" className="mt-auto block rounded-btn border-[1.5px] border-white py-3.5 text-center text-[15px] font-extrabold text-white hover:border-blue-light hover:text-blue-light">
+          <Link href="/#top" className="sheen mt-auto block rounded-btn border-[1.5px] border-white py-3.5 text-center text-[15px] font-extrabold text-white hover:border-blue-light hover:text-blue-light">
             {P.setup.button}
           </Link>
         </div>
-        <div className="flex flex-col gap-4 rounded-[20px] bg-blue p-7 text-white sm:p-[30px]">
+        <div className="hover-lift flex flex-col gap-4 rounded-[20px] bg-blue p-7 text-white sm:p-[30px]">
           <div className="flex flex-wrap items-center justify-between gap-2.5">
             <span className="text-[18px] font-extrabold">{P.monitor.name}</span>
             <span className="rounded-pill bg-white px-2.5 py-1 text-[12px] font-bold text-blue">{P.monitor.chip}</span>
@@ -62,7 +62,7 @@ export function PriceBlock() {
             ))}
           </ul>
           <p className="text-[13px] text-blue-light">{P.monitor.limit}</p>
-          <Link href="/#top" className="mt-auto block rounded-btn bg-white py-3.5 text-center text-[15px] font-extrabold text-ink hover:text-blue">
+          <Link href="/#top" className="sheen mt-auto block rounded-btn bg-white py-3.5 text-center text-[15px] font-extrabold text-ink hover:text-blue">
             {P.monitor.button}
           </Link>
         </div>

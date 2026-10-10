@@ -32,7 +32,7 @@ export function SiteFooter({ variant = "full", note, tagline }: { variant?: "ful
             <div key={c.title} className="flex flex-col gap-2.5 text-[14px]">
               <span className="font-bold">{c.title}</span>
               {c.links.map((l) => (
-                <Link key={l.label} href={l.href} className="text-ink-2">
+                <Link key={l.label} href={l.href} className="nav-link text-ink-2">
                   {l.label}
                 </Link>
               ))}
