@@ -10,7 +10,8 @@
     "worker": "pnpm --filter @maicro/worker start",
     "scan": "pnpm --filter @maicro/core scan",
     "e2e:mock": "MAICRO_MOCK=1 tsx scripts/e2e-mock.mts",
-    "verify:pg": "bash scripts/verify-pg.sh"
+    "verify:pg": "bash scripts/verify-pg.sh",
+    "site": "node scripts/site/snapshot.mjs http://localhost:3000 out/site"
   },
   "devDependencies": {
     "typescript": "^5.6.3",

@@ -1,0 +1,123 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="robots" content="noindex, nofollow">
+<title>Maicro Preview</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;600;700;800&display=swap">
+<link rel="icon" href="icon.svg" type="image/svg+xml">
+<style>
+/* Layout: one reading column, groups of linked pages in the order a visitor meets them.
+   Single light theme on purpose: Maicro has no dark mode (CLAUDE.md conventions). */
+:root {
+  --paper: #ffffff;
+  --panel: #f3f4f6;
+  --ink: #111827;
+  --ink-2: #374151;
+  --muted: #6b7280;
+  --line: #e5e7eb;
+  --blue: #2563eb;
+  --rood: #e11d48;
+  --groen: #2e8555;
+  --grijs: #9ca3af;
+  --font: "Manrope", ui-sans-serif, system-ui, -apple-system, "Segoe UI", sans-serif;
+  color-scheme: light;
+}
+body { background: var(--paper); color: var(--ink); font: 400 16px/1.55 var(--font); padding-inline: 16px; }
+.wrap { max-width: 760px; margin-inline: auto; padding-block: 48px 64px; display: flex; flex-direction: column; gap: 40px; }
+.brand { font-weight: 800; font-size: 22px; letter-spacing: -0.02em; }
+h1 { font-size: clamp(32px, 6vw, 44px); line-height: 1.08; letter-spacing: -0.03em; font-weight: 800; margin: 0; text-wrap: balance; }
+.lead { font-size: 18px; color: var(--ink-2); max-width: 60ch; margin: 12px 0 0; }
+.facts { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 20px; }
+.pill { display: inline-flex; align-items: center; gap: 8px; border: 1.5px solid var(--line); border-radius: 999px; padding: 4px 12px; font-size: 13px; color: var(--ink-2); }
+.dot { width: 10px; height: 10px; border-radius: 50%; flex: none; }
+section { display: flex; flex-direction: column; gap: 12px; }
+h2 { font-size: 13px; text-transform: uppercase; letter-spacing: 0.08em; color: var(--muted); margin: 0; font-weight: 700; }
+.list { border: 1.5px solid var(--line); border-radius: 16px; overflow: hidden; }
+.list a { display: grid; grid-template-columns: 14px minmax(0, 1fr) auto; gap: 14px; align-items: center; padding: 14px 18px; color: var(--ink); text-decoration: none; border-top: 1.5px solid var(--line); }
+.list a:first-child { border-top: 0; }
+.list a:hover, .list a:focus-visible { background: var(--panel); outline: none; }
+.list a:focus-visible { box-shadow: inset 0 0 0 2px var(--blue); }
+.name { font-weight: 700; min-width: 0; }
+.what { display: block; font-weight: 400; font-size: 14px; color: var(--muted); }
+.path { font-size: 13px; color: var(--muted); font-variant-numeric: tabular-nums; }
+.sectors { display: flex; flex-wrap: wrap; gap: 8px; }
+.sectors a { border: 1.5px solid var(--line); border-radius: 999px; padding: 6px 12px; font-size: 14px; color: var(--ink); text-decoration: none; }
+.sectors a:hover, .sectors a:focus-visible { border-color: var(--ink); outline: none; }
+.note { background: var(--panel); border-radius: 16px; padding: 18px 20px; font-size: 15px; color: var(--ink-2); display: flex; flex-direction: column; gap: 6px; }
+.note strong { color: var(--ink); }
+@media (max-width: 520px) { .path { display: none; } .list a { grid-template-columns: 14px minmax(0, 1fr); } }
+</style>
+</head>
+<body>
+
+<div class="wrap">
+  <header>
+    <div class="brand">maicro</div>
+    <h1 style="margin-top:28px">Preview</h1>
+    <p class="lead">Every page of the site as it runs today in demo mode, with fake answers and fictional businesses. The dashboard pages show the demo owner of Bakkerij De Vries, Haarlem, after proving ownership with Google.</p>
+    <div class="facts">
+      <span class="pill">Built from {{COMMIT}}</span>
+      <span class="pill">{{DATE}}</span>
+    </div>
+  </header>
+
+  <div class="note">
+    <strong>What works here and what doesn't</strong>
+    <span>Every link works. Nothing is saved: the scan form opens the example report, checkout opens the welcome page, and the other forms go to a matching page. Live answers, logins and saving need the running app.</span>
+  </div>
+
+  <section>
+    <h2>Visitor</h2>
+    <div class="list">
+      <a href="home.html"><span class="dot" style="background:var(--blue)"></span><span class="name">Home<span class="what">Landing page with the free scan</span></span><span class="path">/</span></a>
+      <a href="r-voorbeeld.html"><span class="dot" style="background:var(--rood)"></span><span class="name">Example report, red<span class="what">4 of 7 questions answered wrongly</span></span><span class="path">/r/voorbeeld</span></a>
+      <a href="r-voorbeeld-grijs.html"><span class="dot" style="background:var(--grijs)"></span><span class="name">Example report, grey<span class="what">The AI does not know the business</span></span><span class="path">/r/voorbeeld-grijs</span></a>
+      <a href="{{SCAN_REPORT}}"><span class="dot" style="background:var(--rood)"></span><span class="name">Scan report from the demo engines<span class="what">What a real free scan produces, with the "Ben jij de eigenaar?" link</span></span><span class="path">/r/…</span></a>
+      <a href="scan-druk.html"><span class="dot" style="background:var(--grijs)"></span><span class="name">Daily scan limit reached<span class="what">Shown once 25 free scans have run that day</span></span><span class="path">/scan/druk</span></a>
+    </div>
+  </section>
+
+  <section>
+    <h2>Pages per trade</h2>
+    <div class="sectors">
+{{SECTORS}}
+    </div>
+  </section>
+
+  <section>
+    <h2>Business owner</h2>
+    <div class="list">
+      <a href="inloggen.html"><span class="dot" style="background:var(--blue)"></span><span class="name">Sign in<span class="what">Magic link by e-mail</span></span><span class="path">/inloggen</span></a>
+      <a href="welkom.html"><span class="dot" style="background:var(--blue)"></span><span class="name">Welcome after payment<span class="what">Google comes first, then details and domain</span></span><span class="path">/welkom</span></a>
+      <a href="app.html"><span class="dot" style="background:var(--rood)"></span><span class="name">Dashboard<span class="what">Findings, sources and setup</span></span><span class="path">/app</span></a>
+      <a href="app-google-eerst.html"><span class="dot" style="background:var(--grijs)"></span><span class="name">Google step, before proof<span class="what">Details and domain wait for this</span></span><span class="path">/app/google</span></a>
+      <a href="app-google.html"><span class="dot" style="background:var(--groen)"></span><span class="name">Google step, after proof<span class="what">Ownership confirmed</span></span><span class="path">/app/google</span></a>
+      <a href="app-gegevens.html"><span class="dot" style="background:var(--groen)"></span><span class="name">Business details<span class="what">Opens only after ownership is proved</span></span><span class="path">/app/gegevens</span></a>
+      <a href="app-domein.html"><span class="dot" style="background:var(--groen)"></span><span class="name">Domain<span class="what">One DNS record for the facts page</span></span><span class="path">/app/domein</span></a>
+      <a href="feiten-bakkerij-de-vries-haarlem.html"><span class="dot" style="background:var(--grijs)"></span><span class="name">Facts page preview<span class="what">What AI assistants will read; owner only</span></span><span class="path">/feiten/…</span></a>
+    </div>
+  </section>
+
+  <section>
+    <h2>When ownership can't be proved</h2>
+    <div class="list">
+      <a href="eigenaar-no_match.html"><span class="dot" style="background:var(--grijs)"></span><span class="name">Profile is a different business</span><span class="path">no_match</span></a>
+      <a href="eigenaar-no_locations.html"><span class="dot" style="background:var(--grijs)"></span><span class="name">Google account has no Business Profile</span><span class="path">no_locations</span></a>
+      <a href="eigenaar-no_place_id.html"><span class="dot" style="background:var(--grijs)"></span><span class="name">Business not found on Google</span><span class="path">no_place_id</span></a>
+    </div>
+  </section>
+
+  <section>
+    <h2>Legal, drafts</h2>
+    <div class="list">
+      <a href="voorwaarden.html"><span class="dot" style="background:var(--grijs)"></span><span class="name">Terms<span class="what">Draft, not yet reviewed by a lawyer</span></span><span class="path">/voorwaarden</span></a>
+      <a href="privacy.html"><span class="dot" style="background:var(--grijs)"></span><span class="name">Privacy policy<span class="what">Draft, not yet reviewed by a lawyer</span></span><span class="path">/privacy</span></a>
+    </div>
+  </section>
+</div>
+</body>
+</html>
