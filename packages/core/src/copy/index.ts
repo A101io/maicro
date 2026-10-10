@@ -343,6 +343,15 @@ export const copy = {
     },
   },
 
+  unsubscribe: {
+    h1: "Afmelden",
+    body: (name: string) => `Je krijgt dan geen mails meer van ons over de controle van ${name}. Je rapport blijft gewoon bereikbaar via de link.`,
+    button: "Afmelden",
+    doneH1: "Je bent afgemeld",
+    doneBody: "We sturen je hierover geen mails meer.",
+    invalid: "Deze afmeldlink klopt niet of is verlopen. Mail ons op hallo@maicro.nl, dan regelen we het.",
+  },
+
   scanBusy: {
     title: "Even geen gratis controles",
     body: "We doen elke dag een beperkt aantal gratis controles en die zijn voor vandaag op. Probeer het morgen opnieuw.",

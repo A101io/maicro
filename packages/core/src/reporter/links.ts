@@ -7,6 +7,7 @@
  */
 import type { BusinessRecord } from "../db/types.js";
 import { defaultFactsHost } from "../publisher/render.js";
+import { unsubscribeToken } from "../shared/unsubscribe.js";
 
 export function baseUrl(): string {
   return (process.env.PUBLIC_BASE_URL || "http://localhost:3000").replace(/\/$/, "");
@@ -40,4 +41,14 @@ export function resultUrl(scanRunIdOrBusiness: string | (Pick<BusinessRecord, "s
 
 export function factsPageUrl(business: Pick<BusinessRecord, "slug" | "factsHost">): string {
   return `https://${business.factsHost ?? defaultFactsHost(business)}/`;
+}
+
+/** Opt-out page for the follow-up mails; signed, see shared/unsubscribe.ts. */
+export function unsubscribeUrl(business: Pick<BusinessRecord, "id">): string {
+  return `${baseUrl()}/afmelden?b=${encodeURIComponent(business.id)}&t=${unsubscribeToken(business.id)}`;
+}
+
+/** RFC 8058 one-click target that mail apps POST to. */
+export function unsubscribeOneClickUrl(business: Pick<BusinessRecord, "id">): string {
+  return `${baseUrl()}/api/afmelden?b=${encodeURIComponent(business.id)}&t=${unsubscribeToken(business.id)}`;
 }
