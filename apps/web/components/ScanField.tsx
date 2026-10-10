@@ -12,6 +12,7 @@ export function ScanField({
   note = true,
   id = "scan",
   className = "",
+  style,
 }: {
   defaultName?: string;
   defaultPlace?: string;
@@ -20,10 +21,11 @@ export function ScanField({
   note?: boolean;
   id?: string;
   className?: string;
+  style?: React.CSSProperties;
 }) {
   const s = copy.scanField;
   return (
-    <form action="/api/scan" method="post" className={`flex w-full flex-col gap-2.5 ${className}`}>
+    <form action="/api/scan" method="post" className={`flex w-full flex-col gap-2.5 ${className}`} style={style}>
       <div className="flex overflow-hidden rounded-btn border-[1.5px] border-ink bg-white">
         <label htmlFor={`${id}-q`} className="sr-only">
           {s.nameLabel}

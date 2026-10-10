@@ -33,14 +33,17 @@ export default function LandingPage() {
         {/* 1 Hero */}
         <section className="wrap grid grid-cols-1 items-center gap-10 pb-16 pt-6 sm:pt-10 lg:grid-cols-12 lg:gap-12 lg:pb-24">
           <div className="flex flex-col gap-6 lg:col-span-5 lg:gap-7">
-            <h1 className="h1">{L.hero.h1}</h1>
-            <p className="max-w-[36ch] text-[18px] leading-[1.5] text-ink-2 sm:text-[19px]">{L.hero.sub}</p>
-            <ScanField id="hero" className="max-w-[440px]" />
+            <h1 className="h1 enter">{L.hero.h1}</h1>
+            <p className="enter max-w-[36ch] text-[18px] leading-[1.5] text-ink-2 sm:text-[19px]" style={{ "--d": "90ms" } as React.CSSProperties}>
+              {L.hero.sub}
+            </p>
+            <ScanField id="hero" className="enter max-w-[440px]" style={{ "--d": "180ms" } as React.CSSProperties} />
           </div>
-          <div className="flex flex-col gap-4 lg:col-span-7">
+          <div className="enter flex flex-col gap-4 lg:col-span-7" style={{ "--d": "120ms" } as React.CSSProperties}>
             <div className="grid grid-cols-10 gap-2 rounded-[20px] bg-panel p-4 sm:gap-3 sm:p-[26px]">
               {L.hero.grid.split("").map((c, i) => (
-                <span key={i} aria-hidden className={`aspect-square rounded-full ${c === "r" ? "bg-rood" : c === "g" ? "bg-groen" : "bg-grijs"}`} />
+                // Ripple from the top-left corner: delay by row + column.
+                <span key={i} aria-hidden className={`dot-in aspect-square rounded-full ${c === "r" ? "bg-rood" : c === "g" ? "bg-groen" : "bg-grijs"}`} style={{ "--i": Math.floor(i / 10) + (i % 10) } as React.CSSProperties} />
               ))}
             </div>
             <div className="flex flex-wrap justify-between gap-x-4 gap-y-2 text-[13px] text-muted">
