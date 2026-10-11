@@ -82,6 +82,10 @@ describe.each(backends)("%s", (_name, makeDb) => {
     expect(resolved.evidenceAfter).toBe(s!.id);
     expect(await db.listFindings(b.id, "open")).toHaveLength(0);
 
+    await db.upsertBusiness({ id: b.id, slug: b.slug, name: b.name, place: b.place, stripeCustomerId: "cus_123" });
+    expect((await db.getBusinessByStripeCustomer("cus_123"))?.id).toBe(b.id);
+    expect(await db.getBusinessByStripeCustomer("cus_other")).toBeNull();
+
     const updated = await db.updateScanRun(run.id, { status: "done", costCents: 12, finishedAt: new Date().toISOString() });
     expect(updated.costCents).toBe(12);
     expect(await db.businessesDueForMonthlyScan(12)).toHaveLength(1);

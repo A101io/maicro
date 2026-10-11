@@ -95,6 +95,8 @@ export interface Db {
   upsertBusiness(input: BusinessUpsert): Promise<BusinessRecord>;
   businessesDueForMonthlyScan(dayOfMonth: number): Promise<BusinessRecord[]>;
   getBusinessByFactsHost(host: string): Promise<BusinessRecord | null>;
+  /** The business paying through this Stripe customer (invoices carry only the customer). */
+  getBusinessByStripeCustomer(customerId: string): Promise<BusinessRecord | null>;
   listBusinessesByStatus(statuses: BusinessStatus[]): Promise<BusinessRecord[]>;
   /** Owner lookup for the dashboard: by owner_user_id first, then by owner_email (case-insensitive). */
   getBusinessByOwner(opts: { userId?: string | null; email?: string | null }): Promise<BusinessRecord | null>;

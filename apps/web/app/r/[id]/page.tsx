@@ -35,7 +35,7 @@ export async function generateMetadata({ params }: { params: Promise<{ id: strin
   return { title: copy.email.subjects.report(loaded.report.business.name), robots: { index: false } };
 }
 
-export default async function ResultPage({ params, searchParams }: { params: Promise<{ id: string }>; searchParams: Promise<{ mail?: string }> }) {
+export default async function ResultPage({ params, searchParams }: { params: Promise<{ id: string }>; searchParams: Promise<{ mail?: string; betaling?: string }> }) {
   const { id } = await params;
   const sp = await searchParams;
   const loaded = await load(id);
@@ -57,9 +57,13 @@ export default async function ResultPage({ params, searchParams }: { params: Pro
             <StipHero tone={report.stip} number={v.hero.number} label={v.hero.label} />
           </div>
           <div className="flex flex-col gap-4 lg:col-span-8">
-            <h1 className="h1-sm">{v.h1}</h1>
-            <p className="lead max-w-[56ch]">{v.intro}</p>
-            <div className="flex flex-wrap gap-x-6 gap-y-1 text-[14px] text-muted">
+            <h1 className="h1-sm enter" style={{ "--d": "120ms" } as React.CSSProperties}>
+              {v.h1}
+            </h1>
+            <p className="lead enter max-w-[56ch]" style={{ "--d": "220ms" } as React.CSSProperties}>
+              {v.intro}
+            </p>
+            <div className="enter flex flex-wrap gap-x-6 gap-y-1 text-[14px] text-muted" style={{ "--d": "320ms" } as React.CSSProperties}>
               {v.engineLines.map((e) => (
                 <span key={e.name}>
                   <span className="font-bold text-ink">{e.name}</span> {e.text}
@@ -71,7 +75,7 @@ export default async function ResultPage({ params, searchParams }: { params: Pro
 
         {/* Three answers */}
         {v.cards.length > 0 && (
-          <section className="grid grid-cols-1 gap-4 md:grid-cols-3">
+          <section className="enter-kids grid grid-cols-1 gap-4 md:grid-cols-3">
             {v.cards.map((c, i) => (
               <AnswerCard key={i} {...c} />
             ))}
@@ -79,7 +83,7 @@ export default async function ResultPage({ params, searchParams }: { params: Pro
         )}
 
         {/* Per question */}
-        <section className="flex flex-col">
+        <section data-motion="stagger" className="flex flex-col">
           <ReportHeaderRow />
           {v.rows.map((row) => (
             <ReportRow key={row.question + row.tone} row={row} />
@@ -122,7 +126,7 @@ export default async function ResultPage({ params, searchParams }: { params: Pro
               <h2 className="h2-sm">{v.sourcesTitle}</h2>
               <p className="max-w-[48ch] text-[16px] leading-[1.55] text-ink-2">{v.sourcesBody}</p>
             </div>
-            <div className="flex flex-col gap-2 lg:col-span-6">
+            <div data-motion="timeline" className="flex flex-col gap-2 lg:col-span-6">
               {v.sources.map((s) => (
                 <SourceRow key={s.label} {...s} />
               ))}
@@ -131,20 +135,27 @@ export default async function ResultPage({ params, searchParams }: { params: Pro
         )}
 
         {/* Plan + CTA */}
-        <section className="panel grid grid-cols-1 items-center gap-8 p-6 sm:p-10 lg:grid-cols-12 lg:gap-10">
+        <section data-motion="rise" className="panel grid grid-cols-1 items-center gap-8 p-6 sm:p-10 lg:grid-cols-12 lg:gap-10">
           <div className="flex flex-col gap-3.5 lg:col-span-7">
             <h2 className="h2-sm">{v.plan.h2}</h2>
-            <ol className="flex flex-col gap-2 text-[16px] leading-[1.5] text-ink-2">
+            <ol data-motion="timeline" className="flex flex-col gap-2 text-[16px] leading-[1.5] text-ink-2">
               {v.plan.steps.map((s, i) => (
                 <li key={i} className="flex gap-3">
-                  <Stip tone={s.tone} size={22} className="mt-[3px]" />
+                  <span data-stip className="flex">
+                    <Stip tone={s.tone} size={22} className="mt-[3px]" />
+                  </span>
                   <span>{s.text}</span>
                 </li>
               ))}
             </ol>
             {v.plan.note && <p className="text-[13px] text-muted">{v.plan.note}</p>}
           </div>
-          <div className="flex flex-col gap-3 lg:col-span-5">
+          <div data-motion="stagger" className="flex flex-col gap-3 lg:col-span-5">
+            {(sp.betaling === "geannuleerd" || sp.betaling === "fout") && (
+              <p className="rounded-xl border-[1.5px] border-line bg-white px-4 py-3 text-[14px] text-ink-2" aria-live="polite">
+                {sp.betaling === "fout" ? copy.checkout.error : copy.checkout.cancelled}
+              </p>
+            )}
             <form action="/api/checkout" method="post">
               <input type="hidden" name="business" value={report.business.id} />
               <input type="hidden" name="scan" value={report.scanRunId} />
@@ -171,7 +182,7 @@ export default async function ResultPage({ params, searchParams }: { params: Pro
         </section>
 
         {/* Email + self */}
-        <section className="grid grid-cols-1 gap-8 md:grid-cols-2">
+        <section data-motion="stagger" className="grid grid-cols-1 gap-8 md:grid-cols-2">
           <EmailCapture scanRunId={report.scanRunId} businessId={report.business.id} sent={sp.mail === "ok" || Boolean(ownerEmail)} invalid={sp.mail === "fout"} />
           <div className="flex flex-col gap-2.5">
             <h3 className="text-[16px] font-bold">{v.self.h3}</h3>

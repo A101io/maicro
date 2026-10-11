@@ -117,6 +117,11 @@ export class MemDb implements Db {
     return null;
   }
 
+  async getBusinessByStripeCustomer(customerId: string): Promise<BusinessRecord | null> {
+    for (const b of this.businesses.values()) if (b.stripeCustomerId === customerId) return { ...b };
+    return null;
+  }
+
   async getBusinessByOwner(opts: { userId?: string | null; email?: string | null }): Promise<BusinessRecord | null> {
     if (opts.userId) for (const b of this.businesses.values()) if (b.ownerUserId === opts.userId) return { ...b };
     if (opts.email) {
