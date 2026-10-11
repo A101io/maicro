@@ -14,7 +14,8 @@
     "./reporter": "./src/reporter/index.ts",
     "./prompts": "./src/prompts/index.ts",
     "./copy": "./src/copy/index.ts",
-    "./shared": "./src/shared/index.ts"
+    "./shared": "./src/shared/index.ts",
+    "./billing": "./src/billing/index.ts"
   },
   "scripts": {
     "typecheck": "tsc --noEmit",

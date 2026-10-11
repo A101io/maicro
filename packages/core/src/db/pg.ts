@@ -257,6 +257,11 @@ export class PgDb implements Db {
     return rows[0] ? mapBusiness(rows[0]) : null;
   }
 
+  async getBusinessByStripeCustomer(customerId: string): Promise<BusinessRecord | null> {
+    const rows = await this.sql`select * from business where stripe_customer_id = ${customerId} limit 1`;
+    return rows[0] ? mapBusiness(rows[0]) : null;
+  }
+
   async getBusinessByOwner(opts: { userId?: string | null; email?: string | null }): Promise<BusinessRecord | null> {
     if (opts.userId) {
       const rows = await this.sql`select * from business where owner_user_id = ${opts.userId} order by created_at desc limit 1`;
