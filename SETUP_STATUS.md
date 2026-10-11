@@ -1,6 +1,6 @@
 # Setup status: Maicro
 
-Baseline v2 · Last checked: 2026-10-11 (repo audit at `70f7eef`; nothing was run against live Supabase, Stripe or a deployed site)
+Baseline v3 · Last checked: 2026-10-11 (repo audit at `70f7eef`; nothing was run against live Supabase, Stripe or a deployed site)
 Status key: ✓verified (observed, evidence + date) · written (code exists, not proven on real infra) · blocked (needs Julian/counsel) · open · n/a
 Compliance checks here are an aid, not legal advice. The baseline itself lives in the project's shared setup folder (`setup/README.md`).
 
@@ -39,13 +39,12 @@ Compliance checks here are an aid, not legal advice. The baseline itself lives i
 | B3 | Auth: site_url, redirects, rate limit, leaked-password, email flows | open | | |
 | B4 | Turnstile on public forms | open | The free scan form is public and only rate-limited by `FREE_SCANS_PER_DAY`; no captcha. | |
 | B5 | Cron verified | n/a | Jobs run in `apps/worker` (own queue + cron), not pg_cron. Verify by job rows once deployed. | |
-| B6 | Plan and cost written down | open | | |
 
 ## D. Deploy, domain, headers
 | # | Step | Status | Evidence | Date |
 |---|---|---|---|---|
 | D1 | CI on every PR | written | `ci.yml`: typecheck, unit tests, `e2e:mock`, `verify:pg` on PR and main. | 2026-10-11 |
-| D2 | Production deploy + preview | open | Only `site.yml` (static mock snapshot to GitHub Pages). No production hosting chosen for the Next app and the worker. | |
+| D2 | Production deploy + preview | open | Only `site.yml` (static mock snapshot to GitHub Pages). CLAUDE.md plans Vercel (web) + Fly/Railway (worker); pick EU regions. | |
 | D3 | No empty env overrides; no-backend build refuses to run | open | | |
 | D4 | Deployed bundle verified | open | | |
 | D5 | Domain on Cloudflare, routes in code | open | | |
@@ -57,7 +56,7 @@ Compliance checks here are an aid, not legal advice. The baseline itself lives i
 | # | Step | Status | Evidence | Date |
 |---|---|---|---|---|
 | E1 | Unit + browser e2e with controls | written | Vitest in core and worker; `e2e:mock` runs the whole pipeline. No Playwright browser tests. | 2026-10-11 |
-| E2 | Accessibility WCAG AA | open | | |
+| E2 | Accessibility WCAG AA (light only; no dark mode by design) | open | | |
 | E3 | Daily checks, no continue-on-error | open | | |
 | E4 | Dependency audit clean | open | | |
 
@@ -76,6 +75,30 @@ Compliance checks here are an aid, not legal advice. The baseline itself lives i
 | G1 | Support address, /support, auto-reply | written | hallo@maicro.nl in the footer; mailbox not verified; no `/support` page. | 2026-10-11 |
 | G2 | Transactional email | written | Resend in `packages/core/src/reporter/mail.ts`, unsubscribe link + `UNSUBSCRIBE_SECRET`, `/afmelden`. SPF/DKIM/DMARC not checked. | 2026-10-11 |
 
+## H. Operations and resilience
+| # | Step | Status | Evidence | Date |
+|---|---|---|---|---|
+| H1 | Backups + restore drill | open | Supabase plan and backup settings not checked; no restore tried. | |
+| H2 | Error monitoring (EU) | open | No error tracker in the code (grep for Sentry: 0 hits). | |
+| H3 | Uptime checks + alerts | open | | |
+| H4 | Rate limiting | written | Free scans capped per day (`FREE_SCANS_PER_DAY`, default 25, `apps/web/lib/env.ts`); event-count queries support limits (`db/types.ts`). No limits on login, report email or webhooks. | 2026-10-11 |
+| H5 | Staging environment | open | One Supabase project; mock mode covers local work. | |
+| H6 | Rollback plan | open | | |
+| H7 | Dependency updates | open | No Dependabot/Renovate config in `.github/`. | |
+| H8 | 2FA + least privilege on operator accounts | open | Not checkable from the repo. | |
+| H9 | Incident + breach runbook | open | | |
+| H10 | security.txt | open | | |
+| H11 | Cost alerts and caps | written | AI scan spend bounded by the daily free-scan cap; mock mode when keys are empty. No budget alerts on vendors. | 2026-10-11 |
+
+## P. Privacy operations
+| # | Step | Status | Evidence | Date |
+|---|---|---|---|---|
+| P1 | Processors list + DPAs | open | Processors in use: Supabase, Stripe, Resend, Google (OAuth, Places, Business Profile), OpenAI/Gemini/Perplexity/SerpAPI, Cloudflare, KvK API. No list or DPAs recorded. | |
+| P2 | Records of processing | open | | |
+| P3 | DPIA screening | open | Business data mostly, plus owner emails; screening likely says no DPIA, but write it down. | |
+| P4 | Proof of consent | open | No consent or terms-version columns in the migrations. | |
+| P5 | Retention jobs | open | Report links expire after 30 days (copy); no deletion job found. | |
+
 ## C. Conditional
 | # | Step | Status | Evidence | Date |
 |---|---|---|---|---|
@@ -85,6 +108,7 @@ Compliance checks here are an aid, not legal advice. The baseline itself lives i
 | C4 | B2C terms | n/a | B2B product. | |
 | C5 | Native app | n/a | | |
 | C6 | Trademark check (EUIPO + BOIP) | open | Renamed from Seatme; "Maicro" not yet checked. | |
+| C7 | Accessibility statement | n/a | B2B service from a microenterprise; publish one anyway when convenient. | |
 
 ## Legal review log
 | Check | Result | Note |
@@ -96,4 +120,4 @@ Compliance checks here are an aid, not legal advice. The baseline itself lives i
 
 ## Needs Julian
 - Legal: adapt the De Boer Legal B2B masters for Maicro (terms, privacy, cookies) and send them for review, or keep Maicro's own draft and send that?
-- Hosting: where should the Next app and the worker run in production (Cloudflare like the others)?
+- Staging: a separate Supabase project for previews (extra monthly cost) or keep previews on mock data only?
