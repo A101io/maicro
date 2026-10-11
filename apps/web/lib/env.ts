@@ -52,6 +52,10 @@ export const env = {
   get stripePriceMonitor() {
     return read("STRIPE_PRICE_MONITOR");
   },
+  /** The 21% BTW tax rate (scripts/stripe-setup.mjs). Prices are excl. btw, so live checkout refuses without it. */
+  get stripeTaxRateId() {
+    return read("STRIPE_TAX_RATE_ID");
+  },
   get hasStripe(): boolean {
     return Boolean(this.stripeSecretKey);
   },

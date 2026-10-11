@@ -13,6 +13,7 @@ export default async function AppLayout({ children }: { children: React.ReactNod
     { href: "/app/gegevens", label: d.setupSteps.facts },
     { href: "/app/domein", label: d.setupSteps.domain },
     { href: "/app/google", label: d.setupSteps.google },
+    { href: "/app/abonnement", label: d.billingNav },
   ];
   return (
     <>

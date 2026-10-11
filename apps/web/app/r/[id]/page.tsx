@@ -35,7 +35,7 @@ export async function generateMetadata({ params }: { params: Promise<{ id: strin
   return { title: copy.email.subjects.report(loaded.report.business.name), robots: { index: false } };
 }
 
-export default async function ResultPage({ params, searchParams }: { params: Promise<{ id: string }>; searchParams: Promise<{ mail?: string }> }) {
+export default async function ResultPage({ params, searchParams }: { params: Promise<{ id: string }>; searchParams: Promise<{ mail?: string; betaling?: string }> }) {
   const { id } = await params;
   const sp = await searchParams;
   const loaded = await load(id);
@@ -151,6 +151,11 @@ export default async function ResultPage({ params, searchParams }: { params: Pro
             {v.plan.note && <p className="text-[13px] text-muted">{v.plan.note}</p>}
           </div>
           <div data-motion="stagger" className="flex flex-col gap-3 lg:col-span-5">
+            {(sp.betaling === "geannuleerd" || sp.betaling === "fout") && (
+              <p className="rounded-xl border-[1.5px] border-line bg-white px-4 py-3 text-[14px] text-ink-2" aria-live="polite">
+                {sp.betaling === "fout" ? copy.checkout.error : copy.checkout.cancelled}
+              </p>
+            )}
             <form action="/api/checkout" method="post">
               <input type="hidden" name="business" value={report.business.id} />
               <input type="hidden" name="scan" value={report.scanRunId} />
