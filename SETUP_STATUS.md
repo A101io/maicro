@@ -1,0 +1,122 @@
+# SETUP_STATUS — Maicro
+
+Baseline v3 (project-setup-baseline) · last checked 13 Oct 2026 · a compliance aid, **not legal advice**.
+Status: `✓verified` (observed, evidence + date) · `written` (code exists, not proven on real infrastructure) · `blocked` (names what it needs) · `open` · `n/a` (reason).
+
+## Project facts
+- Product: Maicro (name under review, see go-live J1). Company: A101 B.V. (handelend als Maicro), Factorij 80, 3071 AV Rotterdam, KvK 42057858, VAT NL869514192B01 (not shown on the site by design: footer has no btw-nummer).
+- Domain: none yet (`maicro.nl` assumed in copy). Support: hallo@maicro.nl (mailbox not verified to exist).
+- Audience: B2B (Dutch businesses). Languages: NL + EN.
+- Stack: Next.js 15 (apps/web), worker (apps/worker), core (packages/core), Supabase `bbynmqvaxpjdnkaasutd` (eu-west-1). Hosting planned Vercel + Fly/Railway (CLAUDE.md wins over the Cloudflare default).
+- Accounts: yes (magic link + Google verification). Payments: Stripe (account not created). AI: yes, as a tool to ask questions (OpenAI, Google, Perplexity, SerpAPI). Outbound email: Resend. Native app: no.
+- Baseline reference files (`/mnt/project-files/setup/`, legal masters, `projects.md`): **not present in this environment**; this file was made from the skill's section 5.
+
+## R. Required
+| # | Step | Status | Evidence | Date |
+|---|---|---|---|---|
+| R1 | Supabase | ✓verified | Project read back by ref: `maicro`, eu-west-1, ACTIVE_HEALTHY. RLS on all 11 tables; advisors: only INFO "RLS enabled, no policy" on the 4 internal tables (intended). Transaction test, rolled back: anon sees 0 business, stranger 0, **control: owner 1** and own event 1. | 13 Oct |
+| R2 | Legal pages + footer | blocked | Drafts at `/voorwaarden`, `/privacy` with a "Concept" banner; footer identity line present. Needs: De Boer Legal masters uploaded, `/legal/terms|privacy|cookies` NL + EN, "Cookie settings" link, counsel review. | 13 Oct |
+| R3 | Fixed header | ✓verified | Playwright, 2000px scroll: header `top 0`, sticky, z 40, visible at 1280 and 390 (`out/screenshots/r3-header-*.png`). Mobile menu (`<details>`) opens, follows a link and closes (`r3-menu-390.png`). `[id]{scroll-margin-top:88px}`. | 13 Oct |
+
+## A. Foundation
+| # | Step | Status | Evidence | Date |
+|---|---|---|---|---|
+| A1 | CLAUDE.md | written | Sections added: resuming work, how to write to Julian, things that cost an hour. | 13 Oct |
+| A2 | Go-live checklist | written | `docs/go-live-checklist.md` | 13 Oct |
+| A3 | Legal-compliance guidelines | written | `docs/legal-compliance-guidelines.md` (claims, never-use, VAT, cookies, DPIA, open questions) | 13 Oct |
+| A4 | Secrets and keys | written | `docs/secrets-and-keys.md` | 13 Oct |
+| A5 | Secret hygiene | ✓verified | `.env.example` complete; `pnpm scan:secrets` in CI; control: a planted `sk_live_…` made it exit 1. No service-role key in `NEXT_PUBLIC_*`. | 13 Oct |
+| A6 | Project ref guard | ✓verified | CLAUDE.md lists Maicro, Sitty and Sonable refs; every MCP call this session used `bbynmqvaxpjdnkaasutd`. | 13 Oct |
+
+## B. Supabase hardening
+| # | Step | Status | Evidence | Date |
+|---|---|---|---|---|
+| B1 | Migrations really applied | written | Ledger `supabase_migrations.schema_migrations`. REST check (`/rest/v1/business?select=owner_verified_at`) not run: `*.supabase.co` blocked from this container. | 13 Oct |
+| B2 | Functions locked down | open | Review `SECURITY DEFINER` functions and anon grants (anon has table grants; RLS returns 0, but revoke is cleaner). | |
+| B3 | Auth settings | blocked | site_url, redirect URLs, custom SMTP (Resend), leaked-password n/a (magic link). Needs domain + Resend. | |
+| B4 | Bot protection (Turnstile) | open | Free-scan form and sign-in send email / spend AI calls; `FREE_SCANS_PER_DAY` caps cost but is not a captcha. | |
+| B5 | Cron jobs | n/a | Cron runs in the worker, not pg_cron. | |
+
+## D. Deploy, domain, headers
+| # | Step | Status | Evidence | Date |
+|---|---|---|---|---|
+| D1 | CI on every PR | ✓verified | `ci.yml`: secret scan, typecheck, tests, mock pipeline, Postgres. No linter configured yet. | 13 Oct |
+| D2 | Deploy | blocked | Only the GitHub Pages preview deploys (`site.yml`). Production hosting: Julian (go-live J3). | |
+| D3 | No empty env overrides | ✓verified | Workflows set no `NEXT_PUBLIC_*`; live checkout refuses without `STRIPE_TAX_RATE_ID`. | 13 Oct |
+| D4 | Verify deployed bundle | open | Needs a production deploy. | |
+| D5 | Domain | blocked | Julian (J2). | |
+| D6 | Launch gate | blocked | Preview is public on GitHub Pages; Julian decides (J4). | |
+| D7 | Security headers + CSP | written | HSTS, nosniff, Referrer-Policy, X-Frame-Options, Permissions-Policy seen via `curl -I` on dev; CSP production-only (`next.config.ts`). | 13 Oct |
+| D8 | Health endpoint | ✓verified | `/api/health` → `{"ok":true,"db":"mem"}` 200 on dev; 503 path when the db throws. | 13 Oct |
+
+## E. Quality
+| # | Step | Status | Evidence | Date |
+|---|---|---|---|---|
+| E1 | Unit + e2e | written | 152 core + 8 worker tests, `e2e:mock`, `verify:pg`. No Playwright suite in the repo yet (checks run ad hoc). | 13 Oct |
+| E2 | Accessibility | open | Reduced motion honoured everywhere, scenes have labels, simulator buttons use aria-pressed + aria-live. No axe run yet. | |
+| E3 | Daily checks | open | | |
+| E4 | Dependency audit | open | | |
+
+## F. Growth
+| # | Step | Status | Evidence | Date |
+|---|---|---|---|---|
+| F1 | i18n | written | NL at `/`, EN at `/en/...` with English slugs (`/en/pricing`, `/en/sectors/...`), hreflang alternates, NL·EN switch in header and footer (plain links, keeps the session). Emails and reports stay Dutch. | 13 Oct |
+| F2 | SEO basics | written | `<html lang>` per language, titles, robots, sitemap, Organization JSON-LD (no sameAs yet). OG image missing. | 13 Oct |
+| F3 | Brand assets | open | `app/icon.svg` only; name not final. | |
+| F4 | Analytics | n/a for now | No analytics; add consent-gated first-party before any marketing. | |
+| F5 | 404 page | ✓verified | `/bestaat-niet` → 404 with header and footer. | 13 Oct |
+
+## G. Support and email
+| # | Step | Status | Evidence | Date |
+|---|---|---|---|---|
+| G1 | Support channel | blocked | hallo@maicro.nl used everywhere; needs the domain and a real mailbox. | |
+| G2 | Transactional email | blocked | Resend code + one-click unsubscribe (RFC 8058) written; DNS (SPF/DKIM/DMARC) needs the domain. | |
+
+## H. Operations
+| # | Step | Status | Evidence | Date |
+|---|---|---|---|---|
+| H1 | Backups + restore drill | blocked | Paid Supabase plan: Julian. | |
+| H2 | Error monitoring | open | | |
+| H3 | Uptime | open | `/api/health` ready for it. | |
+| H4 | Rate limiting | written | `FREE_SCANS_PER_DAY` caps live scans site-wide; per-IP limits open. | |
+| H5 | Staging | open | | |
+| H6 | Rollback plan | open | In go-live X5. | |
+| H7 | Dependency updates | written | `.github/dependabot.yml` weekly, grouped. | 13 Oct |
+| H8 | Operator 2FA | blocked | Julian. | |
+| H9 | Incident runbook | open | | |
+| H10 | security.txt | ✓verified | `/.well-known/security.txt` 200 with Contact, Expires, Canonical, Policy. | 13 Oct |
+| H11 | Cost alerts | open | AI spend capped by `FREE_SCANS_PER_DAY`; provider budget alerts not set. | |
+
+## P. Privacy
+| # | Step | Status | Evidence | Date |
+|---|---|---|---|---|
+| P1 | Processors | written | `docs/processors.md`; DPAs not yet accepted; hosting missing from the privacy text. | 13 Oct |
+| P2 | Records of processing | written | `docs/records-of-processing.md` | 13 Oct |
+| P3 | DPIA screening | written | Not indicated (guidelines doc). | 13 Oct |
+| P4 | Proof of consent | n/a for now | No consent-based processing yet (no non-essential cookies). Terms version accepted at checkout: open. | |
+| P5 | Retention runs | open | Retention periods await counsel. | |
+
+## C. Conditional
+| # | Step | Status | Evidence | Date |
+|---|---|---|---|---|
+| C1 | Payments | blocked | Code done (`docs/PAYMENTS.md`, wrong-account guard). Needs Maicro's own Stripe account. | |
+| C2 | Accounts + personal data | open | Export / delete my data not built. | |
+| C3 | AI features | written | Maicro asks AI providers; it does not chat with customers. Spend capped by `FREE_SCANS_PER_DAY`. | |
+| C4 | B2C | n/a | B2B only. | |
+| C5 | Native app | n/a | | |
+| C6 | New brand | blocked | Trademark check before the domain; name under review. | |
+| C7 | Accessibility statement | open | | |
+
+## Legal review log
+| Check | Result |
+|---|---|
+| GDPR art. 13/14 contents in privacy draft | partial: controller, purposes, basis, recipients, retention, rights, AP complaint present; EEA transfer safeguards named generally; hosting processors missing |
+| Cookie statement matches the browser | fail: no cookie statement page yet (inventory is in the guidelines doc) |
+| Terms cover parties, service, prices + VAT, renewal, liability, NL law | pass (draft) |
+| Company identity visible | pass (footer) |
+| Deviations from masters | n/a: masters not available here |
+
+## Needs Julian
+1. Upload the De Boer Legal masters (B2B, July 2026) so R2 can be built from them.
+2. Hosting choice (Vercel + Fly, or Cloudflare) and the domain; until then D2, D4–D6, G1–G2 wait.
+3. Keep the GitHub Pages preview public, or put it behind a coming-soon page.
