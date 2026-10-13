@@ -1,12 +1,13 @@
 import Link from "next/link";
 import { getI18n } from "@/lib/i18n";
 import { LangSwitch } from "@/components/LangSwitch";
+import { Logo } from "@/components/Logo";
 
 export async function Wordmark({ href = "/" }: { href?: string }) {
-  const { copy, href: to } = await getI18n();
+  const { href: to } = await getI18n();
   return (
-    <Link href={to(href)} aria-label={copy.brand} className="text-[24px] font-extrabold hover:text-ink" style={{ letterSpacing: "-0.5px" }}>
-      {copy.nav.wordmark}
+    <Link href={to(href)} className="inline-flex hover:text-ink">
+      <Logo size={24} />
     </Link>
   );
 }
