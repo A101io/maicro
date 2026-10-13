@@ -8,7 +8,8 @@
  * deterministic synthetic answers.
  */
 import { ENGINES, visibilityFor, type Engine, type Facts, type Finding, type InstableFinding, type Prompt, type ScanKind, type ScanReport, type Sample, type SectorSlug } from "../types";
-import { db as defaultDb, type Db, type FindingInput } from "../db";
+import { type Db, type FindingInput } from "../db";
+import { getDb } from "../shared/db.js";
 import { generatePrompts, selectFreeScanPrompts } from "../prompts";
 import { attributeAll, type AttributionContext } from "./attribute";
 import { compare, groupKey, type ComparableSample, type CompareResult } from "./compare";
@@ -28,6 +29,7 @@ export type { EngineClient, AskContext, EngineAnswer } from "./engines";
 export * from "./resolve";
 export * from "./onboard";
 export * from "./stip";
+export * from "./progress";
 
 /** Defaults per scan kind (ARCHITECTURE.md workflows A and C). */
 export const SCAN_DEFAULTS: Record<ScanKind, { engines: Engine[]; samplesPerPrompt: number }> = {
@@ -154,7 +156,7 @@ function engineStats(engines: Engine[], samples: Pick<Sample, "id" | "engine">[]
 
 /** Run a scan end-to-end and persist everything. */
 export async function runScan(opts: RunScanOptions): Promise<ScanReport> {
-  const db = opts.db ?? defaultDb;
+  const db = opts.db ?? getDb();
   const defaults = SCAN_DEFAULTS[opts.kind];
   const engines = opts.engines?.length ? opts.engines : defaults.engines;
   const samplesPerPrompt = opts.samplesPerPrompt ?? Number(process.env.MAICRO_SAMPLES ?? defaults.samplesPerPrompt);
@@ -316,7 +318,7 @@ function assembleReport(args: {
 
 /** Rebuild the ScanReport for a stored scan run (result page, emails). */
 export async function buildReport(scanRunId: string, dbOverride?: Db): Promise<ScanReport> {
-  const db = dbOverride ?? defaultDb;
+  const db = dbOverride ?? getDb();
   const scanRun = await db.getScanRun(scanRunId);
   if (!scanRun) throw new Error(`scan_run ${scanRunId} not found`);
   const business = await db.getBusiness(scanRun.businessId);

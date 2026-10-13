@@ -204,11 +204,16 @@ export class PgDb implements Db {
   readonly kind = "pg" as const;
   readonly sql: Sql;
 
-  constructor(databaseUrl: string) {
+  /**
+   * `opts` for a short-lived handle (one Worker request through Hyperdrive):
+   * few connections, closed soon after the last query, because the next
+   * request may not reuse them.
+   */
+  constructor(databaseUrl: string, opts: { max?: number; idleTimeout?: number } = {}) {
     this.sql = postgres(databaseUrl, {
       transform: postgres.camel,
-      max: Number(process.env.PG_POOL_MAX ?? 5),
-      idle_timeout: 30,
+      max: opts.max ?? Number(process.env.PG_POOL_MAX ?? 5),
+      idle_timeout: opts.idleTimeout ?? 30,
       connect_timeout: 10,
       prepare: false, // Supabase pooler (pgbouncer transaction mode) friendly
     });

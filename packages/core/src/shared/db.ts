@@ -7,13 +7,36 @@
  * method on the db and fall back to scanning the in-memory store.
  * TODO(integration): move these onto the Db interface once db/ is final.
  */
+import { AsyncLocalStorage } from "node:async_hooks";
 import * as dbModule from "../db/index.js";
 import type { BusinessRecord, Db } from "../db/types.js";
 import type { BusinessStatus, Fix } from "../types.js";
 
 let cached: Db | null = null;
 
+/**
+ * A database handle for one request or one job. On Cloudflare Workers a
+ * connection opened in one request cannot be used by the next ("Cannot
+ * perform I/O on behalf of a different request"), so each invocation opens
+ * its own (Hyperdrive pools them) and runs inside `withDb`. Everything that
+ * calls getDb() then gets that handle without being passed it. Outside a
+ * scope (Node: dev, tests, CLI) the process-wide handle answers, as before.
+ */
+// One instance per isolate, on globalThis: on Cloudflare the Worker entry
+// (apps/web/worker.ts) and the Next server are bundled separately, each with
+// its own copy of this module. Two AsyncLocalStorage instances would mean the
+// scope opened by one is invisible to the other, and every query silently
+// falls back to the shared handle.
+const g = globalThis as typeof globalThis & { __maicroDbScope?: AsyncLocalStorage<Db> };
+const scope = (g.__maicroDbScope ??= new AsyncLocalStorage<Db>());
+
+export function withDb<T>(db: Db, fn: () => Promise<T>): Promise<T> {
+  return scope.run(db, fn);
+}
+
 export function getDb(): Db {
+  const scoped = scope.getStore();
+  if (scoped) return scoped;
   if (cached) return cached;
   const m = dbModule as unknown as Record<string, unknown>;
   if (typeof m.getDb === "function") cached = (m.getDb as () => Db)();

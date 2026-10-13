@@ -1,3 +1,4 @@
+import { cloudflareBindings } from "@/lib/cloudflare";
 import { NextResponse, after } from "next/server";
 import { copyFor } from "@maicro/core/copy";
 import { localizeHref } from "@/lib/lang-paths";
@@ -71,10 +72,18 @@ export async function POST(req: Request) {
   await db.logEvent(business.id, "scan.requested", { q, created, via: "web" });
 
   const state = await createScanState(business.id, copy, FREE_SCAN_ENGINES);
-  // v1: run the scan directly after the response is sent; the waiting room polls /api/scan/[token]/status.
-  after(async () => {
-    await startFreeScan(state, { kind: "free", engines: FREE_SCAN_ENGINES });
-  });
+  // On Cloudflare a scan outlives a request (several minutes with live
+  // engines; waitUntil allows 30 s), so it goes on the queue and the
+  // background worker runs it. Elsewhere (local, mock) it runs right after
+  // the response. Either way the waiting room polls /api/scan/[token]/status.
+  const queue = cloudflareBindings()?.SCAN_QUEUE;
+  if (queue) {
+    await queue.send({ token: state.token, kind: "free", engines: FREE_SCAN_ENGINES });
+  } else {
+    after(async () => {
+      await startFreeScan(state, { kind: "free", engines: FREE_SCAN_ENGINES });
+    });
+  }
 
   return NextResponse.redirect(to(`/scan/${state.token}`), 303);
 }

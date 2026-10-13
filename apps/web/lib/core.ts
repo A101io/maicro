@@ -5,9 +5,9 @@
  */
 import { randomBytes } from "node:crypto";
 import { db as moduleDb, MemDb, type Db } from "@maicro/core/db";
-import { resolveBusiness as coreResolveBusiness, draftProvisionalFacts, prepareBusiness as corePrepareBusiness, runScan as coreRunScan, buildReport, SCAN_DEFAULTS, type BusinessCandidate, type ScanProgress } from "@maicro/core/scanner";
+import { resolveBusiness as coreResolveBusiness, draftProvisionalFacts, prepareBusiness as corePrepareBusiness, buildReport, SCAN_DEFAULTS, runScanWithProgress, persistScanState, readScanState, businessIdFromToken, type BusinessCandidate, type ScanProgressStep, type ScanJobState } from "@maicro/core/scanner";
 import { renderFactsPage } from "@maicro/core/publisher";
-import { setBusinessStatus, setDb } from "@maicro/core/shared";
+import { getDb as scopedDb, setBusinessStatus, setDb } from "@maicro/core/shared";
 import { ENGINE_LABEL, type BusinessStatus, type Engine, type ScanKind, type ScanReport } from "@maicro/core/types";
 import type { CopyShape } from "@maicro/core/copy";
 import { env } from "./env";
@@ -16,9 +16,9 @@ import { seedDemo } from "./demo";
 export type { BusinessCandidate, Db };
 export { draftProvisionalFacts, buildReport, renderFactsPage, ENGINE_LABEL, SCAN_DEFAULTS };
 
-/** prepareBusiness bound to the process-wide db. */
+/** prepareBusiness bound to this request's db. */
 export function prepareBusiness(opts: Omit<Parameters<typeof corePrepareBusiness>[0], "db">) {
-  return corePrepareBusiness({ ...opts, db });
+  return corePrepareBusiness({ ...opts, db: getDb() });
 }
 
 // ---------------------------------------------------------------------------
@@ -40,9 +40,10 @@ const db: Db = (() => {
   return g.__maicroDb;
 })();
 
+/** The request's handle on Cloudflare (core's withDb scope), else the process-wide one. */
 export function getDb(): Db {
   if (env.mock && !g.__maicroSeeded) g.__maicroSeeded = seedDemo(db).catch((err) => console.warn("[web] demo seed failed", err));
-  return db;
+  return scopedDb();
 }
 
 /** Awaits the mock demo seed (no-op outside mock mode). */
@@ -80,20 +81,7 @@ export async function resolveBusiness(query: string, place?: string): Promise<Bu
 // Free scan with a token-keyed waiting room
 // ---------------------------------------------------------------------------
 
-export interface ScanProgressStep {
-  key: string;
-  label: string;
-  done: boolean;
-}
-
-export interface ScanJobState {
-  token: string;
-  businessId: string;
-  scanRunId: string | null;
-  status: "queued" | "running" | "done" | "failed";
-  steps: ScanProgressStep[];
-  error?: string | null;
-}
+export type { ScanProgressStep, ScanJobState };
 
 export const FREE_SCAN_ENGINES: Engine[] = SCAN_DEFAULTS.free.engines;
 
@@ -121,16 +109,12 @@ export function newScanToken(businessId: string): string {
   return `${businessId}_${randomBytes(6).toString("hex")}`;
 }
 
-export function businessIdFromToken(token: string): string | null {
-  // "." for tokens issued before the separator changed.
-  const i = Math.max(token.lastIndexOf("_"), token.lastIndexOf("."));
-  return i > 0 ? token.slice(0, i) : null;
-}
+export { businessIdFromToken };
 
 async function persist(state: ScanJobState) {
   progressMap().set(state.token, state);
   try {
-    await db.logEvent(state.businessId, "scan.progress", { token: state.token, scanRunId: state.scanRunId, status: state.status, steps: state.steps, error: state.error ?? null });
+    await persistScanState(state, getDb());
   } catch (err) {
     console.warn("[web] scan.progress event failed", err);
   }
@@ -138,95 +122,26 @@ async function persist(state: ScanJobState) {
 
 /** Current waiting-room state: memory first, then the latest `scan.progress` event (other process). */
 export async function getScanState(token: string): Promise<ScanJobState | null> {
-  const mem = progressMap().get(token);
-  if (mem) return mem;
-  const businessId = businessIdFromToken(token);
-  if (!businessId) return null;
-  const events = await db.listEvents(businessId, 200);
-  const ev = events.find((e) => e.type === "scan.progress" && e.payload.token === token);
-  if (!ev) return null;
-  const p = ev.payload as unknown as Omit<ScanJobState, "token" | "businessId">;
-  return { token, businessId, scanRunId: p.scanRunId ?? null, status: p.status, steps: p.steps, error: p.error ?? null };
+  return progressMap().get(token) ?? readScanState(token, getDb());
 }
 
-/** Create the waiting-room state (status queued). Call before `after(() => startFreeScan(...))`. */
+/** Create the waiting-room state (status queued). Call before the scan is started or queued. */
 export async function createScanState(businessId: string, copy: CopyShape, engines: Engine[] = FREE_SCAN_ENGINES): Promise<ScanJobState> {
   const state: ScanJobState = { token: newScanToken(businessId), businessId, scanRunId: null, status: "queued", steps: progressTemplate(engines, copy), error: null };
   await persist(state);
   return state;
 }
 
-/** Run the free scan through core and translate its progress events into waiting-room steps. */
+/** Run the free scan here, in this process (local dev, mock mode). On Cloudflare the queue consumer runs it instead. */
 export async function startFreeScan(state: ScanJobState, opts: { kind?: ScanKind; engines?: Engine[] } = {}): Promise<ScanReport | null> {
-  const engines = opts.engines ?? FREE_SCAN_ENGINES;
-  const kind = opts.kind ?? "free";
-  const perEngine = new Map<Engine, number>();
-  let perEngineTotal = Number.POSITIVE_INFINITY;
-  const mark = (key: string) => {
-    const s = state.steps.find((x) => x.key === key);
-    if (s) s.done = true;
-  };
-  const markAllAsk = () => engines.forEach((e) => mark(`ask:${e}`));
-  let dirty = false;
-  let flushing: Promise<void> | null = null;
-  const flush = () => {
-    dirty = true;
-    if (!flushing) {
-      flushing = (async () => {
-        while (dirty) {
-          dirty = false;
-          await persist(state);
-        }
-        flushing = null;
-      })();
-    }
-  };
-
-  state.status = "running";
-  const onProgress = (ev: ScanProgress) => {
-    if (ev.type === "start") {
-      state.scanRunId = ev.scanRunId;
-      perEngineTotal = engines.length ? Math.ceil(ev.total / engines.length) : ev.total;
-      mark("found");
-    } else if (ev.type === "asked") {
-      const n = (perEngine.get(ev.engine) ?? 0) + 1;
-      perEngine.set(ev.engine, n);
-      if (n >= perEngineTotal) mark(`ask:${ev.engine}`);
-    } else if (ev.type === "phase") {
-      if (ev.phase === "extract" || ev.phase === "compare") {
-        markAllAsk();
-        if (ev.phase === "compare") mark("comparing");
-      } else if (ev.phase === "attribute" || ev.phase === "persist") {
-        markAllAsk();
-        mark("comparing");
-        if (ev.phase === "persist") mark("sources");
-      } else if (ev.phase === "done") {
-        state.steps.forEach((s) => (s.done = true));
-      }
-    }
-    flush();
-  };
-  flush();
-  try {
-    const report = await coreRunScan({ businessId: state.businessId, kind, engines, onProgress, db });
-    state.scanRunId = report.scanRunId;
-    state.steps.forEach((s) => (s.done = true));
-    state.status = "done";
-    await persist(state);
-    return report;
-  } catch (err) {
-    state.status = "failed";
-    state.error = err instanceof Error ? err.message : String(err);
-    await persist(state);
-    return null;
-  }
+  return runScanWithProgress(state, { kind: opts.kind ?? "free", engines: opts.engines ?? FREE_SCAN_ENGINES, persist, db: getDb() });
 }
 
 /** Load a finished scan as a ScanReport, or null when the run does not exist. */
 export async function getScanReport(scanRunId: string): Promise<ScanReport | null> {
   await ready();
   try {
-    return await buildReport(scanRunId, db);
+    return await buildReport(scanRunId, getDb());
   } catch {
     return null;
   }

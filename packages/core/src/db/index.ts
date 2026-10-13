@@ -31,8 +31,8 @@ export function withMockDb(): MemDb {
   return new MemDb();
 }
 
-export function createDb(databaseUrl: string): PgDb {
-  return new PgDb(databaseUrl);
+export function createDb(databaseUrl: string, opts?: { max?: number; idleTimeout?: number }): PgDb {
+  return new PgDb(databaseUrl, opts);
 }
 
 function pickDb(): Db {
