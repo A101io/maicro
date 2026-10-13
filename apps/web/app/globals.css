@@ -412,3 +412,7 @@ a.pill:hover { background: var(--panel); }
     52%, 100% { box-shadow: 0 0 0 0.8em rgb(37 99 235 / 0); }
   }
 }
+
+/* Grown from the left by public/motion.js (set here, not by the script, so
+   the server's HTML and the hydrated page agree). */
+[data-motion="draw"], [data-motion="bars"] > * { transform-origin: left center; }

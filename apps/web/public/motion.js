@@ -21,6 +21,10 @@
  *   pop       the element scales in
  * And on a number: data-count="45" data-suffix="%" counts up (CSS counter;
  * the real text stays in the page for screen readers).
+ *
+ * Scenes (components/viz/Scene.tsx, data-scene="14" seconds) loop while on
+ * screen, start from the top each time they scroll in and pause when they
+ * leave. Their parts say when they move: data-show, data-draw, data-pulse.
  */
 (() => {
   if (!("animate" in Element.prototype) || !("IntersectionObserver" in window)) return;
@@ -66,10 +70,7 @@
     const kids = [...box.children];
     if (kind === "rise") prepare(box, box, RISE, { duration: 850 });
     if (kind === "pop") prepare(box, box, POP, { duration: 650, easing: "cubic-bezier(0.3, 1.4, 0.5, 1)" });
-    if (kind === "draw") {
-      box.style.transformOrigin = "left center";
-      prepare(box, box, GROW_X, { duration: 600, delay: 250 });
-    }
+    if (kind === "draw") prepare(box, box, GROW_X, { duration: 600, delay: 250 });
     if (kind === "stagger") {
       kids.forEach((k, i) => {
         prepare(box, k, RISE_SM, { duration: 650, delay: Math.min(i, 10) * 85 });
@@ -87,10 +88,7 @@
       });
     }
     if (kind === "bars") {
-      kids.forEach((k, i) => {
-        k.style.transformOrigin = "left center";
-        prepare(box, k, GROW_X, { duration: 700, delay: 200 + i * 90 });
-      });
+      kids.forEach((k, i) => prepare(box, k, GROW_X, { duration: 700, delay: 200 + i * 90 }));
     }
   }
 
@@ -108,6 +106,55 @@
     prepare(el, text, [{ opacity: 0 }, { opacity: 0 }], { ...opts, fill: "backwards" });
     prepare(el, el, [{ opacity: 1 }, { opacity: 1 }], { ...opts, pseudoElement: "::before", fill: "backwards" });
   }
+
+  // 4. Scenes: one loop per scene, every part timed as a fraction of it.
+  const scenes = new Map();
+  const span = (v) => v.split("-").map(Number);
+  const RING = (a) => `0 0 0 ${a} rgb(37 99 235 / ${a === 0 ? 0.45 : 0})`;
+  for (const scene of main.querySelectorAll("[data-scene]")) {
+    const duration = Number(scene.dataset.scene) * 1000;
+    if (!duration) continue;
+    const anims = [];
+    const loop = (el, frames) => {
+      const a = el.animate(frames, { duration, iterations: Infinity, fill: "both" });
+      a.pause();
+      anims.push(a);
+    };
+    loop(scene, [{ opacity: 0, offset: 0 }, { opacity: 1, offset: 0.025 }, { opacity: 1, offset: 0.965 }, { opacity: 0, offset: 1 }]);
+    for (const el of scene.querySelectorAll("[data-show]")) {
+      const [a, b] = span(el.dataset.show);
+      const hidden = { opacity: 0, translate: "0 0.4em" };
+      const shown = { opacity: 1, translate: "0 0" };
+      const f = [{ ...hidden, offset: 0 }, { ...hidden, offset: a, easing: EASE }, { ...shown, offset: Math.min(a + 0.025, b ?? 1) }];
+      if (b !== undefined) f.push({ ...shown, offset: b }, { opacity: 0, translate: "0 0", offset: Math.min(b + 0.02, 1) }, { opacity: 0, translate: "0 0", offset: 1 });
+      else f.push({ ...shown, offset: 1 });
+      loop(el, f);
+    }
+    for (const el of scene.querySelectorAll("[data-draw]")) {
+      const [a, b] = span(el.dataset.draw);
+      const axis = getComputedStyle(el).transformOrigin.startsWith("50%") ? ["1 0", "1 1"] : ["0 1", "1 1"];
+      loop(el, [{ scale: axis[0], offset: 0 }, { scale: axis[0], offset: a, easing: EASE }, { scale: axis[1], offset: b }, { scale: axis[1], offset: 1 }]);
+    }
+    for (const el of scene.querySelectorAll("[data-pulse]")) {
+      const a = Number(el.dataset.pulse);
+      loop(el, [{ boxShadow: RING("0.9em"), offset: 0 }, { boxShadow: RING(0), offset: a }, { boxShadow: RING("0.9em"), offset: Math.min(a + 0.07, 1) }, { boxShadow: RING("0.9em"), offset: 1 }]);
+    }
+    scenes.set(scene, anims);
+  }
+  const sceneIo = new IntersectionObserver(
+    (entries) => {
+      for (const e of entries) {
+        for (const a of scenes.get(e.target) ?? []) {
+          if (e.isIntersecting) {
+            a.currentTime = 0;
+            a.play();
+          } else a.pause();
+        }
+      }
+    },
+    { threshold: 0.3 },
+  );
+  for (const el of scenes.keys()) sceneIo.observe(el);
 
   const io = new IntersectionObserver(
     (entries) => {
