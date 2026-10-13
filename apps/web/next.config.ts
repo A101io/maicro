@@ -19,7 +19,10 @@ const csp = [
   "base-uri 'self'",
   "object-src 'none'",
   "form-action 'self' https://checkout.stripe.com https://accounts.google.com",
-  "upgrade-insecure-requests",
+  // Only on https: on an http origin (a local production build) it rewrites
+  // the form's own http URL to https, which is then not 'self', and the scan
+  // form silently stops submitting.
+  ...((process.env.PUBLIC_BASE_URL ?? "").startsWith("https://") ? ["upgrade-insecure-requests"] : []),
 ].join("; ");
 const securityHeaders = [
   { key: "Strict-Transport-Security", value: "max-age=63072000; includeSubDomains; preload" },

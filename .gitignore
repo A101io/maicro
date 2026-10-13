@@ -5,3 +5,7 @@ dist
 .env.local
 *.log
 out/
+
+# Cloudflare build output
+.open-next/
+.wrangler/
