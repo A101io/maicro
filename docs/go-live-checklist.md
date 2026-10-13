@@ -23,6 +23,7 @@ The launch gate. "continue" resumes from the first row that is not ✓. Status k
 | D1 | Supabase `bbynmqvaxpjdnkaasutd`, migrations 0001–0005, RLS on all 11 tables | ✓verified 13 Oct 2026: anon 0, stranger 0, owner 1 (control), rolled back |
 | D2 | Paid plan, daily backups, one restore drill | blocked: Julian (billing) |
 | D3 | `DATABASE_URL` in the host env, `/api/health` says `"db":"pg"` | blocked: hosting (J3) |
+| D4 | Merge Dependabot #11 (`@supabase/ssr` 0.5 → 0.12, breaking for a 0.x package) after trying the magic-link sign-in on its branch against the real project | blocked: D3 |
 
 ## Billing
 | # | Item | Status |
