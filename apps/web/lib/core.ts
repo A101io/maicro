@@ -113,12 +113,17 @@ function progressMap() {
   return g.__maicroProgress;
 }
 
+/**
+ * `<businessId>_<hex>`. Not a dot: a path ending in ".<hex>" looks like a file
+ * to the middleware matcher, so /en/scan/<token> was never rewritten (404).
+ */
 export function newScanToken(businessId: string): string {
-  return `${businessId}.${randomBytes(6).toString("hex")}`;
+  return `${businessId}_${randomBytes(6).toString("hex")}`;
 }
 
 export function businessIdFromToken(token: string): string | null {
-  const i = token.lastIndexOf(".");
+  // "." for tokens issued before the separator changed.
+  const i = Math.max(token.lastIndexOf("_"), token.lastIndexOf("."));
   return i > 0 ? token.slice(0, i) : null;
 }
 
