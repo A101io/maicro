@@ -49,11 +49,7 @@ export async function Hero() {
     <>
     <section className="hero-glow wrap grid grid-cols-1 items-center gap-10 pb-16 pt-6 sm:pt-10 lg:grid-cols-12 lg:gap-12 lg:pb-24">
       <div className="flex flex-col gap-6 lg:col-span-5 lg:gap-7">
-        <h1 className="h1 enter">
-          {L.hero.h1.split(L.hero.h1Mark)[0]}
-          <span className="marker">{L.hero.h1Mark}</span>
-          {L.hero.h1.split(L.hero.h1Mark)[1]}
-        </h1>
+        <h1 className="h1 enter">{L.hero.h1}</h1>
         <p className="enter max-w-[36ch] text-[18px] leading-[1.5] text-ink-2 sm:text-[19px]" style={{ "--d": "90ms" } as React.CSSProperties}>
           {L.hero.sub}
         </p>

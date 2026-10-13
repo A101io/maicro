@@ -53,8 +53,6 @@ export const copy = {
   landing: {
     hero: {
       h1: "Wat zegt AI over jouw bedrijf?",
-      /** The words under the marker in the hero heading. */
-      h1Mark: "jouw bedrijf",
       sub: "In Haarlem klopt het bij 47 van de 100 bedrijven niet, of de AI kent ze niet.",
       exampleLabel: "voorbeeld",
       caption: "100 Haarlemse bedrijven · ChatGPT, Google AI en Copilot · 7 oktober 2026",

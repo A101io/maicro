@@ -15,7 +15,6 @@
   --cream: #fbf6ee;
   --sky: #eef4ff;
   --mint: #edf7f1;
-  --sun: #fde68a;
   --red: #e11d48;
   --red-bg: #fdecea;
   --green: #2f855a;
@@ -424,7 +423,7 @@ a.pill:hover { background: var(--panel); }
 
 /* ------------------------------------------------------------------------
  * Warm pass (option 1, Oct 2026): tinted grounds, a glow behind the hero,
- * deep-blue dark sections, a marker under the hero's key words and cards
+ * deep-blue dark sections, and cards
  * that sit on their ground with a soft shadow.
  * --------------------------------------------------------------------- */
 .ground-cream { background: var(--cream); }
@@ -454,12 +453,6 @@ a.pill:hover { background: var(--panel); }
     radial-gradient(45% 60% at 85% 0%, rgb(37 99 235 / 0.35), transparent 70%),
     radial-gradient(40% 50% at 0% 100%, rgb(47 133 90 / 0.18), transparent 70%),
     #0f172a !important;
-}
-.marker {
-  background: linear-gradient(transparent 62%, var(--sun) 62%, var(--sun) 92%, transparent 92%);
-  padding: 0 0.06em;
-  -webkit-box-decoration-break: clone;
-  box-decoration-break: clone;
 }
 .card, .card-sm { box-shadow: 0 1px 2px rgb(17 24 39 / 0.04), 0 12px 32px -26px rgb(17 24 39 / 0.35); }
 /* The hero glow bleeds past the page edge on purpose; it must not widen the page. */
