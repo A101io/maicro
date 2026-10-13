@@ -60,7 +60,7 @@ Status: `✓verified` (observed, evidence + date) · `written` (code exists, not
 ## F. Growth
 | # | Step | Status | Evidence | Date |
 |---|---|---|---|---|
-| F1 | i18n | written | NL at `/`, EN at `/en/...` with English slugs (`/en/pricing`, `/en/sectors/...`), hreflang alternates, NL·EN switch in header and footer (plain links, keeps the session). Emails and reports stay Dutch. | 13 Oct |
+| F1 | i18n | written | NL at `/`, EN at `/en/...` with English slugs (`/en/pricing`, `/en/sectors/...`), hreflang alternates, NL·EN switch in header and footer (plain links, keeps the session). Verified 13 Oct: `/en`, `/en/pricing`, `/en/sectors/*`, `/en/r/voorbeeld`, `/en/terms` 200 with `<html lang="en">` and hreflang; no page errors. Still Dutch on English pages: question lines in the result table (`lib/questions.ts`), the sector questions (the scanner asks in Dutch), two joins in `lib/report.ts`, "Hercontrole" in the dashboard, demo report content, and all emails. | 13 Oct |
 | F2 | SEO basics | written | `<html lang>` per language, titles, robots, sitemap, Organization JSON-LD (no sameAs yet). OG image missing. | 13 Oct |
 | F3 | Brand assets | open | `app/icon.svg` only; name not final. | |
 | F4 | Analytics | n/a for now | No analytics; add consent-gated first-party before any marketing. | |
