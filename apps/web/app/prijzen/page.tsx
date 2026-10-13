@@ -4,6 +4,7 @@ import { SiteHeader } from "@/components/SiteHeader";
 import { SiteFooter } from "@/components/SiteFooter";
 import { ScanField } from "@/components/ScanField";
 import { PriceBlock } from "@/components/PriceBlock";
+import { DriftViz } from "@/components/viz/DriftViz";
 
 export const metadata: Metadata = { title: copy.pricing.title, description: copy.pricing.lead };
 
@@ -29,6 +30,15 @@ export default function PricingPage() {
         <section className="bg-dark text-white">
           <div className="wrap section">
             <PriceBlock />
+          </div>
+        </section>
+        <section className="wrap section grid grid-cols-1 items-center gap-8 lg:grid-cols-12 lg:gap-12">
+          <div className="flex flex-col gap-4 lg:col-span-4">
+            <h2 className="h2">{copy.landing.scenes.drift.h2}</h2>
+            <p className="lead">{copy.landing.scenes.drift.body}</p>
+          </div>
+          <div className="min-w-0 lg:col-span-8">
+            <DriftViz />
           </div>
         </section>
         <section className="wrap section grid grid-cols-1 gap-8 lg:grid-cols-12 lg:gap-12">

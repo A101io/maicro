@@ -13,8 +13,16 @@ import { Faq } from "@/components/Faq";
 import { ReportHeaderRow, ReportRow } from "@/components/ReportRow";
 import { CountUp } from "@/components/CountUp";
 import { HeroViz } from "@/components/HeroViz";
+import { SceneRow } from "@/components/viz/Scene";
+import { RegelViz } from "@/components/viz/RegelViz";
+import { BelViz } from "@/components/viz/BelViz";
+import { GidsenViz } from "@/components/viz/GidsenViz";
+import { ControleViz } from "@/components/viz/ControleViz";
+import { GevondenViz } from "@/components/viz/GevondenViz";
+import { DriftViz } from "@/components/viz/DriftViz";
 
 const L = copy.landing;
+const V = L.scenes;
 const severities: Severity[] = ["afhaker", "misleider", "verwarring"];
 
 function SectionHead({ h2, body, id }: { h2: string; body: string; id?: string }) {
@@ -81,6 +89,11 @@ export default function LandingPage() {
                   <span className={`text-[15px] leading-[1.5] ${i === 2 ? "" : "text-dark-text"}`}>{p.body}</span>
                 </div>
               ))}
+            </div>
+            <div className="border-t border-dark-line pt-10">
+              <SceneRow h3={V.regel.h3} body={V.regel.body} dark>
+                <RegelViz />
+              </SceneRow>
             </div>
             <div data-motion="stagger" className="grid grid-cols-1 gap-8 border-t border-dark-line pt-10 sm:grid-cols-3 sm:gap-10">
               {L.veranderd.stats.map((s) => (
@@ -156,6 +169,9 @@ export default function LandingPage() {
                 </div>
               ))}
             </div>
+            <SceneRow h3={V.bel.h3} body={V.bel.body} flip>
+              <BelViz />
+            </SceneRow>
             <div className="grid grid-cols-1 items-center gap-8 lg:grid-cols-12 lg:gap-12">
               <div data-motion="stagger" className="grid grid-cols-1 gap-6 text-[15px] leading-[1.5] text-ink-2 sm:grid-cols-3 lg:col-span-7">
                 {L.snippers.shares.map((s) => (
@@ -207,6 +223,14 @@ export default function LandingPage() {
                 </li>
               ))}
             </ol>
+            <div className="flex flex-col gap-14 border-t-[1.5px] border-line pt-10">
+              <SceneRow h3={V.gidsen.h3} body={V.gidsen.body}>
+                <GidsenViz />
+              </SceneRow>
+              <SceneRow h3={V.controle.h3} body={V.controle.body} flip>
+                <ControleViz />
+              </SceneRow>
+            </div>
             <div className="grid grid-cols-1 items-center gap-6 border-t-[1.5px] border-line pt-10 lg:grid-cols-12 lg:gap-12">
               <p className="text-[15px] leading-[1.55] text-ink-2 lg:col-span-7">{L.werkt.note}</p>
               <div data-motion="stagger" className="flex flex-wrap gap-2.5 lg:col-span-5">
@@ -324,6 +348,19 @@ export default function LandingPage() {
               <StipRow key={t.text} tone={t.stip as StipColour} text={t.text} meta={t.meta} />
             ))}
             <p className="fine">{L.missie.footnote}</p>
+          </div>
+          <div className="lg:col-span-12">
+            <SceneRow h3={V.gevonden.h3} body={V.gevonden.body} flip>
+              <GevondenViz />
+            </SceneRow>
+          </div>
+        </section>
+
+        {/* 11b Elke maand */}
+        <section className="bg-panel-2">
+          <div className="wrap section flex flex-col gap-10">
+            <SectionHead h2={V.drift.h2} body={V.drift.body} />
+            <DriftViz />
           </div>
         </section>
 
