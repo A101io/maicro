@@ -7,7 +7,7 @@ The launch gate. "continue" resumes from the first row that is not ✓. Status k
 |---|---|---|
 | J1 | Product name: keep "Maicro" or rename (Klopt, Stip, Rightly… shortlisted). Trademark check (EUIPO + BOIP) before buying a domain. | blocked: Julian |
 | J2 | Domain (`maicro.nl`?) and where DNS lives (Cloudflare). | blocked: Julian |
-| J3 | Hosting: CLAUDE.md plans Vercel (web) + Fly/Railway (worker); the A101 default is Cloudflare Workers. | blocked: Julian |
+| J3 | Hosting: **all on Cloudflare** (Julian, 13 Oct 2026): `maicro-web` (OpenNext) and `maicro-worker` (cron, scan queue, facts pages), A101's account. | decided |
 | J4 | Launch gate: the GitHub Pages preview (`a101io.github.io/maicro`, mock data) stays **public until there is a domain** (Julian, 13 Oct 2026). A coming-soon gate comes with the production deploy. | decided |
 
 ## Product
@@ -22,7 +22,7 @@ The launch gate. "continue" resumes from the first row that is not ✓. Status k
 |---|---|---|
 | D1 | Supabase `bbynmqvaxpjdnkaasutd`, migrations 0001–0005, RLS on all 11 tables | ✓verified 13 Oct 2026: anon 0, stranger 0, owner 1 (control), rolled back |
 | D2 | Paid plan, daily backups, one restore drill | blocked: Julian (billing) |
-| D3 | `DATABASE_URL` in the host env, `/api/health` says `"db":"pg"` | blocked: hosting (J3) |
+| D3 | `DATABASE_URL` as a secret on `maicro-web` and `maicro-worker`, `/api/health` says `"db":"pg"` | blocked: Julian (Supabase pooler URL) |
 | D4 | Merge Dependabot #11 (`@supabase/ssr` 0.5 → 0.12, breaking for a 0.x package) after trying the magic-link sign-in on its branch against the real project | blocked: D3 |
 
 ## Billing
@@ -37,7 +37,8 @@ The launch gate. "continue" resumes from the first row that is not ✓. Status k
 | # | Item | Status |
 |---|---|---|
 | X1 | CI on every PR: secret scan, typecheck, tests, mock pipeline, Postgres | ✓verified (GitHub Actions green on PR #8) |
-| X2 | Production deploy workflow, manual (`workflow_dispatch`) | blocked: J3 |
+| X2 | Deploy workflow, manual (`workflow_dispatch`, `preview` or `production`), `.github/workflows/deploy.yml`, ends with `scripts/verify-deploy.mjs` | written: verified locally in workerd (preview passes; a production without database fails with the reason). Needs `CLOUDFLARE_API_TOKEN` + `CLOUDFLARE_ACCOUNT_ID` on the GitHub environments |
+| X2b | Hyperdrive for Supabase (`wrangler hyperdrive create maicro-db`), id into both wrangler.jsonc files | blocked: D3 (`DATABASE_URL`) |
 | X3 | Security headers + CSP | written: headers seen on the dev server 13 Oct; CSP only in production builds |
 | X4 | Error monitoring (EU), uptime checks on `/`, `/privacy`, `/api/health` | open |
 | X5 | Rollback: previous deployment + forward-fix migration, tried once | open |

@@ -2,6 +2,19 @@
 
 Every secret: where it comes from, where it is set, how to prove it landed. When a credential is "definitely set" and something still fails, **list the NAMES the job can see first** (Sitty lost 17 deploy runs to `CLOUDFLARE_API_SECRET` vs `_TOKEN`). `pnpm scan:secrets` fails CI on anything key-shaped in a tracked file.
 
+## Deploying (GitHub → Cloudflare)
+
+Set on **both** GitHub environments of `A101io/maicro` (Settings → Environments → `preview` and `production` → Environment secrets; an environment does not inherit a repository secret of the same name):
+
+| Name | Comes from | Prove it |
+|---|---|---|
+| `CLOUDFLARE_API_TOKEN` | Cloudflare → My Profile → API Tokens → Create Token → Custom. Account resources: A101's account only. Permissions: **Account · Workers Scripts · Edit**, **Account · Queues · Edit**, **Account · Hyperdrive · Edit**, **Account · Account Settings · Read**. Add **Zone · Workers Routes · Edit** once the domain is on Cloudflare. | The deploy workflow's "Require the Cloudflare credentials" step passes; on a miss it prints the secret names it can see |
+| `CLOUDFLARE_ACCOUNT_ID` | Cloudflare dashboard → Workers & Pages → Account ID in the right column (the same account as Sitty and Sonable) | `wrangler deploy` names the account it deployed to |
+
+## On the Workers (`wrangler secret put NAME --name maicro-web` / `--name maicro-worker`)
+
+Production refuses to serve without `DATABASE_URL` or a Hyperdrive binding (503, `apps/web/worker.ts`); it never falls back to mock data.
+
 | Name | Comes from | Set in | Prove it |
 |---|---|---|---|
 | `DATABASE_URL` | Supabase → Project `bbynmqvaxpjdnkaasutd` → Connect → pooler, service role | Web + worker host env | `/api/health` returns `"db":"pg"` |

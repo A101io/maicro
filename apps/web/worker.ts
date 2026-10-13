@@ -27,9 +27,20 @@ export default {
     // Postgres unless plain mock mode; MAICRO_DB=pg is mock engines on a real database (as in core).
     const postgres = env.MAICRO_MOCK !== "1" || env.MAICRO_DB === "pg";
     const url = postgres ? (env.HYPERDRIVE?.connectionString ?? env.DATABASE_URL ?? null) : null;
+    // Not mock, and no database: core would quietly fall back to mock mode and
+    // serve demo data as if it were real. Say so instead (Sitty's rule:
+    // fixtures are never a fallback).
+    if (postgres && !url) return notConfigured();
     if (!url) return handler.fetch(request, env, ctx);
     // Few connections, closed shortly after the last query: the next request opens its own.
     const db = createDb(url, { max: 3, idleTimeout: 5 });
     return withDb(db, () => handler.fetch(request, env, ctx));
   },
 };
+
+function notConfigured(): Response {
+  return new Response("Maicro is not connected to its database (DATABASE_URL / HYPERDRIVE missing). Nothing is served until it is.\n", {
+    status: 503,
+    headers: { "content-type": "text/plain; charset=utf-8", "retry-after": "300" },
+  });
+}

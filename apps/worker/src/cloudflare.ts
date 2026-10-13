@@ -52,13 +52,19 @@ const DRAIN_FOR_MS = 10 * 60 * 1000;
 function scoped<T>(env: Env, fn: () => Promise<T>): Promise<T> {
   const postgres = env.MAICRO_MOCK !== "1" || env.MAICRO_DB === "pg";
   const url = postgres ? (env.HYPERDRIVE?.connectionString ?? env.DATABASE_URL ?? null) : null;
+  // Not mock and no database: core would fall back to mock mode and run fake
+  // scans as if they were real. Refuse instead (fixtures are never a fallback).
+  if (postgres && !url) return Promise.reject(new Error("maicro-worker has no DATABASE_URL or HYPERDRIVE; refusing to run on mock data"));
   if (!url) return fn();
   return withDb(createDb(url, { max: 3, idleTimeout: 5 }), fn);
 }
 
 export default {
   async fetch(request: Request, env: Env): Promise<Response> {
-    return scoped(env, () => handleFactsRequest(request));
+    return scoped(env, () => handleFactsRequest(request)).catch((err) => {
+      log.error("cf.fetch.error", { error: errorMessage(err) });
+      return new Response("Not available right now.\n", { status: 503, headers: { "content-type": "text/plain; charset=utf-8" } });
+    });
   },
 
   async scheduled(controller: { cron: string; scheduledTime: number }, env: Env, ctx: Ctx): Promise<void> {

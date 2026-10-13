@@ -4,13 +4,17 @@ Maicro checks what AI assistants say about a Dutch business, finds wrong facts a
 
 ## Resuming work — read this first
 - **`SETUP_STATUS.md`** is the baseline status (v3); work rows that are not `✓verified`. **`docs/go-live-checklist.md`** is the launch gate, decisions for Julian first.
-- The site is previewed (static, mock data) at https://a101io.github.io/maicro/ by `.github/workflows/site.yml` on every push to main. There is no production deploy yet.
+- Hosting is **Cloudflare** (decided 13 Oct 2026): `apps/web` runs as the Worker `maicro-web` (OpenNext, custom entry `apps/web/worker.ts`), `apps/worker` as `maicro-worker` (`src/cloudflare.ts`: cron, the `maicro-scans` queue, facts pages). Deploys are manual: `.github/workflows/deploy.yml` (`preview` = mock data, `production`). The static mock preview also still goes to https://a101io.github.io/maicro/ on every push to main.
+- Test the Cloudflare build locally: `pnpm --filter @maicro/web cf:build`, then in `apps/web`: `npx wrangler dev -c wrangler.jsonc -c ../worker/wrangler.jsonc` with a `.dev.vars` (gitignored) per app, e.g. `MAICRO_MOCK=1`, `MAICRO_DB=pg`, `DATABASE_URL=` a local Postgres.
 - NL lives at `/`, EN at `/en/...` (`apps/web/middleware.ts`, `lib/lang-paths.ts`, `lib/i18n.ts`). Copy: `packages/core/src/copy/index.ts` (Dutch, the source) and `en.ts` (same shape, enforced by `CopyShape`). Add a key to both or typecheck fails.
 
 ## How to write to Julian
 Short. One action at a time. Real strings, not placeholders. End with one concrete question and a suggested answer when something needs him. Say plainly when something keeps failing. Never touch his iCloud folder.
 
 ## Things that cost an hour to rediscover
+- **On Workers a database connection cannot cross requests.** Every request and job runs inside `withDb()` (core/shared/db.ts) with its own handle; anything that reads a module-level `db` instead hangs every second request ("Cannot perform I/O on behalf of a different request"). The scope lives on `globalThis` because the Worker entry and the Next server bundle core separately; two AsyncLocalStorage instances made the scope invisible. Measured: without it 200 500 200 500.
+- **OpenNext runs the middleware twice on a rewrite**: the second pass sees the rewritten Dutch route, so `/en` came out Dutch until the middleware kept the first pass's language.
+- **CSP `upgrade-insecure-requests` on an http origin blocks the scan form** (its own URL becomes https, not 'self'). Only added when `PUBLIC_BASE_URL` is https.
 - **This cloud container cannot reach `*.supabase.co`, `a101io.github.io` or `api.stripe.com`.** Use the Supabase MCP tools (check the ref on every call) and the GitHub MCP tools; ask Julian to open the Pages site himself.
 - **A script that touches React-rendered text before hydration makes React throw the server HTML away** and rebuild the page, which also drops every Web Animations API animation `motion.js` set up (scenes freeze, elements "not attached to the DOM"). `public/ask.js` therefore waits until the node carries a `__reactFiber` key. `motion.js` only animates, it never changes markup; keep it that way.
 - **`pkill -f next-server` kills the shell running it.** Find the pid with `ps` and kill that.
@@ -56,7 +60,7 @@ Not done yet: `DATABASE_URL` / service-role key in a secret store, and a run of 
 1. Real database: project and migrations done (see Supabase above). Remaining: put `DATABASE_URL` (pooler, service role) in `.env`, run `MAICRO_DB=pg pnpm e2e:mock` against it once, then clear the rows it wrote.
 2. First real engine (runbook: `docs/FIRST-REAL-SCAN.md`): `OPENAI_API_KEY` (ChatGPT sampling + extraction). Run `pnpm scan --list <20 businesses in one town>` and read `out/scans/*.md`. This validates the idea before anything else.
 3. `GOOGLE_PLACES_API_KEY` so business resolution and the `/scan/kies` step work.
-4. Stripe (runbook: `docs/PAYMENTS.md`, `pnpm stripe:setup`; billing rules in `packages/core/src/billing`); Resend; deploy web (Vercel) and worker (Fly/Railway); Cloudflare for SaaS for facts hosts.
+4. Stripe (runbook: `docs/PAYMENTS.md`, `pnpm stripe:setup`; billing rules in `packages/core/src/billing`); Resend; deploy to Cloudflare (`deploy.yml`, token in `docs/secrets-and-keys.md`); Hyperdrive; Cloudflare for SaaS for facts hosts.
 5. Then Gemini, Perplexity, SerpAPI.
 
 ## Conventions
