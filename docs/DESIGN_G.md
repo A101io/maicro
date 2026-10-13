@@ -44,7 +44,7 @@ Rules kept from the brief: one primary (blue) button per view; no gradients, no 
 - **CriteriumCard** (3 cards: afhakers / misleiders / verwarring) + colour legend.
 - **SectorCard** (11): sector name, one-line "doorslaggevend feit", link to `/vak/[slug]`.
 - **PriceBlock**: two plans, "Excl. btw · geen opzegtermijn".
-- **Footer**: `A101 B.V. (handelend als Maicro) · Factorij 80, 3071 AV Rotterdam · KvK 42057858 · Prijzen excl. btw`. No btw-nummer.
+- **Footer**: `A101 B.V. (handelend als Vidalo) · Factorij 80, 3071 AV Rotterdam · KvK 42057858 · Prijzen excl. btw`. No btw-nummer.
 
 ## Landing (`/`) — section order, anchors
 
@@ -64,7 +64,7 @@ Rules kept from the brief: one primary (blue) button per view; no gradients, no 
 14. Slot — "Welke kleur heeft jouw stip?" + ScanField.
 15. Footer.
 
-Nav: maicro wordmark · Zo werkt het (#werkt) · Criteria (#criteria) · Per vak (#vak) · Prijs (#prijs) · Vragen (#vragen) · Inloggen.
+Nav: Vidalo logo (`components/Logo.tsx`: the mark, a blue dot with one corner at the bottom left rounded at 10 %, plus the wordmark "vidalo") · Zo werkt het (#werkt) · Criteria (#criteria) · Per vak (#vak) · Prijs (#prijs) · Vragen (#vragen) · Inloggen.
 
 ## Result (`/r/[id]`)
 

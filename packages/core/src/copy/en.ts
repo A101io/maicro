@@ -2,7 +2,7 @@ import type { CopyShape } from "./index.js";
 
 /** English copy. Same shape as the Dutch in ./index.ts; Dutch prevails where they differ (legal). */
 export const en: CopyShape = {
-  brand: "Maicro",
+  brand: "Vidalo",
   tagline: "Your customers ask ChatGPT. We make sure the answer is right.",
   engines: {
     chatgpt: "ChatGPT",
@@ -13,7 +13,7 @@ export const en: CopyShape = {
   },
 
   nav: {
-    wordmark: "maicro",
+    wordmark: "vidalo",
     how: "How it works",
     why: "Why",
     criteria: "Criteria",
@@ -612,8 +612,8 @@ export const en: CopyShape = {
         { title: "Information", links: [{ label: "What we check", href: "/hoe-het-werkt#criteria" }, { label: "Questions", href: "/#vragen" }, { label: "Contact", href: "mailto:hallo@maicro.nl" }] },
         { title: "Legal", links: [{ label: "Terms and conditions", href: "/voorwaarden" }, { label: "Privacy policy", href: "/privacy" }] },
       ],
-      legal: "A101 B.V. (trading as Maicro) · Factorij 80, 3071 AV Rotterdam · KvK (Dutch Chamber of Commerce) 42057858 · Prices excl. VAT",
-      copyright: "© 2026 Maicro. All rights reserved.",
+      legal: "A101 B.V. (trading as Vidalo) · Factorij 80, 3071 AV Rotterdam · KvK (Dutch Chamber of Commerce) 42057858 · Prices excl. VAT",
+      copyright: "© 2026 Vidalo. All rights reserved.",
       reportNote: "This report link works for 30 days.",
     },
   },

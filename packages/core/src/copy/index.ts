@@ -15,7 +15,7 @@ export const PRICES = {
 } as const;
 
 export const copy = {
-  brand: "Maicro",
+  brand: "Vidalo",
   tagline: "Je klanten vragen het aan ChatGPT. Wij zorgen dat het antwoord klopt.",
   engines: {
     chatgpt: "ChatGPT",
@@ -26,7 +26,7 @@ export const copy = {
   },
 
   nav: {
-    wordmark: "maicro",
+    wordmark: "vidalo",
     how: "Zo werkt het",
     why: "Waarom",
     criteria: "Criteria",
@@ -625,8 +625,8 @@ export const copy = {
         { title: "Informatie", links: [{ label: "Wat we controleren", href: "/hoe-het-werkt#criteria" }, { label: "Vragen", href: "/#vragen" }, { label: "Contact", href: "mailto:hallo@maicro.nl" }] },
         { title: "Juridisch", links: [{ label: "Algemene voorwaarden", href: "/voorwaarden" }, { label: "Privacybeleid", href: "/privacy" }] },
       ],
-      legal: "A101 B.V. (handelend als Maicro) · Factorij 80, 3071 AV Rotterdam · KvK 42057858 · Prijzen excl. btw",
-      copyright: "© 2026 Maicro. Alle rechten voorbehouden.",
+      legal: "A101 B.V. (handelend als Vidalo) · Factorij 80, 3071 AV Rotterdam · KvK 42057858 · Prijzen excl. btw",
+      copyright: "© 2026 Vidalo. Alle rechten voorbehouden.",
       reportNote: "Deze rapportlink werkt 30 dagen.",
     },
   },
