@@ -1,10 +1,10 @@
 import type { Metadata, Viewport } from "next";
-import { Manrope } from "next/font/google";
+import { Plus_Jakarta_Sans } from "next/font/google";
 import "./globals.css";
 import "./scenes.css";
 import { getCopy, getLang, getRoute, localizeHref } from "@/lib/i18n";
 
-const manrope = Manrope({ subsets: ["latin"], weight: ["400", "500", "600", "700", "800"], variable: "--font-manrope", display: "swap" });
+const jakarta = Plus_Jakarta_Sans({ subsets: ["latin"], weight: ["400", "500", "600", "700", "800"], variable: "--font-jakarta", display: "swap" });
 
 export async function generateMetadata(): Promise<Metadata> {
   const [copy, route] = [await getCopy(), await getRoute()];
@@ -22,7 +22,7 @@ export const viewport: Viewport = { width: "device-width", initialScale: 1, colo
 export default async function RootLayout({ children }: { children: React.ReactNode }) {
   const lang = await getLang();
   return (
-    <html lang={lang} className={manrope.variable}>
+    <html lang={lang} className={jakarta.variable}>
       <body className="font-sans">
         {children}
         {/* Scroll motion; hides nothing on its own, so the page is whole without it. */}
