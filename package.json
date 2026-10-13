@@ -12,7 +12,8 @@
     "e2e:mock": "MAICRO_MOCK=1 tsx scripts/e2e-mock.mts",
     "verify:pg": "bash scripts/verify-pg.sh",
     "site": "node scripts/site/snapshot.mjs http://localhost:3000 out/site",
-    "stripe:setup": "pnpm --filter @maicro/web stripe:setup"
+    "stripe:setup": "pnpm --filter @maicro/web stripe:setup",
+    "scan:secrets": "node scripts/scan-secrets.mjs"
   },
   "devDependencies": {
     "typescript": "^5.6.3",

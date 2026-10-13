@@ -23,6 +23,19 @@ import { DriftViz } from "@/components/viz/DriftViz";
 
 const L = copy.landing;
 const V = L.scenes;
+
+/** Organization data for search engines (baseline F2). No sameAs until there are real profiles to point at. */
+const ORGANIZATION = {
+  "@context": "https://schema.org",
+  "@type": "Organization",
+  name: copy.brand,
+  legalName: "A101 B.V.",
+  url: process.env.PUBLIC_BASE_URL ?? "https://maicro.nl",
+  email: "hallo@maicro.nl",
+  description: copy.tagline,
+  address: { "@type": "PostalAddress", streetAddress: "Factorij 80", postalCode: "3071 AV", addressLocality: "Rotterdam", addressCountry: "NL" },
+  identifier: { "@type": "PropertyValue", propertyID: "KvK", value: "42057858" },
+};
 const severities: Severity[] = ["afhaker", "misleider", "verwarring"];
 
 function SectionHead({ h2, body, id }: { h2: string; body: string; id?: string }) {
@@ -37,6 +50,7 @@ function SectionHead({ h2, body, id }: { h2: string; body: string; id?: string }
 export default function LandingPage() {
   return (
     <>
+      <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(ORGANIZATION) }} />
       <span id="top" />
       <SiteHeader />
       <main>
