@@ -609,7 +609,7 @@ export const en: CopyShape = {
       lang: "EN",
       columns: [
         { title: "Product", links: [{ label: "How it works", href: "/hoe-het-werkt" }, { label: "Why", href: "/waarom" }, { label: "AI agents and OKF", href: "/straks" }, { label: "Example report", href: "/#rapport" }, { label: "Pricing", href: "/prijzen" }, { label: "By trade", href: "/#vak" }] },
-        { title: "Information", links: [{ label: "What we check", href: "/hoe-het-werkt#criteria" }, { label: "Questions", href: "/#vragen" }, { label: "Contact", href: "mailto:hallo@vidalo.nl" }] },
+        { title: "Information", links: [{ label: "What we check", href: "/hoe-het-werkt#criteria" }, { label: "Questions", href: "/#vragen" }, { label: "Facts about Vidalo", href: "/feiten" }, { label: "Contact", href: "mailto:hallo@vidalo.nl" }] },
         { title: "Legal", links: [{ label: "Terms and conditions", href: "/voorwaarden" }, { label: "Privacy policy", href: "/privacy" }] },
       ],
       legal: "A101 B.V. (trading as Vidalo) · Factorij 80, 3071 AV Rotterdam · KvK (Dutch Chamber of Commerce) 42057858 · Prices excl. VAT",
@@ -624,6 +624,13 @@ export const en: CopyShape = {
    */
   /** Titles and descriptions for search engines and AI assistants, per page. */
   pages: {
+    ownFacts: {
+      crumb: "Facts",
+      title: "Facts about Vidalo: address, opening hours, services and prices",
+      description: "Vidalo's own facts page, built the same way as for our customers: address, opening hours, what we do and do not do, prices, dated. Also as schema.org and llms.txt.",
+      intro: "What we build for customers, we have for ourselves. This is our own facts page, with the same layout, the same date and the same text version for AI assistants.",
+      textVersion: "Text version for AI assistants",
+    },
     home: {
       title: "Is what ChatGPT says about your business right? Free AI check",
       description: "Free check: what do ChatGPT, Google AI and Copilot say about your business? We find every error and its source, and fix that source. Set it right €149 once, keep it right €49 a month, excl. VAT.",

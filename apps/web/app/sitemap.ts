@@ -11,6 +11,7 @@ const ROUTES: { route: string; priority: number; changeFrequency: "weekly" | "mo
   { route: "/hoe-het-werkt", priority: 0.8, changeFrequency: "monthly" },
   { route: "/waarom", priority: 0.8, changeFrequency: "monthly" },
   { route: "/straks", priority: 0.7, changeFrequency: "monthly" },
+  { route: "/feiten", priority: 0.6, changeFrequency: "monthly" },
   ...SECTOR_SLUGS.map((slug) => ({ route: `/vak/${slug}`, priority: 0.7, changeFrequency: "monthly" as const })),
   // Terms and privacy join once they are reviewed: drafts are noindex.
   ...(copy.legal.draft ? [] : [{ route: "/voorwaarden", priority: 0.2, changeFrequency: "yearly" as const }, { route: "/privacy", priority: 0.2, changeFrequency: "yearly" as const }]),

@@ -43,6 +43,18 @@ The launch gate. "continue" resumes from the first row that is not ✓. Status k
 | X4 | Error monitoring (EU), uptime checks on `/`, `/privacy`, `/api/health` | open |
 | X5 | Rollback: previous deployment + forward-fix migration, tried once | open |
 
+## Practise what we preach (Vidalo as its own first customer)
+What the site promises a customer exists for Vidalo itself, from one record: `packages/core/src/shared/own.ts` (`OWN_FACTS`, `OWN_BUSINESS`). The web app renders it at `/feiten`, in the structured data of every page and in `/llms.txt`; the worker upserts Vidalo as a business at every start and runs setup, publish, directory sync and the monthly scan for it (`ensureOwnBusiness`). The guard test `packages/core/test/own.test.ts` fails when a criterium goes unanswered that is not on its open list.
+
+| # | Item | Status |
+|---|---|---|
+| W1 | Own facts page in three forms (HTML, schema.org, llms.txt), dated, on our own site | written: `/feiten`, `organizationLd`, `/llms.txt` |
+| W2 | Facts confirmed by the owner (`OWN_FACTS_VERIFIED_AT`); until then the page says "nog niet bevestigd" | blocked: Julian confirms address, hours (now ma–vr 09:00–17:00), what we do and do not do |
+| W3 | Phone number, payment methods, name clashes ("niet te verwarren met"), erkenningen | blocked: Julian (the four open items in `own.test.ts`) |
+| W4 | Vidalo in the directories, Google Business Profile, Bing, Apple (the `sync` job, same as a customer) | blocked: the first production deploy and a Google Business Profile for Vidalo (gives the place id) |
+| W5 | Monthly scan of Vidalo itself: "Wat zegt AI over Vidalo?" | blocked: `OPENAI_API_KEY` (P3) and the first production deploy |
+| W6 | `feiten.<domain>` as the own facts host, DNS at Cloudflare | blocked: domain (J2) |
+
 ## Legal
 | # | Item | Status |
 |---|---|---|

@@ -3,3 +3,4 @@ export * from "./log.js";
 export * from "./facts-nl.js";
 export * from "./ownership.js";
 export * from "./unsubscribe.js";
+export * from "./own.js";
