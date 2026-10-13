@@ -81,7 +81,7 @@ Status: `✓verified` (observed, evidence + date) · `written` (code exists, not
 | H4 | Rate limiting | written | `FREE_SCANS_PER_DAY` caps live scans site-wide; per-IP limits open. | |
 | H5 | Staging | open | | |
 | H6 | Rollback plan | open | In go-live X5. | |
-| H7 | Dependency updates | written | `.github/dependabot.yml` weekly, grouped. | 13 Oct |
+| H7 | Dependency updates | ✓verified | `.github/dependabot.yml` weekly, grouped; it opened PRs #10–#15 on 13 Oct. Majors ignored (Julian): #12–#15 closed; security updates still open regardless. | 13 Oct |
 | H8 | Operator 2FA | blocked | Julian. | |
 | H9 | Incident runbook | open | | |
 | H10 | security.txt | ✓verified | `/.well-known/security.txt` 200 with Contact, Expires, Canonical, Policy. | 13 Oct |
