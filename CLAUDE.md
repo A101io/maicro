@@ -3,6 +3,7 @@
 Maicro checks what AI assistants say about a Dutch business, finds wrong facts and their sources, publishes a facts page on the owner's domain, syncs directories, and fixes errors at the source with proof. Tagline: *Je klanten vragen het aan ChatGPT. Wij zorgen dat het antwoord klopt.*
 
 ## Resuming work — read this first
+- **Brand: Vidalo (Oct 2026).** All customer-facing text says Vidalo; the logo is `apps/web/components/Logo.tsx` (design canvas: https://claude.ai/artifact/8gZvpo4hRiVVqA8KERN5Uq). The domain will be **vidalo.io**; e-mail addresses (`hallo@maicro.nl`, `controle@maicro.nl`), hosts, package names (`@maicro/*`) and env vars (`MAICRO_*`) still say maicro until the move.
 - **`SETUP_STATUS.md`** is the baseline status (v3); work rows that are not `✓verified`. **`docs/go-live-checklist.md`** is the launch gate, decisions for Julian first.
 - The site is previewed (static, mock data) at https://a101io.github.io/maicro/ by `.github/workflows/site.yml` on every push to main. There is no production deploy yet.
 - NL lives at `/`, EN at `/en/...` (`apps/web/middleware.ts`, `lib/lang-paths.ts`, `lib/i18n.ts`). Copy: `packages/core/src/copy/index.ts` (Dutch, the source) and `en.ts` (same shape, enforced by `CopyShape`). Add a key to both or typecheck fails.

@@ -67,10 +67,10 @@ export function Tick() {
   );
 }
 
-export function Maicro({ text, ...rest }: { text: string } & Record<`data-${string}`, string>) {
+export function Vidalo({ text, ...rest }: { text: string } & Record<`data-${string}`, string>) {
   return (
     <div className="sc-maicro" {...rest}>
-      <span className="sc-maicro-mark">maicro</span>
+      <span className="sc-maicro-mark">vidalo</span>
       <span>{text}</span>
     </div>
   );

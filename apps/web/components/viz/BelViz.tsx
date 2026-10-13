@@ -1,5 +1,5 @@
 import { getI18n } from "@/lib/i18n";
-import { Chip, Maicro, Scene } from "./Scene";
+import { Chip, Vidalo, Scene } from "./Scene";
 
 const MISSED = 8;
 
@@ -13,7 +13,7 @@ function Phone() {
 
 /**
  * A stale phone number in three directories (14s): every customer who asks
- * the AI gets a dead line, and the count goes up until Maicro fixes the
+ * the AI gets a dead line, and the count goes up until Vidalo fixes the
  * directories and the call goes through.
  */
 export async function BelViz() {
@@ -85,7 +85,7 @@ export async function BelViz() {
               </li>
             ))}
           </ul>
-          <Maicro text={S.maicro} data-show="0.46" data-pulse="0.47" />
+          <Vidalo text={S.maicro} data-show="0.46" data-pulse="0.47" />
         </div>
       </div>
     </Scene>

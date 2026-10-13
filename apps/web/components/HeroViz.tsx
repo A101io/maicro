@@ -1,12 +1,12 @@
 import { getI18n } from "@/lib/i18n";
 
 /**
- * The landing hero's visual: what Maicro does, as one loop (12s).
+ * The landing hero's visual: what Vidalo does, as one loop (12s).
  *
  *   1. A customer asks a question.
  *   2. Four sources feed the AI's answer (particles along the lines).
  *   3. The answer comes back wrong, in red: one source is from 2022.
- *   4. Maicro finds that source and draws a line to it; the source turns
+ *   4. Vidalo finds that source and draws a line to it; the source turns
  *      green, its particles turn green, the answer flips to the right one.
  *
  * No script: the particles and line colours are SVG (SMIL), the rest is CSS
@@ -50,7 +50,7 @@ export async function HeroViz() {
               {i === BAD && <animate attributeName="stroke" dur="12s" repeatCount="indefinite" values={`${RED};${RED};${GREEN};${GREEN}`} keyTimes="0;0.54;0.57;1" />}
             </path>
           ))}
-          {/* Maicro's line to the source it repairs: drawn, held, cleared. */}
+          {/* Vidalo's line to the source it repairs: drawn, held, cleared. */}
           <path className="viz-repair" d={REPAIR} pathLength={1} fill="none" stroke="#2563EB" strokeWidth={2} strokeDasharray="1" strokeLinecap="round">
             <animate attributeName="stroke-dashoffset" dur="12s" repeatCount="indefinite" values="1;1;0;0;1" keyTimes="0;0.42;0.52;0.9;1" />
           </path>
@@ -113,9 +113,9 @@ export async function HeroViz() {
             </div>
           </div>
 
-          {/* Maicro at work. */}
+          {/* Vidalo at work. */}
           <div className="viz-maicro" style={{ left: pct(252, W), top: pct(392, H), width: pct(296, W) }}>
-            <span className="viz-maicro-mark">maicro</span>
+            <span className="viz-maicro-mark">vidalo</span>
             <span className="viz-swap viz-swap-3">
               {V.maicro.map((t) => (
                 <span key={t}>{t}</span>

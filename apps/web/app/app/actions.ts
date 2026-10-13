@@ -16,7 +16,7 @@ export async function checkNow() {
   redirect((await getI18n()).href("/app?controle=ingepland"));
 }
 
-/** Option B on the domain page: let Maicro register a domain. */
+/** Option B on the domain page: let Vidalo register a domain. */
 export async function registerDomain() {
   const { business } = await requireVerifiedOwner("/app/domein");
   const db = await ready();

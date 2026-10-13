@@ -18,7 +18,7 @@ Elke fout controleren we opnieuw zodra de bron is aangepast. Je hoort van ons al
 Je overzicht: https://maicro.nl/dashboard
 
 Groet,
-Maicro
+Vidalo
 "
 `;
 
@@ -34,7 +34,7 @@ Elke fout controleren we opnieuw zodra de bron is aangepast. Je hoort van ons al
 Je overzicht: https://maicro.nl/dashboard
 
 Groet,
-Maicro
+Vidalo
 "
 `;
 
@@ -73,7 +73,7 @@ Elke fout controleren we opnieuw zodra de bron is aangepast. Je hoort van ons al
 Je overzicht: https://maicro.nl/dashboard
 
 Groet,
-Maicro
+Vidalo
 "
 `;
 
@@ -117,7 +117,7 @@ Elke fout controleren we opnieuw zodra de bron is aangepast. Je hoort van ons al
 Je overzicht: https://maicro.nl/dashboard
 
 Groet,
-Maicro
+Vidalo
 "
 `;
 
@@ -210,7 +210,7 @@ Het volledige resultaat, met de bron van elke fout: https://maicro.nl/scan/bakke
 Zelf oplossen kan: de bronnen staan erbij. Liever dat wij het doen? Instellen kost 149 euro eenmalig, bewaking 49 euro per maand, maandelijks opzegbaar. Prijzen excl. btw.
 
 Groet,
-Maicro
+Vidalo
 
 Geen mails meer hierover? Afmelden: https://maicro.nl/afmelden?b=b1&t=tok
 "
@@ -228,7 +228,7 @@ Resultaat: https://maicro.nl/scan/bakkerij-jansen-haarlem
 Dit is de laatste mail hierover. Wil je dat wij de bronnen herstellen, dan regel je dat via de link. Zo niet, dan laten we je met rust.
 
 Groet,
-Maicro
+Vidalo
 
 Geen mails meer hierover? Afmelden: https://maicro.nl/afmelden?b=b1&t=tok
 "
@@ -251,7 +251,7 @@ Lukt het niet of heb je hulp nodig van je websitebouwer? Stuur deze mail door, d
 Je overzicht: https://maicro.nl/dashboard
 
 Groet,
-Maicro
+Vidalo
 "
 `;
 
@@ -270,7 +270,7 @@ Zolang dit op je website staat, blijft AI het overnemen. Het is één tekstwijzi
 Je overzicht: https://maicro.nl/dashboard
 
 Groet,
-Maicro
+Vidalo
 "
 `;
 
@@ -300,7 +300,7 @@ Wat we doen: We vragen de bron uit jouw naam om de gegevens te corrigeren.
 Alle antwoorden, met datum en bron: https://maicro.nl/dashboard
 
 Groet,
-Maicro
+Vidalo
 "
 `;
 
@@ -318,7 +318,7 @@ Er is niets te herstellen. Fijn.
 Alle antwoorden, met datum en bron: https://maicro.nl/dashboard
 
 Groet,
-Maicro
+Vidalo
 "
 `;
 
@@ -343,7 +343,7 @@ Wat we doen: Niet gevonden: we maken je vindbaar
 Alle antwoorden, met datum en bron: https://maicro.nl/dashboard
 
 Groet,
-Maicro
+Vidalo
 "
 `;
 
@@ -367,7 +367,7 @@ We blijven dit antwoord elke maand controleren.
 Je overzicht: https://maicro.nl/dashboard
 
 Groet,
-Maicro
+Vidalo
 "
 `;
 
@@ -387,7 +387,7 @@ Wat nu: we laten dit antwoord in je overzicht staan en controleren het elke maan
 Je overzicht: https://maicro.nl/dashboard
 
 Groet,
-Maicro
+Vidalo
 "
 `;
 
@@ -407,12 +407,12 @@ Wat nu: we laten dit antwoord in je overzicht staan en controleren het elke maan
 Je overzicht: https://maicro.nl/dashboard
 
 Groet,
-Maicro
+Vidalo
 "
 `;
 
 exports[`email templates > snapshots > welcome 1`] = `
-"Welkom bij Maicro: 4 stappen voor Bakkerij Jansen
+"Welkom bij Vidalo: 4 stappen voor Bakkerij Jansen
 
 Hoi,
 
@@ -439,6 +439,6 @@ Je overzicht: https://maicro.nl/dashboard
 Vragen? Antwoord op deze mail.
 
 Groet,
-Maicro
+Vidalo
 "
 `;

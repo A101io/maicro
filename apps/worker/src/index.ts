@@ -1,5 +1,5 @@
 /**
- * Maicro worker: job loop + cron tick + facts-page HTTP server in one process.
+ * Vidalo worker: job loop + cron tick + facts-page HTTP server in one process.
  *
  *   MAICRO_MOCK=1 pnpm --filter @maicro/worker start
  *

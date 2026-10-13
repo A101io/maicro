@@ -7,7 +7,7 @@ const PRIVATE = ["/r/", "/en/r/", "/app", "/en/app", "/api/", "/scan/", "/en/sca
 
 /**
  * Search engines and AI assistants are welcome on every public page: being
- * read correctly by them is what Maicro sells. The AI crawlers are named so
+ * read correctly by them is what Vidalo sells. The AI crawlers are named so
  * that intent is explicit, not left to the wildcard.
  */
 export default function robots(): MetadataRoute.Robots {

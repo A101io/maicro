@@ -10,7 +10,7 @@ import type { JobKind } from "./types.js";
  * Google Business Profile (shared/ownership.ts). Anyone can run a free scan
  * and type an e-mail address into a report; without both checks a stranger
  * could push their own "facts" to the facts page, the directories and
- * third-party sites in Maicro's name.
+ * third-party sites in Vidalo's name.
  */
 export const PAID_ONLY: ReadonlySet<JobKind> = new Set<JobKind>(["setup", "publish", "sync", "fixes", "fix", "recheck"]);
 const PAYING: ReadonlySet<BusinessStatus> = new Set<BusinessStatus>(["trial", "active"]);

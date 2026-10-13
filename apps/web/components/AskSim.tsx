@@ -4,7 +4,7 @@ import { getI18n } from "@/lib/i18n";
  * "Vraag het zelf": a simulated conversation with an AI assistant. A visitor
  * picks a customer's question and watches the answer arrive, with the wrong
  * part marked; then what is wrong, where it came from, what it costs and what
- * Maicro does; and the same answer after the fix.
+ * Vidalo does; and the same answer after the fix.
  *
  * Server-rendered, so it reads fine without script: the first case shows,
  * complete. public/ask.js adds the playback (typing, marking, the rows one by

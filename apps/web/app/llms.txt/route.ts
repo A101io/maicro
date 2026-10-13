@@ -3,8 +3,8 @@ import { localizeHref } from "@/lib/lang-paths";
 import { SITE } from "@/lib/seo";
 
 /**
- * /llms.txt (llmstxt.org): what Maicro is, in plain Markdown, for AI
- * assistants that read it. Maicro publishes one for every customer's facts
+ * /llms.txt (llmstxt.org): what Vidalo is, in plain Markdown, for AI
+ * assistants that read it. Vidalo publishes one for every customer's facts
  * page; this is its own. Built from the same copy as the pages, so the two
  * cannot disagree.
  */
@@ -16,13 +16,13 @@ export function GET() {
   const u = (route: string, lang: "nl" | "en") => SITE + (localizeHref(route, lang) === "/" ? "" : localizeHref(route, lang));
   const steps = nl.landing.werkt.steps.map((s) => `- **${s.title}**: ${s.body}`).join("\n");
   const faq = nl.landing.vragen.items.map((it) => `- **${it.q}** ${it.a}`).join("\n");
-  const body = `# Maicro
+  const body = `# Vidalo
 
 > ${nl.pages.home.description}
 
-${nl.tagline} Maicro is een dienst van A101 B.V. (Rotterdam, KvK 42057858) voor Nederlandse bedrijven. English: ${en.pages.home.description}
+${nl.tagline} Vidalo is een dienst van A101 B.V. (Rotterdam, KvK 42057858) voor Nederlandse bedrijven. English: ${en.pages.home.description}
 
-## Wat Maicro doet
+## Wat Vidalo doet
 ${steps}
 
 ## Prijs

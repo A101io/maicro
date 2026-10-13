@@ -21,7 +21,7 @@ export function pageMetadata({ title, description, route, lang, absoluteTitle = 
       canonical: url,
       languages: { nl: abs(localizeHref(route, "nl")), en: abs(localizeHref(route, "en")), "x-default": abs(route) },
     },
-    openGraph: { title, description, url, siteName: "Maicro", locale: lang === "en" ? "en_GB" : "nl_NL", alternateLocale: lang === "en" ? "nl_NL" : "en_GB", type: "website" },
+    openGraph: { title, description, url, siteName: "Vidalo", locale: lang === "en" ? "en_GB" : "nl_NL", alternateLocale: lang === "en" ? "nl_NL" : "en_GB", type: "website" },
     twitter: { card: "summary_large_image", title, description },
   };
 }

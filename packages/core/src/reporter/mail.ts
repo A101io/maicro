@@ -25,7 +25,7 @@ export interface MailResult {
 }
 
 export function defaultFrom(): string {
-  return process.env.EMAIL_FROM || "Maicro <controle@maicro.nl>";
+  return process.env.EMAIL_FROM || "Vidalo <controle@maicro.nl>";
 }
 
 function useResend(): boolean {

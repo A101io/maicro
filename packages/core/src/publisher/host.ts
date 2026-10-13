@@ -1,7 +1,7 @@
 /**
  * Facts host logic.
  *
- * Preferred: `feiten.{domain}` on the owner's own domain, pointed at Maicro with
+ * Preferred: `feiten.{domain}` on the owner's own domain, pointed at Vidalo with
  * one CNAME record. Fallback: `{slug}.feiten.{FACTS_HOST_SUFFIX}`.
  *
  * Cloudflare for SaaS (custom hostnames) is used when CLOUDFLARE_API_TOKEN and

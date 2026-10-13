@@ -1,5 +1,5 @@
 /**
- * Shared domain types for Maicro.
+ * Shared domain types for Vidalo.
  * Facts are owner-asserted. Samples are evidence. Findings are the diff.
  */
 

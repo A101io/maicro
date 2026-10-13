@@ -3,7 +3,7 @@
  * verifies the signature and hands the event here; everything that changes
  * a business because of money happens in this one place, and is tested.
  *
- * State, in Maicro's words:
+ * State, in Vidalo's words:
  *   scanned  → trial    paid checkout (setup or setup + monitoring)
  *   trial    → active   first monthly invoice paid
  *   active   → paused   Stripe gave up collecting (subscription "unpaid")
@@ -16,7 +16,7 @@
  *   (payment_status "unpaid"); those wait for async_payment_succeeded.
  * - Stripe retries webhooks. Each event id is handled once per business.
  * - Stripe's own retry schedule (Smart Retries, set in the dashboard) does
- *   the dunning; Maicro only follows the subscription's status.
+ *   the dunning; Vidalo only follows the subscription's status.
  */
 import type { BusinessRecord } from "../db/types.js";
 import { getDb, setBusinessStatus } from "../shared/db.js";
@@ -164,7 +164,7 @@ export async function handleStripeEvent(event: StripeEventLike): Promise<Billing
   }
 }
 
-/** The webhook events Maicro listens to (scripts/stripe-setup.mjs registers exactly these). */
+/** The webhook events Vidalo listens to (scripts/stripe-setup.mjs registers exactly these). */
 export const STRIPE_WEBHOOK_EVENTS = [
   "checkout.session.completed",
   "checkout.session.async_payment_succeeded",

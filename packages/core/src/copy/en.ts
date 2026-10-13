@@ -48,7 +48,7 @@ export const en: CopyShape = {
       grid: "rggrrxrggrxrrggrxrggrxrrggrxrggrxrrggrxrrggrxrggrxgrrgrxrggrrxgrgrxrgrgrxgrrgrxgrrgrxgrgrxgrgrxrggrx",
       /** The animated hero: one answer, built from four sources, put right at the source. */
       viz: {
-        label: "How it works: an AI builds an answer from sources. One outdated source made the answer wrong. Maicro fixes that source and the answer is right again.",
+        label: "How it works: an AI builds an answer from sources. One outdated source made the answer wrong. Vidalo fixes that source and the answer is right again.",
         question: "Is Bakkerij De Vries open on Sunday?",
         engine: "ChatGPT",
         wrong: "Yes, Sunday from 9:00 to 17:00.",
@@ -128,7 +128,7 @@ export const en: CopyShape = {
     },
     loket: {
       h2: "You cannot change the answer. You can change the sources.",
-      body: "There is no desk at ChatGPT or Google that corrects the answer. The only way that works: find the source the AI took it from, and fix that. That is exactly what Maicro does.",
+      body: "There is no desk at ChatGPT or Google that corrects the answer. The only way that works: find the source the AI took it from, and fix that. That is exactly what Vidalo does.",
       timeline: [
         { stip: "rood", text: "openingstijden.nl says: Sunday 9–17", meta: "source found" },
         { stip: "oranje", text: "Correction submitted, proof kept", meta: "day 1" },
@@ -137,7 +137,7 @@ export const en: CopyShape = {
       ],
     },
     werkt: {
-      h2: "How Maicro works",
+      h2: "How Vidalo works",
       sub: "You do five minutes of work at the start. The rest runs by itself, every month.",
       steps: [
         { n: "1", tone: "ink", title: "Record", body: "Your details right, once: address, phone, opening hours, what you do and do not do. We fill them in beforehand, you confirm.", meta: "You: 5 minutes" },
@@ -238,7 +238,7 @@ export const en: CopyShape = {
     },
     missie: {
       h2: "Every business deserves a place in the answer.",
-      body: "Most businesses in the Netherlands are small, have a simple website or none, and appear in no source an AI reads. Not wrong, but invisible. A grey dot. Maicro gives them a facts page AI can read, puts them in the directories AI uses, and checks whether they are named afterwards.",
+      body: "Most businesses in the Netherlands are small, have a simple website or none, and appear in no source an AI reads. Not wrong, but invisible. A grey dot. Vidalo gives them a facts page AI can read, puts them in the directories AI uses, and checks whether they are named afterwards.",
       timeline: [
         { stip: "grijs", text: "“I cannot find anything about Installatiebedrijf Hendriks.”", meta: "day 0" },
         { stip: "oranje", text: "Facts page live, Google and directories filled in", meta: "day 2" },
@@ -395,7 +395,7 @@ export const en: CopyShape = {
         { term: "A2A (Agent2Agent)", body: "An open protocol, published by Google in 2025, through which AI assistants from different companies consult each other and hand tasks to each other." },
         { term: "Ordering through an assistant", body: "Agreements that let an assistant order and pay on the customer's behalf, such as the Agentic Commerce Protocol from OpenAI and Stripe, from 2025." },
       ],
-      usTitle: "What Maicro does with this",
+      usTitle: "What Vidalo does with this",
       us: [
         { title: "Already now", body: "Your facts page exists in three forms: as a normal page, as schema.org data and as llms.txt. The same facts, with a date, on your own domain." },
         { title: "As soon as it settles", body: "We follow new formats such as OKF. If a format is really used, we put your facts in it too. You do not have to do anything for that." },
@@ -404,7 +404,7 @@ export const en: CopyShape = {
       footnote: "This is where the agreements stand now (October 2026). Which ones win is not up to us; that your facts are ready is.",
     },
     /**
-     * The looping scenes (components/viz). Each shows one thing Maicro does and
+     * The looping scenes (components/viz). Each shows one thing Vidalo does and
      * what it costs a business when nobody does it. Fictional businesses, real
      * patterns; every scene says so in its caption.
      */
@@ -412,7 +412,7 @@ export const en: CopyShape = {
       regel: {
         h3: "Soon the AI places the order. Whoever is closed according to the data drops out.",
         body: "A customer lets the AI assistant order. It looks for bakeries, checks who is open on Sunday and chooses. If one directory still says you are closed on Sunday, you are out. Nobody tells you.",
-        label: "Example: a customer lets an AI assistant order croissants for Sunday. Bakkerij Smit is open on Sunday, but a directory from 2021 says closed. The assistant orders from another bakery. After Maicro has fixed that directory, the order goes to Bakkerij Smit.",
+        label: "Example: a customer lets an AI assistant order croissants for Sunday. Bakkerij Smit is open on Sunday, but a directory from 2021 says closed. The assistant orders from another bakery. After Vidalo has fixed that directory, the order goes to Bakkerij Smit.",
         phaseWrong: "With an outdated directory",
         phaseRight: "After the fix at the source",
         ask: "Order 12 croissants for Sunday from a bakery in Haarlem.",
@@ -435,7 +435,7 @@ export const en: CopyShape = {
       bel: {
         h3: "One old number in three directories. Whoever calls reaches nobody.",
         body: "The AI gives the number that appears most often. If your old number is still in three directories, that is the one the customer calls. They hear “not in service” and call the next one.",
-        label: "Example: a customer asks Copilot for the number of Fysiotherapie Van Dijk and gets the old number, which is still in three directories. The customer hears that the number is not in service, and so it goes with every caller. Maicro corrects the three directories; after that Copilot gives the right number and the customer gets through.",
+        label: "Example: a customer asks Copilot for the number of Fysiotherapie Van Dijk and gets the old number, which is still in three directories. The customer hears that the number is not in service, and so it goes with every caller. Vidalo corrects the three directories; after that Copilot gives the right number and the customer gets through.",
         ask: "What is the number of Fysiotherapie Van Dijk?",
         engine: "Copilot",
         wrong: "038 – 421 07 33",
@@ -459,7 +459,7 @@ export const en: CopyShape = {
       gidsen: {
         h3: "Record it once, the same everywhere",
         body: "As long as sixteen sources give three different numbers, the AI picks one itself. We put your facts page live and send the same details to Google, Bing, Apple and thirteen Dutch directories. Then there is nothing left to choose.",
-        label: "Example: sixteen sources give three different phone numbers and ChatGPT, Google AI and Copilot give an old number. Maicro publishes a facts page and puts the same details in all sixteen sources. After that the answer is right with all three.",
+        label: "Example: sixteen sources give three different phone numbers and ChatGPT, Google AI and Copilot give an old number. Vidalo publishes a facts page and puts the same details in all sixteen sources. After that the answer is right with all three.",
         before: "16 sources · 3 different numbers",
         after: "16 sources · one version of the facts",
         factsTitle: "Facts page",
@@ -637,9 +637,9 @@ export const en: CopyShape = {
     },
     how: {
       crumb: "How it works",
-      title: "How Maicro works: record, publish, check, fix",
+      title: "How Vidalo works: record, publish, check, fix",
       description: "Record your details once, publish them the same everywhere, check every question twenty times a month with ChatGPT, Google AI and Copilot, and fix errors at the source with proof.",
-      h1: "How Maicro works",
+      h1: "How Vidalo works",
       intro: "Five minutes of work for you at the start. After that we check every month what AI assistants say about you, and fix every error at its source.",
     },
     next: {
@@ -649,7 +649,7 @@ export const en: CopyShape = {
       h1: "Soon, assistants talk to each other",
       intro: "What changes when AI assistants do not just answer but also arrange things, and which agreements are being made for it now. Without jargon.",
     },
-    home_crumb: "Maicro",
+    home_crumb: "Vidalo",
   },
 
   legal: {
@@ -659,7 +659,7 @@ export const en: CopyShape = {
     contact: "Questions? Email us at hallo@maicro.nl.",
     terms: {
       title: "Terms and conditions",
-      intro: "These terms apply to every check and every subscription from Maicro, a trade name of A101 B.V.",
+      intro: "These terms apply to every check and every subscription from Vidalo, a trade name of A101 B.V.",
       sections: [
         { h: "What we do", p: ["We ask AI assistants such as ChatGPT, Google AI and Copilot what they say about your business, compare that with the details you confirm, and show where an error comes from.", "With a paid plan we publish a facts page, put your details in Google, Bing, Apple and Dutch directories, and ask sources with an error to fix it."] },
         { h: "What we do not promise", p: ["Nobody decides what an AI assistant answers. We fix the sources those answers come from. Answers from a model's memory only change with a new model version.", "A fix at another website or directory depends on that party and can take up to 14 days or longer."] },
@@ -672,7 +672,7 @@ export const en: CopyShape = {
     },
     privacy: {
       title: "Privacy policy",
-      intro: "Maicro is a trade name of A101 B.V. This page sets out which data we use, why, and with whom we share it.",
+      intro: "Vidalo is a trade name of A101 B.V. This page sets out which data we use, why, and with whom we share it.",
       sections: [
         { h: "Which data", p: ["About your business: name, town, address, phone number, website, opening hours, services and other details you confirm. These are usually not personal data, unless your business carries your own name.", "About you: your email address, to log in and to send your reports. When you pay, Stripe processes your payment details; we do not see them.", "About the check: the questions we ask, the answers of AI assistants and the sources they mention."] },
         { h: "Why", p: ["To carry out the check, fix errors, email you about your report and invoice your subscription. After a free check we send you a reminder after 7 and after 21 days; if you do not want that, email us. The legal basis is the agreement with you, and for a free check our legitimate interest in being able to give you a report."] },
@@ -1415,8 +1415,8 @@ export const en: CopyShape = {
     mockNotice: "Payment simulated (no Stripe key set).",
     cancelled: "Your payment was not completed. Nothing has been charged. You can try again below.",
     error: "Checkout is not working right now. Nothing has been charged. Please try again later or email us at hallo@maicro.nl.",
-    productSetup: "Maicro Set it right (one-off)",
-    productMonitor: "Maicro Keep it right (per month)",
+    productSetup: "Vidalo Set it right (one-off)",
+    productMonitor: "Vidalo Keep it right (per month)",
   },
 
   pricing: {
@@ -1453,7 +1453,7 @@ export const en: CopyShape = {
   },
 
   welcome: {
-    h1: "Welcome to Maicro",
+    h1: "Welcome to Vidalo",
     body: "Your payment went through. Four things, and we are live within 48 hours.",
     processingH1: "Thank you, your payment is being processed",
     processingBody: "With a direct debit it takes a few working days for the money to arrive. You can already do the steps below; we start as soon as the payment is complete.",
@@ -1463,7 +1463,7 @@ export const en: CopyShape = {
     steps: [
       { title: "Log in to Google once", body: "With the account of your Google Business Profile. That is how we know you are the owner.", href: "/app/google", cta: "Log in to Google" },
       { title: "Confirm your details", body: "Check your address, phone, opening hours and what you do and do not do.", href: "/app/gegevens", cta: "Confirm details" },
-      { title: "Choose your domain", body: "One DNS record on your own domain, or let Maicro register a domain.", href: "/app/domein", cta: "Set up domain" },
+      { title: "Choose your domain", body: "One DNS record on your own domain, or let Vidalo register a domain.", href: "/app/domein", cta: "Set up domain" },
       { title: "Wait for the first check", body: "After that you get a report every month. You do not need to install anything.", href: "/app", cta: "Go to your overview" },
     ],
     loginHint: "You will receive a login link by email. No password needed.",
@@ -1584,9 +1584,9 @@ export const en: CopyShape = {
     recordName: "Name",
     recordValue: "Value",
     checkButton: "Check DNS",
-    verified: (host: string) => `${host} points to Maicro. Your facts page is live.`,
+    verified: (host: string) => `${host} points to Vidalo. Your facts page is live.`,
     notYet: "We do not see the DNS record yet. DNS changes can take up to an hour. We check again every 10 minutes.",
-    optionB: "Let Maicro register a domain",
+    optionB: "Let Vidalo register a domain",
     optionBHint: (name: string) => `We register ${name} and set everything up. You do not need to do anything.`,
     optionBButton: "Register it for me",
     optionBQueued: "We are registering the domain and will let you know when it is live.",
@@ -1661,8 +1661,8 @@ export const en: CopyShape = {
       monthlyAllOk: (total: number) => `${total} of ${total} answers are right`,
       monthly: (found: number, fixed: number, pending: number) => `${found} ${found === 1 ? "error" : "errors"} found, ${fixed} fixed, ${pending} in progress`,
       resolved: (business: string) => `Fixed: ${business}`,
-      welcome: "Welcome to Maicro: four steps to your first check",
-      login: "Your login link for Maicro",
+      welcome: "Welcome to Vidalo: four steps to your first check",
+      login: "Your login link for Vidalo",
     },
   },
 };
