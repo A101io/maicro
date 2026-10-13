@@ -1,8 +1,31 @@
 import type { MetadataRoute } from "next";
 import { SECTOR_SLUGS } from "@maicro/core/types";
+import { localizeHref } from "@/lib/lang-paths";
+import { copy } from "@maicro/core/copy";
+import { SITE } from "@/lib/seo";
 
-const base = process.env.PUBLIC_BASE_URL ?? "http://localhost:3000";
+/** Every public page in both languages, each entry naming its translation (hreflang). */
+const ROUTES: { route: string; priority: number; changeFrequency: "weekly" | "monthly" | "yearly" }[] = [
+  { route: "/", priority: 1, changeFrequency: "weekly" },
+  { route: "/prijzen", priority: 0.9, changeFrequency: "monthly" },
+  { route: "/hoe-het-werkt", priority: 0.8, changeFrequency: "monthly" },
+  { route: "/waarom", priority: 0.8, changeFrequency: "monthly" },
+  { route: "/straks", priority: 0.7, changeFrequency: "monthly" },
+  ...SECTOR_SLUGS.map((slug) => ({ route: `/vak/${slug}`, priority: 0.7, changeFrequency: "monthly" as const })),
+  // Terms and privacy join once they are reviewed: drafts are noindex.
+  ...(copy.legal.draft ? [] : [{ route: "/voorwaarden", priority: 0.2, changeFrequency: "yearly" as const }, { route: "/privacy", priority: 0.2, changeFrequency: "yearly" as const }]),
+];
 
 export default function sitemap(): MetadataRoute.Sitemap {
-  return [{ url: `${base}/`, changeFrequency: "weekly", priority: 1 }, { url: `${base}/prijzen`, changeFrequency: "monthly", priority: 0.9 }, ...SECTOR_SLUGS.map((slug) => ({ url: `${base}/vak/${slug}`, changeFrequency: "monthly" as const, priority: 0.8 }))];
+  const lastModified = new Date();
+  const url = (route: string, lang: "nl" | "en") => SITE + (localizeHref(route, lang) === "/" ? "" : localizeHref(route, lang));
+  return ROUTES.flatMap(({ route, priority, changeFrequency }) =>
+    (["nl", "en"] as const).map((lang) => ({
+      url: url(route, lang),
+      lastModified,
+      changeFrequency,
+      priority: lang === "nl" ? priority : Math.round(priority * 8) / 10,
+      alternates: { languages: { nl: url(route, "nl"), en: url(route, "en") } },
+    })),
+  );
 }

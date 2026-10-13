@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
-import { getCopy, getI18n } from "@/lib/i18n";
+import { getI18n } from "@/lib/i18n";
+import { pageMetadata } from "@/lib/seo";
 import { SiteHeader } from "@/components/SiteHeader";
 import { SiteFooter } from "@/components/SiteFooter";
 import { ScanField } from "@/components/ScanField";
@@ -7,8 +8,8 @@ import { PriceBlock } from "@/components/PriceBlock";
 import { DriftViz } from "@/components/viz/DriftViz";
 
 export async function generateMetadata(): Promise<Metadata> {
-  const copy = await getCopy();
-  return { title: copy.pricing.title, description: copy.pricing.lead };
+  const { copy, lang } = await getI18n();
+  return pageMetadata({ title: copy.pricing.title, description: copy.pricing.lead, route: "/prijzen", lang });
 }
 
 /** Pricing on its own page: the same two plans as the landing, plus how paying works. */
