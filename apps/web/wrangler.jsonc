@@ -13,10 +13,24 @@
   "assets": { "directory": ".open-next/assets", "binding": "ASSETS" },
   "observability": { "enabled": true },
   "upload_source_maps": true,
-  // workers.dev stays on until a domain is bound: adding routes turns it off
-  // silently (Sitty lost two deploys to that), so it is written down here.
+  // Adding routes turns workers.dev OFF silently (Sitty lost two deploys to
+  // that), so it is written down: it stays on, as the address a deploy can
+  // always be checked on even when DNS is wrong.
   "workers_dev": true,
-  "vars": { "VIDALO_MOCK": "0", "PUBLIC_BASE_URL": "https://vidalo-web.julian-devriend.workers.dev" },
+  // vidalo.nl is the site. The other five hosts are bound to the same Worker
+  // and answer with a 301 to vidalo.nl (worker.ts, core/shared/canonical.ts,
+  // which lists the same hosts). Custom Domains create their own DNS records
+  // and certificates; each zone must be active in A101's Cloudflare account
+  // first, or the deploy fails naming the zone.
+  "routes": [
+    { "pattern": "vidalo.nl", "custom_domain": true },
+    { "pattern": "www.vidalo.nl", "custom_domain": true },
+    { "pattern": "vidalo.com", "custom_domain": true },
+    { "pattern": "www.vidalo.com", "custom_domain": true },
+    { "pattern": "vidalo.io", "custom_domain": true },
+    { "pattern": "www.vidalo.io", "custom_domain": true }
+  ],
+  "vars": { "VIDALO_MOCK": "0", "PUBLIC_BASE_URL": "https://vidalo.nl" },
   // Hyperdrive pools the Supabase connections (one handle per request,
   // worker.ts). Create it once with the pooler URL, then put its id here:
   //   wrangler hyperdrive create vidalo-db --connection-string="postgres://..."
@@ -28,6 +42,9 @@
     "preview": {
       "name": "vidalo-web-preview",
       "workers_dev": true,
+      // routes are inherited by an environment: without this the preview
+      // would try to claim vidalo.nl.
+      "routes": [],
       "vars": { "VIDALO_MOCK": "1", "PUBLIC_BASE_URL": "https://vidalo-web-preview.julian-devriend.workers.dev" },
       "queues": { "producers": [] }
     }

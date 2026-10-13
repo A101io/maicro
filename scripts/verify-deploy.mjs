@@ -4,7 +4,46 @@
  * diagnosis of a failing check was wrong because it only said "failed").
  *
  *   node scripts/verify-deploy.mjs https://vidalo-web-preview.julian-devriend.workers.dev
+ *   node scripts/verify-deploy.mjs --redirects https://vidalo.nl vidalo.io www.vidalo.nl ...
+ *
+ * --redirects: every host given must answer 301 with Location on the target,
+ * same path and query.
  */
+if (process.argv[2] === "--redirects") {
+  const target = (process.argv[3] ?? "").replace(/\/$/, "");
+  const hosts = process.argv.slice(4);
+  if (!/^https:\/\//.test(target) || hosts.length === 0) {
+    console.error("usage: verify-deploy.mjs --redirects https://target host [host...]");
+    process.exit(2);
+  }
+  const probe = "/prijzen?check=1";
+  let bad = 0;
+  for (const host of hosts) {
+    let status = 0;
+    let location = "";
+    for (let attempt = 1; attempt <= 3; attempt++) {
+      try {
+        const res = await fetch(`https://${host}${probe}`, { redirect: "manual", headers: { "user-agent": "vidalo-deploy-verify" } });
+        status = res.status;
+        location = res.headers.get("location") ?? "";
+        if (status === 301 && location === target + probe) break;
+      } catch (err) {
+        location = String(err);
+      }
+      await new Promise((r) => setTimeout(r, attempt * 3000));
+    }
+    const ok = status === 301 && location === target + probe;
+    if (!ok) bad++;
+    console.log(`${ok ? "✓" : "✗"} ${host.padEnd(18)} ${String(status).padEnd(4)} → ${location || "(no Location)"}`);
+  }
+  if (bad) {
+    console.error(`\n${bad} host(s) do not redirect to ${target}`);
+    process.exit(1);
+  }
+  console.log(`\nAll ${hosts.length} hosts redirect to ${target}`);
+  process.exit(0);
+}
+
 const base = (process.argv[2] ?? "").replace(/\/$/, "");
 if (!/^https?:\/\//.test(base)) {
   console.error("usage: verify-deploy.mjs https://host");

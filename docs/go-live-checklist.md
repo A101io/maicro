@@ -61,5 +61,19 @@ What the site promises a customer exists for Vidalo itself, from one record: `pa
 | L1 | Terms, privacy, cookie statement from the De Boer Legal masters, NL + EN, at `/legal/*` | blocked: masters not in this environment (upload) + counsel review |
 | L2 | Processors, records of processing, DPIA screening | written (`docs/processors.md`, `docs/records-of-processing.md`, `docs/legal-compliance-guidelines.md`) |
 
+## Domains (J2)
+Written as if the three domains exist (Julian, 13 Oct 2026: "ga er even van uit"). Nothing is bound until a production deploy runs.
+
+| # | Item | Status |
+|---|---|---|
+| D1 | Register `vidalo.com` and `vidalo.io` at Cloudflare Registrar, `vidalo.nl` at a Dutch registrar; add `vidalo.nl` to Cloudflare as a zone and set its nameservers there | blocked: Julian |
+| D2 | `vidalo-web` binds `vidalo.nl`, `www.vidalo.nl`, `vidalo.com`, `www.vidalo.com`, `vidalo.io`, `www.vidalo.io` as Custom Domains (`apps/web/wrangler.jsonc`); every host but `vidalo.nl` answers 301 to the same path on `vidalo.nl` (`apps/web/worker.ts`, `packages/core/src/shared/canonical.ts`) | written; proven in workerd with a Host header (301 for .io/.com/www, 200 for .nl and workers.dev) |
+| D3 | Deploy check: production verifies `https://vidalo.nl`, then `--redirects` for the five other hosts (`scripts/verify-deploy.mjs`) | written |
+| D4 | Cloudflare token gains **Zone · Workers Routes · Edit** on the three zones (docs/secrets-and-keys.md) | blocked: D1 |
+| D5 | Fallback facts hosts `{slug}.feiten.vidalo.nl` are two levels deep: Universal SSL covers only `*.vidalo.nl`, so they need Advanced Certificate Manager (about $10/month) or a one-level scheme such as `{slug}-feiten.vidalo.nl` | decision: Julian |
+| D6 | `feiten.vidalo.nl` as the CNAME target for customers' own domains (Cloudflare for SaaS, fallback origin on `vidalo-worker`) | open |
+
+⚠ With D2 in place, the first production deploy puts the product on `vidalo.nl`. There is no coming-soon gate yet (J4). That deploy is the one-way door below, not a routine step.
+
 ## The one-way door
 Pointing the real domain at production, with live Stripe prices, is the launch. It waits for Julian's explicit yes, and for every row above to be ✓ or consciously accepted.

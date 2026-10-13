@@ -11,7 +11,7 @@
  */
 import handler from "./.open-next/worker.js";
 import { createDb } from "@vidalo/core/db";
-import { withDb } from "@vidalo/core/shared";
+import { canonicalRedirect, withDb } from "@vidalo/core/shared";
 
 export { DOQueueHandler, DOShardedTagCache, BucketCachePurge } from "./.open-next/worker.js";
 
@@ -24,6 +24,10 @@ interface Env {
 
 export default {
   async fetch(request: Request, env: Env, ctx: { waitUntil(p: Promise<unknown>): void }): Promise<Response> {
+    // vidalo.com, vidalo.io and www.* are the same site: one permanent
+    // redirect to vidalo.nl, before anything touches the database.
+    const canonical = canonicalRedirect(request.url);
+    if (canonical) return Response.redirect(canonical, 301);
     // Postgres unless plain mock mode; VIDALO_DB=pg is mock engines on a real database (as in core).
     const postgres = env.VIDALO_MOCK !== "1" || env.VIDALO_DB === "pg";
     const url = postgres ? (env.HYPERDRIVE?.connectionString ?? env.DATABASE_URL ?? null) : null;

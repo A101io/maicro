@@ -4,3 +4,4 @@ export * from "./facts-nl.js";
 export * from "./ownership.js";
 export * from "./unsubscribe.js";
 export * from "./own.js";
+export * from "./canonical.js";
