@@ -11,7 +11,7 @@ The product is **Vidalo** (from *videre*, to see). The code, copy (NL + EN), pac
 | Supabase project name `maicro` (ref `bbynmqvaxpjdnkaasutd`) | display name only, Julian renames in the dashboard; the ref never changes |
 | Committed migrations | keep the word Maicro in two comments; migrations are never edited |
 | `docs/design-g/*.html` | the original design boards, kept as they were |
-| Domains `vidalo.nl` / `vidalo.com` | Julian registers |
+| Domains: `vidalo.nl` main; `vidalo.com` and `vidalo.io` redirect to it | Julian registers (.com/.io at Cloudflare Registrar, .nl at a Dutch registrar, DNS on Cloudflare) |
 | Stripe, Cloudflare Workers, Google OAuth app, Resend | none exist yet; create them as Vidalo |
 
 ## Resuming work — read this first

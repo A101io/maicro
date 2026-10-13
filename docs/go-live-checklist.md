@@ -6,7 +6,7 @@ The launch gate. "continue" resumes from the first row that is not ✓. Status k
 | # | Decision | Status |
 |---|---|---|
 | J1 | Product name: **Vidalo** (Julian, 13 Oct 2026; was Maicro). Web search found no Vidalo brand; nearest: Vidado (AI data extraction), Vidyo (video calls). Formal TMview check (EUIPO + BOIP) and the domains are Julian's. | decided; TMview + domains open |
-| J2 | Domain (`vidalo.nl`?) and where DNS lives (Cloudflare). | blocked: Julian |
+| J2 | Domain: **`vidalo.nl` is the main domain**; `vidalo.com` and `vidalo.io` redirect to it (Julian, 13 Oct 2026). `.com` and `.io` at Cloudflare Registrar, `.nl` at a Dutch registrar with DNS on Cloudflare. | decided; registration: Julian |
 | J3 | Hosting: **all on Cloudflare** (Julian, 13 Oct 2026): `vidalo-web` (OpenNext) and `vidalo-worker` (cron, scan queue, facts pages), A101's account. | decided |
 | J4 | Launch gate: the GitHub Pages preview (`a101io.github.io/maicro`, mock data) stays **public until there is a domain** (Julian, 13 Oct 2026). A coming-soon gate comes with the production deploy. | decided |
 
@@ -53,7 +53,7 @@ What the site promises a customer exists for Vidalo itself, from one record: `pa
 | W3 | Phone number, payment methods, name clashes ("niet te verwarren met"), erkenningen | blocked: Julian (the four open items in `own.test.ts`) |
 | W4 | Vidalo in the directories, Google Business Profile, Bing, Apple (the `sync` job, same as a customer) | blocked: the first production deploy and a Google Business Profile for Vidalo (gives the place id) |
 | W5 | Monthly scan of Vidalo itself: "Wat zegt AI over Vidalo?" | blocked: `OPENAI_API_KEY` (P3) and the first production deploy |
-| W6 | `feiten.<domain>` as the own facts host, DNS at Cloudflare | blocked: domain (J2) |
+| W6 | `feiten.vidalo.nl` as the own facts host, DNS at Cloudflare | blocked: registration of vidalo.nl (J2) |
 
 ## Legal
 | # | Item | Status |
