@@ -45,7 +45,7 @@ Status: `✓verified` (observed, evidence + date) · `written` (code exists, not
 | D3 | No empty env overrides | ✓verified | Workflows set no `NEXT_PUBLIC_*`; live checkout refuses without `STRIPE_TAX_RATE_ID`. | 13 Oct |
 | D4 | Verify deployed bundle | open | Needs a production deploy. | |
 | D5 | Domain | blocked | Julian (J2). | |
-| D6 | Launch gate | blocked | Preview is public on GitHub Pages; Julian decides (J4). | |
+| D6 | Launch gate | open | Julian, 13 Oct: the GitHub Pages preview (mock data) stays public until there is a domain. The gate (coming-soon on `/`, `/legal/*` reachable, invariant test) comes with the production deploy. | 13 Oct |
 | D7 | Security headers + CSP | written | HSTS, nosniff, Referrer-Policy, X-Frame-Options, Permissions-Policy seen via `curl -I` on dev; CSP production-only (`next.config.ts`). | 13 Oct |
 | D8 | Health endpoint | ✓verified | `/api/health` → `{"ok":true,"db":"mem"}` 200 on dev; 503 path when the db throws. | 13 Oct |
 
@@ -119,4 +119,3 @@ Status: `✓verified` (observed, evidence + date) · `written` (code exists, not
 ## Needs Julian
 1. Upload the De Boer Legal masters (B2B, July 2026) so R2 can be built from them.
 2. Hosting choice (Vercel + Fly, or Cloudflare) and the domain; until then D2, D4–D6, G1–G2 wait.
-3. Keep the GitHub Pages preview public, or put it behind a coming-soon page.

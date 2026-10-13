@@ -8,7 +8,7 @@ The launch gate. "continue" resumes from the first row that is not ✓. Status k
 | J1 | Product name: keep "Maicro" or rename (Klopt, Stip, Rightly… shortlisted). Trademark check (EUIPO + BOIP) before buying a domain. | blocked: Julian |
 | J2 | Domain (`maicro.nl`?) and where DNS lives (Cloudflare). | blocked: Julian |
 | J3 | Hosting: CLAUDE.md plans Vercel (web) + Fly/Railway (worker); the A101 default is Cloudflare Workers. | blocked: Julian |
-| J4 | Launch gate: the GitHub Pages preview (`a101io.github.io/maicro`) is public now. Keep it public, or put it behind a coming-soon page? | blocked: Julian |
+| J4 | Launch gate: the GitHub Pages preview (`a101io.github.io/maicro`, mock data) stays **public until there is a domain** (Julian, 13 Oct 2026). A coming-soon gate comes with the production deploy. | decided |
 
 ## Product
 | # | Item | Status |
