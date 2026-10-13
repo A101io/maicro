@@ -25,7 +25,7 @@ export default {
         dark: { DEFAULT: "#0F172A", panel: "#1E293B", text: "#CBD5E1", line: "#334155" },
       },
       fontFamily: {
-        sans: ["var(--font-manrope)", "Manrope", "system-ui", "sans-serif"],
+        sans: ["var(--font-jakarta)", "Plus Jakarta Sans", "system-ui", "sans-serif"],
       },
       borderRadius: { card: "22px", panel: "28px", btn: "14px", pill: "999px" },
       borderWidth: { DEFAULT: "1.5px", 1: "1px" },

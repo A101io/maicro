@@ -38,7 +38,7 @@ pnpm verify:pg                             # migrations + PgDb + whole pipeline 
 MAICRO_MOCK=1 pnpm dev                     # web on :3000 (demo owner eigenaar@bakkerijdevries.nl)
 MAICRO_MOCK=1 pnpm worker                  # job loop + cron + facts pages on :8787
 MAICRO_MOCK=1 pnpm scan --name "X" --place Y --kind free
-pnpm --filter web build                    # needs fonts.googleapis.com (next/font/google Manrope); offline: NEXT_FONT_GOOGLE_MOCKED_RESPONSES=<mock.js>
+pnpm --filter web build                    # needs fonts.googleapis.com (next/font/google Plus Jakarta Sans); offline: NEXT_FONT_GOOGLE_MOCKED_RESPONSES=<mock.js>
 ```
 
 ## State (v0.1)
