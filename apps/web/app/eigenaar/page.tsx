@@ -1,5 +1,5 @@
 import type { Metadata } from "next";
-import type { CopyShape } from "@maicro/core/copy";
+import type { CopyShape } from "@vidalo/core/copy";
 import { getCopy, getI18n } from "@/lib/i18n";
 import { SiteHeader } from "@/components/SiteHeader";
 import { SiteFooter } from "@/components/SiteFooter";

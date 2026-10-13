@@ -1,6 +1,6 @@
 /**
  * Engine registry. Real engines are used when their keys exist and
- * MAICRO_MOCK is not "1"; otherwise every engine is the deterministic mock.
+ * VIDALO_MOCK is not "1"; otherwise every engine is the deterministic mock.
  */
 import { ENGINES, type Engine } from "../../types";
 import { chatgptEngine } from "./chatgpt";
@@ -25,7 +25,7 @@ const REAL: Record<Engine, EngineClient> = {
 
 /** True when engines must not call any external API. */
 export function isMockEngines(): boolean {
-  return process.env.MAICRO_MOCK === "1";
+  return process.env.VIDALO_MOCK === "1";
 }
 
 /**

@@ -58,7 +58,7 @@ async function seed(db: MemDb, sourceType: SourceType, extra: Partial<Finding> =
     ownerEmail: "eigenaar@bakkerijjansen.nl",
     status: "active",
     plan: "monitor",
-    factsHost: "bakkerij-jansen-haarlem.feiten.maicro.nl",
+    factsHost: "bakkerij-jansen-haarlem.feiten.vidalo.nl",
     factsHostVerifiedAt: new Date().toISOString(),
   });
   await db.insertFacts(business.id, { ...baseFacts, businessId: business.id }, { provisional: false, verifiedAt: new Date().toISOString() });
@@ -110,8 +110,8 @@ describe("openFixForFinding", () => {
   beforeEach(() => {
     db = new MemDb();
     setDb(db);
-    process.env.MAICRO_MOCK = "1";
-    process.env.MAICRO_OUT_DIR = "out/test";
+    process.env.VIDALO_MOCK = "1";
+    process.env.VIDALO_OUT_DIR = "out/test";
   });
 
   it("third_party → correction email job in the owner's name, finding 'fixing', recheck in 30 days", async () => {
@@ -127,11 +127,11 @@ describe("openFixForFinding", () => {
     expect(job.payload.replyTo).toBe(business.ownerEmail);
     expect(String(job.payload.text)).toContain("10:00 tot 14:00");
     expect(String(job.payload.text)).toContain("gesloten");
-    expect(String(job.payload.text)).toContain("feiten.maicro.nl");
+    expect(String(job.payload.text)).toContain("feiten.vidalo.nl");
   });
 
   it("owned_facts_page → republish immediately", async () => {
-    const { finding, business } = await seed(db, "owned_facts_page", { sourceUrl: "https://bakkerij-jansen-haarlem.feiten.maicro.nl/" });
+    const { finding, business } = await seed(db, "owned_facts_page", { sourceUrl: "https://bakkerij-jansen-haarlem.feiten.vidalo.nl/" });
     const out = await openFixForFinding(finding);
     expect(out.action).toBe("republish");
     expect(out.executed).toBe(true);
@@ -198,8 +198,8 @@ describe("runRecheck", () => {
   beforeEach(() => {
     db = new MemDb();
     setDb(db);
-    process.env.MAICRO_MOCK = "1";
-    process.env.MAICRO_OUT_DIR = "out/test";
+    process.env.VIDALO_MOCK = "1";
+    process.env.VIDALO_OUT_DIR = "out/test";
   });
 
   it("selects the prompts that probe the finding", async () => {

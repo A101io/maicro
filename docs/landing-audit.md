@@ -12,12 +12,12 @@ Goal of `/`: turn a reader into a paying customer, via the free check. Measured 
 | Pricing starts at | 86% of the page | 87% |
 | Interactive proof (simulator) | screen 3 | screen 4 |
 
-SEO/GEO before: no canonical on `/`, `/prijzen`, `/en`; no Open Graph or Twitter tags and no share image; meta description is the tagline; JSON-LD only Organization (no Service/Offer, no FAQPage); sitemap without `/en`, legal pages or hreflang; Maicro's own site has no `/llms.txt` (the thing it sells).
+SEO/GEO before: no canonical on `/`, `/prijzen`, `/en`; no Open Graph or Twitter tags and no share image; meta description is the tagline; JSON-LD only Organization (no Service/Offer, no FAQPage); sitemap without `/en`, legal pages or hreflang; Vidalo's own site has no `/llms.txt` (the thing it sells).
 
 ## Decision
 - `/` keeps what converts: hero + check, the simulator (proof), what it costs you (one scene + three numbers), how it works (four steps), the example report, price, FAQ, final check. A check field after the proof and after the report.
 - The explanation moves to its own pages, each a search and AI-assistant answer in its own right: `/waarom` (how AI answers about a business: veranderd, leest, snippers, loket, niet gevonden), `/hoe-het-werkt` (sync, twenty asks, criteria, every month), `/straks` (assistants talking to each other, OKF and the other terms). English at `/en/why`, `/en/how-it-works`, `/en/whats-next`.
-- Structured data: Organization, WebSite, Service with two Offers (€149 once, €49/month, excl. VAT), FAQPage, DefinedTermSet on `/straks`, BreadcrumbList on the sub-pages. Canonical, Open Graph and a share image on every page. A sitemap with both languages and hreflang. `/llms.txt` describing Maicro.
+- Structured data: Organization, WebSite, Service with two Offers (€149 once, €49/month, excl. VAT), FAQPage, DefinedTermSet on `/straks`, BreadcrumbList on the sub-pages. Canonical, Open Graph and a share image on every page. A sitemap with both languages and hreflang. `/llms.txt` describing Vidalo.
 
 ## After (same measurement)
 | | Desktop 1280×800 | Phone 390×844 |
@@ -30,6 +30,6 @@ SEO/GEO before: no canonical on `/`, `/prijzen`, `/en`; no Open Graph or Twitter
 
 Order on `/`: hero + check · Vraag het zelf · check · what it costs you (one scene + three numbers) · the four steps + links to the explainer pages · example report · red to green · check · price · FAQ · trades · final check.
 
-SEO/GEO after: canonical, hreflang, Open Graph + Twitter + a generated share image (`app/opengraph-image.tsx`) on every page; the landing carries Organization, WebSite, Service with both Offers (excl. btw) and FAQPage; explainer pages carry BreadcrumbList, `/straks` a DefinedTermSet; sitemap with 32 URLs (16 routes × NL/EN) and hreflang, legal drafts left out while they are noindex; `robots.txt` names the AI crawlers; `/llms.txt` describes Maicro from the same copy as the pages.
+SEO/GEO after: canonical, hreflang, Open Graph + Twitter + a generated share image (`app/opengraph-image.tsx`) on every page; the landing carries Organization, WebSite, Service with both Offers (excl. btw) and FAQPage; explainer pages carry BreadcrumbList, `/straks` a DefinedTermSet; sitemap with 32 URLs (16 routes × NL/EN) and hreflang, legal drafts left out while they are noindex; `robots.txt` names the AI crawlers; `/llms.txt` describes Vidalo from the same copy as the pages.
 
 Not measured (needs real traffic): conversion itself. Once there is a domain, track: check started per visit, report → checkout, by entry page.

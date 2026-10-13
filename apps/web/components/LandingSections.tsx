@@ -4,8 +4,8 @@
  * pieces. Moved here verbatim from app/page.tsx.
  */
 import Link from "next/link";
-import type { Severity, Stip as StipColour } from "@maicro/core/types";
-import { SECTOR_LIST } from "@maicro/core/prompts";
+import type { Severity, Stip as StipColour } from "@vidalo/core/types";
+import { SECTOR_LIST } from "@vidalo/core/prompts";
 import { getI18n } from "@/lib/i18n";
 import { SiteHeader } from "@/components/SiteHeader";
 import { SiteFooter } from "@/components/SiteFooter";

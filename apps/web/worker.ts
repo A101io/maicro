@@ -10,22 +10,22 @@
  * after `opennextjs-cloudflare build`; wrangler bundles it with esbuild.
  */
 import handler from "./.open-next/worker.js";
-import { createDb } from "@maicro/core/db";
-import { withDb } from "@maicro/core/shared";
+import { createDb } from "@vidalo/core/db";
+import { withDb } from "@vidalo/core/shared";
 
 export { DOQueueHandler, DOShardedTagCache, BucketCachePurge } from "./.open-next/worker.js";
 
 interface Env {
   HYPERDRIVE?: { connectionString: string };
-  MAICRO_MOCK?: string;
-  MAICRO_DB?: string;
+  VIDALO_MOCK?: string;
+  VIDALO_DB?: string;
   DATABASE_URL?: string;
 }
 
 export default {
   async fetch(request: Request, env: Env, ctx: { waitUntil(p: Promise<unknown>): void }): Promise<Response> {
-    // Postgres unless plain mock mode; MAICRO_DB=pg is mock engines on a real database (as in core).
-    const postgres = env.MAICRO_MOCK !== "1" || env.MAICRO_DB === "pg";
+    // Postgres unless plain mock mode; VIDALO_DB=pg is mock engines on a real database (as in core).
+    const postgres = env.VIDALO_MOCK !== "1" || env.VIDALO_DB === "pg";
     const url = postgres ? (env.HYPERDRIVE?.connectionString ?? env.DATABASE_URL ?? null) : null;
     // Not mock, and no database: core would quietly fall back to mock mode and
     // serve demo data as if it were real. Say so instead (Sitty's rule:
@@ -39,7 +39,7 @@ export default {
 };
 
 function notConfigured(): Response {
-  return new Response("Maicro is not connected to its database (DATABASE_URL / HYPERDRIVE missing). Nothing is served until it is.\n", {
+  return new Response("Vidalo is not connected to its database (DATABASE_URL / HYPERDRIVE missing). Nothing is served until it is.\n", {
     status: 503,
     headers: { "content-type": "text/plain; charset=utf-8", "retry-after": "300" },
   });

@@ -4,7 +4,7 @@
  * plain VM. Behind Cloudflare the same handler can run in a Worker.
  */
 import { createServer, type IncomingMessage, type Server, type ServerResponse } from "node:http";
-import { handleFactsRequest } from "@maicro/core/publisher";
+import { handleFactsRequest } from "@vidalo/core/publisher";
 import { errorMessage, log } from "./log.js";
 
 function toRequest(req: IncomingMessage): Request {

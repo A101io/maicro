@@ -3,7 +3,7 @@
  *
  * TODO(bing): Bing Places has no public write API for single businesses; the
  * supported routes are (a) the Bing Places bulk-upload CSV for agencies/chains
- * or (b) the web console. Plan: register Maicro as an agency account, keep a
+ * or (b) the web console. Plan: register Vidalo as an agency account, keep a
  * per-customer listing, and push changes through the bulk feed. Until then this
  * adapter computes the diff and hands it to the operator queue.
  */

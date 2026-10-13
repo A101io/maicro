@@ -10,7 +10,7 @@ jobs:
   check:
     runs-on: ubuntu-latest
     env:
-      MAICRO_MOCK: "1"
+      VIDALO_MOCK: "1"
     steps:
       - uses: actions/checkout@v4
       - uses: pnpm/action-setup@v4
@@ -52,8 +52,8 @@ jobs:
     # deploying: a change that breaks them should fail here, not at deploy.
     runs-on: ubuntu-latest
     env:
-      MAICRO_MOCK: "1"
-      PUBLIC_BASE_URL: https://maicro-web-preview.julian-devriend.workers.dev
+      VIDALO_MOCK: "1"
+      PUBLIC_BASE_URL: https://vidalo-web-preview.julian-devriend.workers.dev
     steps:
       - uses: actions/checkout@v4
       - uses: pnpm/action-setup@v4

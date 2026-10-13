@@ -1,7 +1,7 @@
 import type { MetadataRoute } from "next";
-import { SECTOR_SLUGS } from "@maicro/core/types";
+import { SECTOR_SLUGS } from "@vidalo/core/types";
 import { localizeHref } from "@/lib/lang-paths";
-import { copy } from "@maicro/core/copy";
+import { copy } from "@vidalo/core/copy";
 import { SITE } from "@/lib/seo";
 
 /** Every public page in both languages, each entry naming its translation (hreflang). */

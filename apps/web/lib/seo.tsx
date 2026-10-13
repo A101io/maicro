@@ -1,5 +1,5 @@
 import type { Metadata } from "next";
-import { PRICES, type CopyShape } from "@maicro/core/copy";
+import { PRICES, type CopyShape } from "@vidalo/core/copy";
 import { localizeHref, type Lang } from "./lang-paths";
 
 /**
@@ -8,7 +8,7 @@ import { localizeHref, type Lang } from "./lang-paths";
  * description, canonical, hreflang, Open Graph) and to AI assistants
  * (JSON-LD and /llms.txt). Only what the page itself shows goes in here.
  */
-export const SITE = (process.env.PUBLIC_BASE_URL ?? "https://maicro.nl").replace(/\/$/, "");
+export const SITE = (process.env.PUBLIC_BASE_URL ?? "https://vidalo.nl").replace(/\/$/, "");
 const abs = (path: string) => SITE + (path === "/" ? "" : path);
 
 /** Title, description, canonical, both languages and the share card for one route. */
@@ -21,7 +21,7 @@ export function pageMetadata({ title, description, route, lang, absoluteTitle = 
       canonical: url,
       languages: { nl: abs(localizeHref(route, "nl")), en: abs(localizeHref(route, "en")), "x-default": abs(route) },
     },
-    openGraph: { title, description, url, siteName: "Maicro", locale: lang === "en" ? "en_GB" : "nl_NL", alternateLocale: lang === "en" ? "nl_NL" : "en_GB", type: "website" },
+    openGraph: { title, description, url, siteName: "Vidalo", locale: lang === "en" ? "en_GB" : "nl_NL", alternateLocale: lang === "en" ? "nl_NL" : "en_GB", type: "website" },
     twitter: { card: "summary_large_image", title, description },
   };
 }
@@ -34,7 +34,7 @@ export function organizationLd(copy: CopyShape) {
     name: copy.brand,
     legalName: "A101 B.V.",
     url: SITE,
-    email: "hallo@maicro.nl",
+    email: "hallo@vidalo.nl",
     description: copy.tagline,
     address: { "@type": "PostalAddress", streetAddress: "Factorij 80", postalCode: "3071 AV", addressLocality: "Rotterdam", addressCountry: "NL" },
     identifier: { "@type": "PropertyValue", propertyID: "KvK", value: "42057858" },

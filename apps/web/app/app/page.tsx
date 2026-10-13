@@ -1,8 +1,8 @@
 import Link from "next/link";
-import type { CopyShape } from "@maicro/core/copy";
+import type { CopyShape } from "@vidalo/core/copy";
 import { getI18n } from "@/lib/i18n";
-import { ENGINE_LABEL } from "@maicro/core/types";
-import type { Channel, Finding, FindingStatus, Stip as StipColour } from "@maicro/core/types";
+import { ENGINE_LABEL } from "@vidalo/core/types";
+import type { Channel, Finding, FindingStatus, Stip as StipColour } from "@vidalo/core/types";
 import { Stip, StipRow } from "@/components/Stip";
 import { requireOwner } from "@/lib/owner";
 import { loadDashboard } from "@/lib/reads";

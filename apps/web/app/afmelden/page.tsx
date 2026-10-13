@@ -1,6 +1,6 @@
 import type { Metadata } from "next";
 import { getCopy, getI18n } from "@/lib/i18n";
-import { verifyUnsubscribeToken } from "@maicro/core/shared";
+import { verifyUnsubscribeToken } from "@vidalo/core/shared";
 import { SiteHeader } from "@/components/SiteHeader";
 import { SiteFooter } from "@/components/SiteFooter";
 import { ready } from "@/lib/db";

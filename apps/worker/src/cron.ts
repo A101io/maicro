@@ -8,9 +8,9 @@
  *   4. lifecycle: paused → churned after 60 days; churned → free re-scan after 90 days
  *   5. follow-ups for scanned-but-not-purchased businesses at day 7 / day 21
  */
-import { pollFactsHost } from "@maicro/core/publisher";
-import { listBusinessesByStatus, setBusinessStatus, UNSUBSCRIBED_EVENT } from "@maicro/core/shared";
-import type { BusinessRecord, EventRow } from "@maicro/core/db";
+import { pollFactsHost } from "@vidalo/core/publisher";
+import { listBusinessesByStatus, setBusinessStatus, UNSUBSCRIBED_EVENT } from "@vidalo/core/shared";
+import type { BusinessRecord, EventRow } from "@vidalo/core/db";
 import { getDb } from "./compat.js";
 import { errorMessage, log } from "./log.js";
 

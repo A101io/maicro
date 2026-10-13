@@ -54,7 +54,7 @@ export async function ensureFactsHost(businessId: string, choice: "domain" | "fa
   const host = choice === "domain" ? preferredFactsHost(business) : defaultFactsHost(business);
   const verifiedAt = isFallbackHost(host) ? new Date().toISOString() : null;
   const updated = await setFactsHost(business.id, host, verifiedAt);
-  await db.logEvent(business.id, "facts_host.set", { host, verified: verifiedAt !== null, cnameTarget: isFallbackHost(host) ? null : `feiten.${process.env.FACTS_HOST_SUFFIX || "maicro.nl"}` });
+  await db.logEvent(business.id, "facts_host.set", { host, verified: verifiedAt !== null, cnameTarget: isFallbackHost(host) ? null : `feiten.${process.env.FACTS_HOST_SUFFIX || "vidalo.nl"}` });
   return updated;
 }
 
@@ -75,7 +75,7 @@ export async function pollFactsHost(businessId: string): Promise<{ verified: boo
 }
 
 async function writeMockOutput(host: string, page: RenderedFactsPage): Promise<string> {
-  const dir = path.resolve(process.env.MAICRO_OUT_DIR ?? "out", "pages", host);
+  const dir = path.resolve(process.env.VIDALO_OUT_DIR ?? "out", "pages", host);
   await mkdir(dir, { recursive: true });
   await Promise.all([
     writeFile(path.join(dir, "index.html"), page.html, "utf8"),
@@ -103,7 +103,7 @@ export async function publishFactsPage(businessId: string): Promise<PublishResul
   const page = renderFactsPage(facts, business, { host, verifiedAt: new Date().toISOString() });
   clearServeCache(host);
 
-  const outputDir = isMock() || process.env.MAICRO_WRITE_PAGES === "1" ? await writeMockOutput(host, page) : null;
+  const outputDir = isMock() || process.env.VIDALO_WRITE_PAGES === "1" ? await writeMockOutput(host, page) : null;
   const verified = business.factsHostVerifiedAt !== null;
   const indexNow = verified ? await pingIndexNow([page.canonicalUrl, `${page.canonicalUrl}llms.txt`]) : { skipped: true };
 

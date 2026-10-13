@@ -1,6 +1,6 @@
 /**
  * MemDb: in-memory implementation of Db (Map-based). Used when DATABASE_URL is
- * missing or MAICRO_MOCK=1, so the CLI and tests run with zero infrastructure.
+ * missing or VIDALO_MOCK=1, so the CLI and tests run with zero infrastructure.
  * Semantics mirror PgDb (same matching rules for upserts, same job backoff).
  */
 import { randomUUID } from "node:crypto";

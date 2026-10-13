@@ -1,5 +1,5 @@
-import { discoverDirectories, ensureFactsHost, publishFactsPage, syncAllChannels } from "@maicro/core/publisher";
-import { sendWelcome } from "@maicro/core/reporter";
+import { discoverDirectories, ensureFactsHost, publishFactsPage, syncAllChannels } from "@vidalo/core/publisher";
+import { sendWelcome } from "@vidalo/core/reporter";
 import { generatePrompts, getDb } from "../compat.js";
 import { log } from "../log.js";
 import type { Handler } from "./types.js";

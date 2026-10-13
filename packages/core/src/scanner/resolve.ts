@@ -40,7 +40,7 @@ export function sectorForCandidate(c: Pick<BusinessCandidate, "googleCategory" |
 
 export type DraftFacts = Omit<Facts, "businessId" | "version">;
 
-const isMock = () => process.env.MAICRO_MOCK === "1";
+const isMock = () => process.env.VIDALO_MOCK === "1";
 
 // ---------------------------------------------------------------------------
 // Google Places (New) Text Search

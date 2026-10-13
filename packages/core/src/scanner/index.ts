@@ -4,7 +4,7 @@
  *
  *   const report = await runScan({ businessId, kind: "free" });
  *
- * Mock mode (MAICRO_MOCK=1 or no keys) runs the whole pipeline offline with
+ * Mock mode (VIDALO_MOCK=1 or no keys) runs the whole pipeline offline with
  * deterministic synthetic answers.
  */
 import { ENGINES, visibilityFor, type Engine, type Facts, type Finding, type InstableFinding, type Prompt, type ScanKind, type ScanReport, type Sample, type SectorSlug } from "../types";
@@ -49,7 +49,7 @@ export interface RunScanOptions {
   promptIds?: string[];
   /** Engine clients to use instead of the registry (tests, worker-injected adapters). */
   clients?: EngineClient[];
-  /** Parallel engine calls (default MAICRO_CONCURRENCY or 4). */
+  /** Parallel engine calls (default VIDALO_CONCURRENCY or 4). */
   concurrency?: number;
   db?: Db;
   /** Progress callback: which prompt is being asked (result page shows this). */
@@ -128,7 +128,7 @@ async function sampleAll(
 }
 
 function attributionContext(business: { domain: string | null; slug: string; name: string; factsHost?: string | null }, facts: Facts): AttributionContext {
-  const suffix = process.env.FACTS_HOST_SUFFIX ?? "maicro.nl";
+  const suffix = process.env.FACTS_HOST_SUFFIX ?? "vidalo.nl";
   return {
     business,
     factsHost: business.factsHost ?? `${business.slug}.feiten.${suffix}`,
@@ -159,8 +159,8 @@ export async function runScan(opts: RunScanOptions): Promise<ScanReport> {
   const db = opts.db ?? getDb();
   const defaults = SCAN_DEFAULTS[opts.kind];
   const engines = opts.engines?.length ? opts.engines : defaults.engines;
-  const samplesPerPrompt = opts.samplesPerPrompt ?? Number(process.env.MAICRO_SAMPLES ?? defaults.samplesPerPrompt);
-  const concurrency = opts.concurrency ?? Number(process.env.MAICRO_CONCURRENCY ?? 4);
+  const samplesPerPrompt = opts.samplesPerPrompt ?? Number(process.env.VIDALO_SAMPLES ?? defaults.samplesPerPrompt);
+  const concurrency = opts.concurrency ?? Number(process.env.VIDALO_CONCURRENCY ?? 4);
 
   const business = await db.getBusiness(opts.businessId);
   if (!business) throw new Error(`business ${opts.businessId} not found`);

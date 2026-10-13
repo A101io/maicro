@@ -44,7 +44,7 @@ Rules kept from the brief: one primary (blue) button per view; no gradients, no 
 - **CriteriumCard** (3 cards: afhakers / misleiders / verwarring) + colour legend.
 - **SectorCard** (11): sector name, one-line "doorslaggevend feit", link to `/vak/[slug]`.
 - **PriceBlock**: two plans, "Excl. btw · geen opzegtermijn".
-- **Footer**: `A101 B.V. (handelend als Maicro) · Factorij 80, 3071 AV Rotterdam · KvK 42057858 · Prijzen excl. btw`. No btw-nummer.
+- **Footer**: `A101 B.V. (handelend als Vidalo) · Factorij 80, 3071 AV Rotterdam · KvK 42057858 · Prijzen excl. btw`. No btw-nummer.
 
 ## Landing (`/`) — section order, anchors
 
@@ -53,7 +53,7 @@ Rules kept from the brief: one primary (blue) button per view; no gradients, no 
 3. `#leest` Zo leest AI over je bedrijf — the agent explainer for laypeople (how an assistant assembles an answer from sources; grey "AI kent je niet" case).
 4. Snippers — "Het antwoord is uit snippers gebouwd. De helft klopt niet." (sources with numbers from Insites 10k audit).
 5. Geen loket — "Je kunt het antwoord niet aanpassen. Wel de bronnen."
-6. `#werkt` Zo werkt Maicro — controleren, vinden, herstellen, bewijzen.
+6. `#werkt` Zo werkt Vidalo — controleren, vinden, herstellen, bewijzen.
 7. `#criteria` Twaalf feiten die een klant laten komen, of afhaken — 3 CriteriumCards + legend (from `docs/CRITERIA.md`).
 8. `#vak` Per vak andere vragen, andere fouten — 11 SectorCards → `/vak/[slug]`.
 9. `#rapport` Zo ziet je rapport eruit — sample report incl. grey row.
@@ -64,7 +64,7 @@ Rules kept from the brief: one primary (blue) button per view; no gradients, no 
 14. Slot — "Welke kleur heeft jouw stip?" + ScanField.
 15. Footer.
 
-Nav: maicro wordmark · Zo werkt het (#werkt) · Criteria (#criteria) · Per vak (#vak) · Prijs (#prijs) · Vragen (#vragen) · Inloggen.
+Nav: vidalo wordmark · Zo werkt het (#werkt) · Criteria (#criteria) · Per vak (#vak) · Prijs (#prijs) · Vragen (#vragen) · Inloggen.
 
 ## Result (`/r/[id]`)
 
@@ -82,4 +82,4 @@ Not designed yet in G; follow the earlier mobile boards' structure (stack everyt
 
 - Landing, result (3 states), 11 sector pages, dashboard shell all in G.
 - Playwright screenshots at 1280 and 390 for `/`, `/r/[demo]` (red + grey), `/vak/loodgieters-installateurs` stored in `out/screenshots/`.
-- `pnpm -r typecheck && pnpm -r test && MAICRO_MOCK=1 pnpm e2e:mock && pnpm --filter web build` green.
+- `pnpm -r typecheck && pnpm -r test && VIDALO_MOCK=1 pnpm e2e:mock && pnpm --filter web build` green.

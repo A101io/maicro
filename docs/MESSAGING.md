@@ -1,4 +1,4 @@
-# Maicro messaging (condensed from the brief)
+# Vidalo messaging (condensed from the brief)
 
 Tagline: **Je klanten vragen het aan ChatGPT. Wij zorgen dat het antwoord klopt.**
 Category: AI-antwoordcontrole voor bedrijven. Never "AI visibility", "GEO", "AEO", "LLM", "zichtbaarheid", "ranking", "optimaliseren", "agent" in headlines.
@@ -18,7 +18,7 @@ Landing page sections (Dutch copy):
 2b Wat is er veranderd? — Vroeger zocht je klant en koos zelf uit tien links. Nu stelt hij een vraag aan ChatGPT of Google en krijgt één antwoord. Binnenkort laat hij de AI ook kiezen, reserveren en bestellen. Die AI kent jou alleen van wat het online vond. Of dat klopt, weet niemand. Behalve als je het controleert.
 3 De schade — H2: Bij de helft van de bedrijven klopt het antwoord niet. Body: In een controle van 10.000 bedrijven gaf ChatGPT bij 1 op de 3 een verkeerd telefoonnummer. Een boekwinkel werd "permanent gesloten" genoemd en had een maand bijna geen omzet. De eigenaar hoort het als laatste.
 4 Geen loket — H2: Je kunt het antwoord niet aanpassen. Wel de bronnen. Body: AI bouwt zijn antwoord uit Wikipedia, oude gidsen, nieuwsberichten en een bedrijf met dezelfde naam. Er is geen loket. De enige weg is: vind de bron, herstel de bron.
-5 Zo werkt Maicro — 01 Vastleggen (je gegevens één keer goed) · 02 Publiceren (feitenpagina op je eigen domein + Google, Bing, Apple, NL-gidsen) · 03 Controleren (elke maand, in het Nederlands, ChatGPT/Google/Copilot) · 04 Herstellen (elke fout met bron, hersteld waar het kan, aangeschreven waar het moet, met bewijs).
+5 Zo werkt Vidalo — 01 Vastleggen (je gegevens één keer goed) · 02 Publiceren (feitenpagina op je eigen domein + Google, Bing, Apple, NL-gidsen) · 03 Controleren (elke maand, in het Nederlands, ChatGPT/Google/Copilot) · 04 Herstellen (elke fout met bron, hersteld waar het kan, aangeschreven waar het moet, met bewijs).
 6 Bewijs — H2: Wat we vonden en herstelden. Cards: "ChatGPT: 'gesloten op maandag' → nu: open 9–18. Bron: openingstijden.nl, hersteld in 12 dagen." Label "voorbeeld" until real.
 7 Prijzen — Gratis AI-check · Instellen €149 eenmalig (feitenpagina, synchronisatie, eerste herstelronde) · Bewaking €49 per maand (maandelijkse controle, herstel, rapport). Alle prijzen excl. btw. Geen opzegtermijn, geen verborgen kosten, maandelijks opzegbaar.
 8 FAQ — Ik heb toch een website? / Kunnen jullie ChatGPT laten zeggen wat ik wil? (Nee, niemand. Wij herstellen de bronnen.) / Werkt het altijd? (the honest limit) / Wat moet ik zelf doen? (5 minuten: gegevens bevestigen, één DNS-regel, één keer inloggen bij Google.) / Moet ik iets installeren? (Nee.) / Hoe vaak controleren jullie? (Elke maand, en na elke wijziging.)

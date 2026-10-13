@@ -6,7 +6,7 @@ ready except the key and the list.
 
 ## 1. Cap the bill before adding the key
 
-Create a separate OpenAI **project** for Maicro and set a hard monthly budget
+Create a separate OpenAI **project** for Vidalo and set a hard monthly budget
 on it (Settings → Limits). The code keeps its own estimate, but only the
 project budget actually stops spending.
 
@@ -14,7 +14,7 @@ project budget actually stops spending.
 
 `packages/core/examples/businesses.csv` is fictional and spread over ten towns;
 it is for mock runs. For the real run, write `scans/<town>.csv`, one town, the
-kinds of business Maicro would sell to (bakers, plumbers, garages,
+kinds of business Vidalo would sell to (bakers, plumbers, garages,
 hairdressers), copied exactly as they appear on Google Maps:
 
 ```
@@ -25,8 +25,8 @@ name,place
 ## 3. Run it, ChatGPT only
 
 ```bash
-export OPENAI_API_KEY=sk-...          # the Maicro project's key
-MAICRO_MOCK=0 pnpm scan --list scans/<town>.csv --kind free --engines chatgpt --out out/scans
+export OPENAI_API_KEY=sk-...          # the Vidalo project's key
+VIDALO_MOCK=0 pnpm scan --list scans/<town>.csv --kind free --engines chatgpt --out out/scans
 ```
 
 No `DATABASE_URL`: the run uses the in-memory store and writes nothing to

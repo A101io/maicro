@@ -1,5 +1,5 @@
 import { NextResponse } from "next/server";
-import { recordUnsubscribe, verifyUnsubscribeToken } from "@maicro/core/shared";
+import { recordUnsubscribe, verifyUnsubscribeToken } from "@vidalo/core/shared";
 import { ready } from "@/lib/db";
 import { env } from "@/lib/env";
 

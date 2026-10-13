@@ -27,8 +27,8 @@ let cached: Db | null = null;
 // its own copy of this module. Two AsyncLocalStorage instances would mean the
 // scope opened by one is invisible to the other, and every query silently
 // falls back to the shared handle.
-const g = globalThis as typeof globalThis & { __maicroDbScope?: AsyncLocalStorage<Db> };
-const scope = (g.__maicroDbScope ??= new AsyncLocalStorage<Db>());
+const g = globalThis as typeof globalThis & { __vidaloDbScope?: AsyncLocalStorage<Db> };
+const scope = (g.__vidaloDbScope ??= new AsyncLocalStorage<Db>());
 
 export function withDb<T>(db: Db, fn: () => Promise<T>): Promise<T> {
   return scope.run(db, fn);
@@ -62,7 +62,7 @@ export async function getBusinessByFactsHost(host: string): Promise<BusinessReco
     for (const b of anyDb.businesses.values()) if (b.factsHost?.toLowerCase() === h) return { ...b };
   }
   // Fallback host "{slug}.feiten.{suffix}" → derive slug.
-  const suffix = (process.env.FACTS_HOST_SUFFIX || "maicro.nl").toLowerCase();
+  const suffix = (process.env.FACTS_HOST_SUFFIX || "vidalo.nl").toLowerCase();
   const tail = `.feiten.${suffix}`;
   if (h.endsWith(tail)) {
     const slug = h.slice(0, -tail.length);
@@ -115,5 +115,5 @@ export async function getFix(fixId: string): Promise<Fix | null> {
 }
 
 export function isMock(): boolean {
-  return process.env.MAICRO_MOCK === "1";
+  return process.env.VIDALO_MOCK === "1";
 }

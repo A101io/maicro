@@ -3,10 +3,10 @@
  * placeholder business ("X in [plaats]") from the sample facts in copy, so
  * the page and the scanner share one source (packages/core/src/prompts/sectors.ts).
  */
-import type { Facts, Hours, SectorSlug, Severity } from "@maicro/core/types";
-import { SECTORS, type SectorPromptTemplate } from "@maicro/core/prompts";
-import { criterium, type Criterium } from "@maicro/core/criteria";
-import type { CopyShape } from "@maicro/core/copy";
+import type { Facts, Hours, SectorSlug, Severity } from "@vidalo/core/types";
+import { SECTORS, type SectorPromptTemplate } from "@vidalo/core/prompts";
+import { criterium, type Criterium } from "@vidalo/core/criteria";
+import type { CopyShape } from "@vidalo/core/copy";
 
 export interface SectorQuestion {
   text: string;

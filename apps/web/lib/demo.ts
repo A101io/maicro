@@ -8,10 +8,10 @@
  *     (login: eigenaar@bakkerijdevries.nl) with a finished free scan so the
  *     dashboard has content.
  */
-import type { Db } from "@maicro/core/db";
-import type { CriteriumId, Engine, EngineStip, Finding, ScanReport } from "@maicro/core/types";
-import { ABSENT_LABEL, NOT_FOUND_LABEL } from "@maicro/core/types";
-import { prepareBusiness, runScan, groupBySeverity } from "@maicro/core/scanner";
+import type { Db } from "@vidalo/core/db";
+import type { CriteriumId, Engine, EngineStip, Finding, ScanReport } from "@vidalo/core/types";
+import { ABSENT_LABEL, NOT_FOUND_LABEL } from "@vidalo/core/types";
+import { prepareBusiness, runScan, groupBySeverity } from "@vidalo/core/scanner";
 import type { SourceRowData } from "./report";
 
 export const DEMO_OWNER_EMAIL = "eigenaar@bakkerijdevries.nl";

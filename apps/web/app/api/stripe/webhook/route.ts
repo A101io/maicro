@@ -1,5 +1,5 @@
 import { NextResponse } from "next/server";
-import { handleStripeEvent } from "@maicro/core/billing";
+import { handleStripeEvent } from "@vidalo/core/billing";
 import { ready } from "@/lib/db";
 import { env } from "@/lib/env";
 import { getStripe } from "@/lib/stripe";

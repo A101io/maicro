@@ -38,6 +38,6 @@ describe("withDb", () => {
 
   it("is one scope per isolate, whichever copy of the module opened it", () => {
     // The Worker entry and the Next server bundle core separately; both must find the same store.
-    expect((globalThis as { __maicroDbScope?: unknown }).__maicroDbScope).toBeDefined();
+    expect((globalThis as { __vidaloDbScope?: unknown }).__vidaloDbScope).toBeDefined();
   });
 });

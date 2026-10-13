@@ -1,8 +1,8 @@
 import { beforeEach, describe, expect, it } from "vitest";
-import { MemDb } from "@maicro/core/db";
-import { setDb } from "@maicro/core/shared";
+import { MemDb } from "@vidalo/core/db";
+import { setDb } from "@vidalo/core/shared";
 import { handlerFor } from "../src/jobs/index";
-import type { Job } from "@maicro/core/db";
+import type { Job } from "@vidalo/core/db";
 
 // A business nobody has paid for must never get anything published or sent in
 // its name, whoever claimed it. Status alone decides.

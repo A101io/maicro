@@ -1,6 +1,6 @@
-import type { BusinessStatus } from "@maicro/core/types";
+import type { BusinessStatus } from "@vidalo/core/types";
 // The same handle the publisher and fixer use, so the guard sees what they act on.
-import { getDb } from "@maicro/core/shared";
+import { getDb } from "@vidalo/core/shared";
 import { log } from "../log.js";
 import type { JobKind } from "./types.js";
 
@@ -10,7 +10,7 @@ import type { JobKind } from "./types.js";
  * Google Business Profile (shared/ownership.ts). Anyone can run a free scan
  * and type an e-mail address into a report; without both checks a stranger
  * could push their own "facts" to the facts page, the directories and
- * third-party sites in Maicro's name.
+ * third-party sites in Vidalo's name.
  */
 export const PAID_ONLY: ReadonlySet<JobKind> = new Set<JobKind>(["setup", "publish", "sync", "fixes", "fix", "recheck"]);
 const PAYING: ReadonlySet<BusinessStatus> = new Set<BusinessStatus>(["trial", "active"]);

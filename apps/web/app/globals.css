@@ -286,7 +286,7 @@ a.pill:hover { background: var(--panel); }
 /* ------------------------------------------------------------------------
  * Hero visual (components/HeroViz.tsx): one 12s loop, CSS for the boxes and
  * SVG/SMIL for the lines and particles. Percentages below are moments in the
- * loop: 6% question, 10–22% thinking, 24% wrong answer, 42–52% Maicro draws
+ * loop: 6% question, 10–22% thinking, 24% wrong answer, 42–52% Vidalo draws
  * its line, 55% the source is fixed, 64% the right answer, 94% fade, repeat.
  * --------------------------------------------------------------------- */
 .viz {
@@ -346,7 +346,7 @@ a.pill:hover { background: var(--panel); }
 .viz-typing i { width: 0.45em; height: 0.45em; border-radius: 9999px; background: var(--grey); }
 .viz-wrong { color: var(--red); }
 .viz-right { color: var(--green-ink); }
-.viz-maicro {
+.viz-vidalo {
   display: flex;
   align-items: center;
   gap: 0.75em;
@@ -356,7 +356,7 @@ a.pill:hover { background: var(--panel); }
   border-radius: 9999px;
   font-size: 0.92em;
 }
-.viz-maicro-mark { font-weight: 800; letter-spacing: -0.02em; color: var(--blue); }
+.viz-vidalo-mark { font-weight: 800; letter-spacing: -0.02em; color: var(--blue); }
 .viz-swap-3 > * { color: var(--ink); font-size: 1em; opacity: 0; }
 .viz-swap-3 > :last-child { opacity: 1; }
 .viz-repair { stroke-dasharray: none; }
@@ -384,7 +384,7 @@ a.pill:hover { background: var(--panel); }
   .viz-swap-3 > :nth-child(1) { animation: viz-m1 12s linear infinite; }
   .viz-swap-3 > :nth-child(2) { animation: viz-m2 12s linear infinite; }
   .viz-swap-3 > :nth-child(3) { animation: viz-m3 12s linear infinite; }
-  .viz-maicro { animation: viz-maicro 12s linear infinite; }
+  .viz-vidalo { animation: viz-vidalo 12s linear infinite; }
 
   @keyframes viz-cycle { 0% { opacity: 0; } 3% { opacity: 1; } 95% { opacity: 1; } 100% { opacity: 0; } }
   @keyframes viz-q { 0%, 1% { opacity: 0; translate: 0 10px; } 7%, 100% { opacity: 1; translate: none; } }
@@ -411,7 +411,7 @@ a.pill:hover { background: var(--panel); }
   @keyframes viz-m1 { 0%, 40% { opacity: 1; } 42%, 100% { opacity: 0; } }
   @keyframes viz-m2 { 0%, 41% { opacity: 0; } 43%, 57% { opacity: 1; } 59%, 100% { opacity: 0; } }
   @keyframes viz-m3 { 0%, 58% { opacity: 0; } 60%, 100% { opacity: 1; } }
-  @keyframes viz-maicro {
+  @keyframes viz-vidalo {
     0%, 40% { box-shadow: 0 0 0 0 rgb(37 99 235 / 0); }
     43% { box-shadow: 0 0 0 0 rgb(37 99 235 / 0.4); }
     52%, 100% { box-shadow: 0 0 0 0.8em rgb(37 99 235 / 0); }

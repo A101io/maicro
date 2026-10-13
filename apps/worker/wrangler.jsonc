@@ -5,13 +5,13 @@
 // in docs/secrets-and-keys.md.
 {
   "$schema": "../web/node_modules/wrangler/config-schema.json",
-  "name": "maicro-worker",
+  "name": "vidalo-worker",
   "main": "src/cloudflare.ts",
   "compatibility_date": "2026-10-01",
   "compatibility_flags": ["nodejs_compat"],
   "observability": { "enabled": true },
   "workers_dev": true,
-  "vars": { "MAICRO_MOCK": "0", "FACTS_HOST_SUFFIX": "maicro.nl" },
+  "vars": { "VIDALO_MOCK": "0", "FACTS_HOST_SUFFIX": "vidalo.nl" },
   "triggers": {
     // Every minute: run queued jobs. Every ten minutes: the cron tick
     // (monthly scans, rechecks, host polls, follow-ups). src/cloudflare.ts
@@ -19,7 +19,7 @@
     "crons": ["* * * * *", "*/10 * * * *"]
   },
   "queues": {
-    "consumers": [{ "queue": "maicro-scans", "max_batch_size": 1, "max_retries": 2 }]
+    "consumers": [{ "queue": "vidalo-scans", "max_batch_size": 1, "max_retries": 2 }]
   }
   // Same Hyperdrive as apps/web/wrangler.jsonc, once it exists:
   // "hyperdrive": [{ "binding": "HYPERDRIVE", "id": "<id>" }]

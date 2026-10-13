@@ -4,9 +4,9 @@ name: Deploy to Cloudflare
 # on push: merging and shipping are separate decisions, as for Sitty and
 # Sonable. main can therefore be ahead of what is live.
 #
-#   preview     maicro-web-preview: the site on mock data (no database, no keys)
-#   production  maicro-worker (jobs, cron, scan queue, facts pages) and
-#               maicro-web; refuses to serve without its database (worker.ts)
+#   preview     vidalo-web-preview: the site on mock data (no database, no keys)
+#   production  vidalo-worker (jobs, cron, scan queue, facts pages) and
+#               vidalo-web; refuses to serve without its database (worker.ts)
 #
 # DO NOT CONNECT CLOUDFLARE "WORKERS BUILDS": it deploys on every push.
 
@@ -28,12 +28,12 @@ jobs:
       name: ${{ inputs.target }}
       # Literals, not a repository variable: a variable outside the repo can
       # name a dead host for weeks (Sitty's DEPLOY_URL did).
-      url: ${{ inputs.target == 'production' && 'https://maicro-web.julian-devriend.workers.dev' || 'https://maicro-web-preview.julian-devriend.workers.dev' }}
+      url: ${{ inputs.target == 'production' && 'https://vidalo-web.julian-devriend.workers.dev' || 'https://vidalo-web-preview.julian-devriend.workers.dev' }}
     permissions:
       contents: read
       deployments: write
     env:
-      SITE: ${{ inputs.target == 'production' && 'https://maicro-web.julian-devriend.workers.dev' || 'https://maicro-web-preview.julian-devriend.workers.dev' }}
+      SITE: ${{ inputs.target == 'production' && 'https://vidalo-web.julian-devriend.workers.dev' || 'https://vidalo-web-preview.julian-devriend.workers.dev' }}
       WRANGLER_ENV: ${{ inputs.target == 'production' && '' || 'preview' }}
     steps:
       - uses: actions/checkout@v4
@@ -78,7 +78,7 @@ jobs:
         working-directory: apps/web
         env:
           PUBLIC_BASE_URL: ${{ env.SITE }}
-          MAICRO_MOCK: ${{ inputs.target == 'production' && '0' || '1' }}
+          VIDALO_MOCK: ${{ inputs.target == 'production' && '0' || '1' }}
         run: pnpm cf:build
 
       # Production only: the queue the website sends free scans to, then the
@@ -90,7 +90,7 @@ jobs:
         env:
           CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
           CLOUDFLARE_ACCOUNT_ID: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
-        run: pnpm exec wrangler queues info maicro-scans >/dev/null 2>&1 || pnpm exec wrangler queues create maicro-scans
+        run: pnpm exec wrangler queues info vidalo-scans >/dev/null 2>&1 || pnpm exec wrangler queues create vidalo-scans
 
       - name: Deploy the background worker
         if: inputs.target == 'production'

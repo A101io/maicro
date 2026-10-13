@@ -1,6 +1,6 @@
 import { NextResponse } from "next/server";
 import { cookies } from "next/headers";
-import { matchProfileLocation, type ProfileLocation } from "@maicro/core/shared";
+import { matchProfileLocation, type ProfileLocation } from "@vidalo/core/shared";
 import { env } from "@/lib/env";
 import { ready } from "@/lib/db";
 import { getSession } from "@/lib/session";

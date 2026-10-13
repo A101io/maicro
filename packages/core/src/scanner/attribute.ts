@@ -137,7 +137,7 @@ export async function attributeFinding(candidate: FindingCandidate, ctx: Attribu
   const citations = candidate.citations.filter((u) => /^https?:\/\//i.test(u));
   if (!citations.length) return { sourceUrl: null, sourceType: "none" };
 
-  const offline = opts.offline ?? process.env.MAICRO_MOCK === "1";
+  const offline = opts.offline ?? process.env.VIDALO_MOCK === "1";
   if (!offline) {
     const fetchFn = opts.fetch ?? ((url: string) => fetchText(url, { timeoutMs: opts.timeoutMs ?? 8_000, maxBytes: opts.maxBytes ?? 200_000 }));
     for (const url of citations.slice(0, 8)) {

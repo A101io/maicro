@@ -1,4 +1,4 @@
-import type { Stip as StipColour } from "@maicro/core/types";
+import type { Stip as StipColour } from "@vidalo/core/types";
 import { getI18n } from "@/lib/i18n";
 import { Stip } from "./Stip";
 

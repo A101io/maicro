@@ -6,17 +6,17 @@
  *   fetch      facts pages on customers' domains (core's handleFactsRequest)
  *   scheduled  every minute: run queued jobs for up to 10 minutes;
  *              every 10 minutes also the cron tick (cron.ts)
- *   queue      "maicro-scans": a free scan started on the website
+ *   queue      "vidalo-scans": a free scan started on the website
  *
  * Every invocation gets its own database handle (withDb): a connection
  * opened in one invocation cannot be used by the next. Hyperdrive, when
  * bound, pools the real connections.
  */
-import { createDb } from "@maicro/core/db";
-import { withDb } from "@maicro/core/shared";
-import { handleFactsRequest } from "@maicro/core/publisher";
-import { readScanState, runScanWithProgress } from "@maicro/core/scanner";
-import type { Engine } from "@maicro/core/types";
+import { createDb } from "@vidalo/core/db";
+import { withDb } from "@vidalo/core/shared";
+import { handleFactsRequest } from "@vidalo/core/publisher";
+import { readScanState, runScanWithProgress } from "@vidalo/core/scanner";
+import type { Engine } from "@vidalo/core/types";
 import { cronTick } from "./cron.js";
 import { drainQueue } from "./loop.js";
 import { errorMessage, log } from "./log.js";
@@ -24,8 +24,8 @@ import { errorMessage, log } from "./log.js";
 interface Env {
   HYPERDRIVE?: { connectionString: string };
   DATABASE_URL?: string;
-  MAICRO_MOCK?: string;
-  MAICRO_DB?: string;
+  VIDALO_MOCK?: string;
+  VIDALO_DB?: string;
 }
 
 interface Ctx {
@@ -50,11 +50,11 @@ const EVERY_MINUTE = "* * * * *";
 const DRAIN_FOR_MS = 10 * 60 * 1000;
 
 function scoped<T>(env: Env, fn: () => Promise<T>): Promise<T> {
-  const postgres = env.MAICRO_MOCK !== "1" || env.MAICRO_DB === "pg";
+  const postgres = env.VIDALO_MOCK !== "1" || env.VIDALO_DB === "pg";
   const url = postgres ? (env.HYPERDRIVE?.connectionString ?? env.DATABASE_URL ?? null) : null;
   // Not mock and no database: core would fall back to mock mode and run fake
   // scans as if they were real. Refuse instead (fixtures are never a fallback).
-  if (postgres && !url) return Promise.reject(new Error("maicro-worker has no DATABASE_URL or HYPERDRIVE; refusing to run on mock data"));
+  if (postgres && !url) return Promise.reject(new Error("vidalo-worker has no DATABASE_URL or HYPERDRIVE; refusing to run on mock data"));
   if (!url) return fn();
   return withDb(createDb(url, { max: 3, idleTimeout: 5 }), fn);
 }
@@ -87,7 +87,7 @@ export default {
           const state = await readScanState(token);
           // Already running or finished (a redelivered message): nothing to do.
           if (!state || state.status !== "queued") {
-            log.warn("cf.scan.skipped", { token, found: Boolean(state), status: state?.status ?? null, postgres: env.MAICRO_MOCK !== "1" || env.MAICRO_DB === "pg" });
+            log.warn("cf.scan.skipped", { token, found: Boolean(state), status: state?.status ?? null, postgres: env.VIDALO_MOCK !== "1" || env.VIDALO_DB === "pg" });
             return;
           }
           await runScanWithProgress(state, { kind, engines: engines as Engine[] });

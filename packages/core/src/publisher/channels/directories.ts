@@ -79,11 +79,11 @@ function slugWords(s: string): string[] {
 export async function findListing(business: Pick<Business, "name" | "place" | "slug">, directory: Directory): Promise<ListingHit> {
   const q = encodeURIComponent(`${business.name} ${business.place}`);
   const url = directory.searchUrl.replace("{q}", q);
-  if (process.env.MAICRO_MOCK === "1") {
+  if (process.env.VIDALO_MOCK === "1") {
     return { directory, url: `https://www.${directory.domain}/${business.slug}`, found: true, mode: "mock" };
   }
   try {
-    const res = await fetch(url, { headers: { "user-agent": "MaicroBot/1.0 (+https://maicro.nl)", accept: "text/html" }, signal: AbortSignal.timeout(10000) });
+    const res = await fetch(url, { headers: { "user-agent": "VidaloBot/1.0 (+https://vidalo.nl)", accept: "text/html" }, signal: AbortSignal.timeout(10000) });
     if (!res.ok) return { directory, url: null, found: false, mode: "live" };
     const html = await res.text();
     const words = slugWords(business.name);
@@ -145,7 +145,7 @@ export function setFormAgent(agent: FormAgent): void {
 }
 
 export function factsPageUrlFor(business: Pick<Business, "slug"> & { factsHost?: string | null }): string {
-  const host = business.factsHost ?? `${business.slug}.feiten.${process.env.FACTS_HOST_SUFFIX || "maicro.nl"}`;
+  const host = business.factsHost ?? `${business.slug}.feiten.${process.env.FACTS_HOST_SUFFIX || "vidalo.nl"}`;
   return `https://${host}/`;
 }
 
@@ -169,7 +169,7 @@ export const directoryAdapter: ChannelAdapter = {
 
     if (dir.mode === "email") {
       const to = dir.contactEmail;
-      if (!to && process.env.MAICRO_MOCK !== "1") {
+      if (!to && process.env.VIDALO_MOCK !== "1") {
         return {
           ...base,
           status: "manual",

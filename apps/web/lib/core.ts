@@ -1,15 +1,15 @@
 /**
  * The seam between apps/web and packages/core. Everything the web app needs
- * from core is imported here (and only here). Mock mode (MAICRO_MOCK=1 or no
+ * from core is imported here (and only here). Mock mode (VIDALO_MOCK=1 or no
  * DATABASE_URL) is handled by core itself: MemDb + deterministic mock engines.
  */
 import { randomBytes } from "node:crypto";
-import { db as moduleDb, MemDb, type Db } from "@maicro/core/db";
-import { resolveBusiness as coreResolveBusiness, draftProvisionalFacts, prepareBusiness as corePrepareBusiness, buildReport, SCAN_DEFAULTS, runScanWithProgress, persistScanState, readScanState, businessIdFromToken, type BusinessCandidate, type ScanProgressStep, type ScanJobState } from "@maicro/core/scanner";
-import { renderFactsPage } from "@maicro/core/publisher";
-import { getDb as scopedDb, setBusinessStatus, setDb } from "@maicro/core/shared";
-import { ENGINE_LABEL, type BusinessStatus, type Engine, type ScanKind, type ScanReport } from "@maicro/core/types";
-import type { CopyShape } from "@maicro/core/copy";
+import { db as moduleDb, MemDb, type Db } from "@vidalo/core/db";
+import { resolveBusiness as coreResolveBusiness, draftProvisionalFacts, prepareBusiness as corePrepareBusiness, buildReport, SCAN_DEFAULTS, runScanWithProgress, persistScanState, readScanState, businessIdFromToken, type BusinessCandidate, type ScanProgressStep, type ScanJobState } from "@vidalo/core/scanner";
+import { renderFactsPage } from "@vidalo/core/publisher";
+import { getDb as scopedDb, setBusinessStatus, setDb } from "@vidalo/core/shared";
+import { ENGINE_LABEL, type BusinessStatus, type Engine, type ScanKind, type ScanReport } from "@vidalo/core/types";
+import type { CopyShape } from "@vidalo/core/copy";
 import { env } from "./env";
 import { seedDemo } from "./demo";
 
@@ -25,7 +25,7 @@ export function prepareBusiness(opts: Omit<Parameters<typeof corePrepareBusiness
 // Database
 // ---------------------------------------------------------------------------
 
-type G = typeof globalThis & { __maicroDb?: Db; __maicroSeeded?: Promise<void>; __maicroProgress?: Map<string, ScanJobState> };
+type G = typeof globalThis & { __vidaloDb?: Db; __vidaloSeeded?: Promise<void>; __vidaloProgress?: Map<string, ScanJobState> };
 const g = globalThis as G;
 
 /**
@@ -35,21 +35,21 @@ const g = globalThis as G;
  * core about it via setDb) makes mock mode consistent across routes.
  */
 const db: Db = (() => {
-  if (!g.__maicroDb) g.__maicroDb = env.mock ? new MemDb() : moduleDb;
-  setDb(g.__maicroDb);
-  return g.__maicroDb;
+  if (!g.__vidaloDb) g.__vidaloDb = env.mock ? new MemDb() : moduleDb;
+  setDb(g.__vidaloDb);
+  return g.__vidaloDb;
 })();
 
 /** The request's handle on Cloudflare (core's withDb scope), else the process-wide one. */
 export function getDb(): Db {
-  if (env.mock && !g.__maicroSeeded) g.__maicroSeeded = seedDemo(db).catch((err) => console.warn("[web] demo seed failed", err));
+  if (env.mock && !g.__vidaloSeeded) g.__vidaloSeeded = seedDemo(db).catch((err) => console.warn("[web] demo seed failed", err));
   return scopedDb();
 }
 
 /** Awaits the mock demo seed (no-op outside mock mode). */
 export async function ready(): Promise<Db> {
   const d = getDb();
-  if (g.__maicroSeeded) await g.__maicroSeeded;
+  if (g.__vidaloSeeded) await g.__vidaloSeeded;
   return d;
 }
 
@@ -97,8 +97,8 @@ export function progressTemplate(engines: Engine[], copy: CopyShape): ScanProgre
 }
 
 function progressMap() {
-  g.__maicroProgress ??= new Map();
-  return g.__maicroProgress;
+  g.__vidaloProgress ??= new Map();
+  return g.__vidaloProgress;
 }
 
 /**

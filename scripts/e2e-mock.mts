@@ -1,5 +1,5 @@
 /**
- * End-to-end in one process, fully offline (MAICRO_MOCK=1):
+ * End-to-end in one process, fully offline (VIDALO_MOCK=1):
  *   prepareBusiness → free scan → "checkout" (status trial + setup job) →
  *   drain the job queue with the worker's dispatcher → assert facts page,
  *   fixes, welcome + baseline mails.
@@ -11,17 +11,17 @@ import { tmpdir } from "node:os";
 import path from "node:path";
 import assert from "node:assert/strict";
 
-process.env.MAICRO_MOCK = "1";
-process.env.MAICRO_OUT_DIR ??= await mkdtemp(path.join(tmpdir(), "maicro-e2e-"));
+process.env.VIDALO_MOCK = "1";
+process.env.VIDALO_OUT_DIR ??= await mkdtemp(path.join(tmpdir(), "vidalo-e2e-"));
 process.env.PUBLIC_BASE_URL ??= "http://localhost:3000";
 
-const { db } = await import("@maicro/core/db");
-const { prepareBusiness, runScan } = await import("@maicro/core/scanner");
-const { setBusinessStatus } = await import("@maicro/core/shared");
-const { handlerFor, validatePayload, JOB_KINDS } = await import("@maicro/worker/src/jobs/index.ts");
-const { copy } = await import("@maicro/core/copy");
+const { db } = await import("@vidalo/core/db");
+const { prepareBusiness, runScan } = await import("@vidalo/core/scanner");
+const { setBusinessStatus } = await import("@vidalo/core/shared");
+const { handlerFor, validatePayload, JOB_KINDS } = await import("@vidalo/worker/src/jobs/index.ts");
+const { copy } = await import("@vidalo/core/copy");
 
-const out = process.env.MAICRO_OUT_DIR!;
+const out = process.env.VIDALO_OUT_DIR!;
 const step = (s: string) => console.log(`\n== ${s}`);
 
 // 1. Acquisition: business + provisional facts + prompts, then the free scan (what /api/scan does).
@@ -106,7 +106,7 @@ assert.ok(recFindings.length > 0, "a recommendation finding (business absent) ex
 assert.ok(recFindings.every((f) => f.wrongValue === "niet genoemd" && f.criterium != null && f.correctValue !== ""), "recommendation findings carry 'niet genoemd' + criterium");
 assert.ok(findings.every((f) => f.criterium != null), "every finding carries its criterium");
 const scans = await db.listScanRuns(business.id);
-const { buildReport } = await import("@maicro/core/scanner");
+const { buildReport } = await import("@vidalo/core/scanner");
 const full = await buildReport(scans[0]!.id, db);
 console.log(`latest scan ${full.kind}: stip ${full.stip}, ${full.findings.length} findings, ${full.instable.length} instable, ${full.criteriaNotFound.length} criteria not found`);
 assert.ok(["rood", "oranje", "groen", "grijs"].includes(full.stip), "full scan carries a stip colour");

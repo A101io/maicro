@@ -1,6 +1,6 @@
 import { cloudflareBindings } from "@/lib/cloudflare";
 import { NextResponse, after } from "next/server";
-import { copyFor } from "@maicro/core/copy";
+import { copyFor } from "@vidalo/core/copy";
 import { localizeHref } from "@/lib/lang-paths";
 import { langFromReferer } from "@/lib/request-lang";
 import { env } from "@/lib/env";

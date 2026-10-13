@@ -2,7 +2,7 @@
  * Claiming and running jobs, shared by the Node entry (index.ts: a loop) and
  * the Cloudflare entry (cloudflare.ts: a cron trigger drains it for a while).
  */
-import type { Job } from "@maicro/core/db";
+import type { Job } from "@vidalo/core/db";
 import { getDb } from "./compat.js";
 import { handlerFor, validatePayload, JOB_KINDS, type JobKind } from "./jobs/index.js";
 import { errorMessage, log } from "./log.js";

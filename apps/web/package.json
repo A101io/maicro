@@ -1,5 +1,5 @@
 {
-  "name": "@maicro/web",
+  "name": "@vidalo/web",
   "version": "0.1.0",
   "private": true,
   "type": "module",
@@ -15,7 +15,7 @@
     "cf:deploy": "opennextjs-cloudflare deploy"
   },
   "dependencies": {
-    "@maicro/core": "workspace:*",
+    "@vidalo/core": "workspace:*",
     "@opennextjs/cloudflare": "1.20.10",
     "@supabase/ssr": "^0.5.2",
     "@supabase/supabase-js": "^2.47.10",

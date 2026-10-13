@@ -1,9 +1,9 @@
 /**
  * Dev seed for mock mode: one business with verified facts and a `setup` job,
- * so `WORKER_SEED=1 WORKER_ONCE=1 MAICRO_MOCK=1 pnpm --filter @maicro/worker start`
+ * so `WORKER_SEED=1 WORKER_ONCE=1 VIDALO_MOCK=1 pnpm --filter @vidalo/worker start`
  * exercises setup → publish → sync → baseline scan → fixes → mails end to end.
  */
-import type { Facts } from "@maicro/core/types";
+import type { Facts } from "@vidalo/core/types";
 import { getDb } from "./compat.js";
 import { log } from "./log.js";
 

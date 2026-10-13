@@ -2,8 +2,8 @@
 
 import { revalidatePath } from "next/cache";
 import { redirect } from "next/navigation";
-import type { Facts, Hours, PriceItem, SectorSlug } from "@maicro/core/types";
-import { SECTOR_SLUGS } from "@maicro/core/types";
+import type { Facts, Hours, PriceItem, SectorSlug } from "@vidalo/core/types";
+import { SECTOR_SLUGS } from "@vidalo/core/types";
 import { ready } from "@/lib/db";
 import { getI18n } from "@/lib/i18n";
 import { requireVerifiedOwner } from "@/lib/owner";

@@ -4,7 +4,7 @@ import { ready } from "@/lib/db";
 import { env } from "@/lib/env";
 import { getSession, getOwnedBusiness } from "@/lib/session";
 import { cnameTarget } from "@/lib/factsPage";
-import { isVerifiedOwner } from "@maicro/core/shared";
+import { isVerifiedOwner } from "@vidalo/core/shared";
 
 export const runtime = "nodejs";
 

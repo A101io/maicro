@@ -8,15 +8,15 @@ importers:
 
   .:
     devDependencies:
-      '@maicro/core':
-        specifier: workspace:*
-        version: link:packages/core
-      '@maicro/worker':
-        specifier: workspace:*
-        version: link:apps/worker
       '@types/node':
         specifier: ^22.10.1
         version: 22.20.5
+      '@vidalo/core':
+        specifier: workspace:*
+        version: link:packages/core
+      '@vidalo/worker':
+        specifier: workspace:*
+        version: link:apps/worker
       tsx:
         specifier: ^4.19.2
         version: 4.23.15
@@ -26,9 +26,6 @@ importers:
 
   apps/web:
     dependencies:
-      '@maicro/core':
-        specifier: workspace:*
-        version: link:../../packages/core
       '@opennextjs/cloudflare':
         specifier: 1.20.10
         version: 1.20.10(next@15.5.27(@types/node@22.20.5)(react-dom@19.0.0(react@19.0.0))(react@19.0.0))(wrangler@4.149.0(@types/node@22.20.5))
@@ -38,6 +35,9 @@ importers:
       '@supabase/supabase-js':
         specifier: ^2.47.10
         version: 2.117.2
+      '@vidalo/core':
+        specifier: workspace:*
+        version: link:../../packages/core
       next:
         specifier: 15.5.27
         version: 15.5.27(@types/node@22.20.5)(react-dom@19.0.0(react@19.0.0))(react@19.0.0)
@@ -78,7 +78,7 @@ importers:
 
   apps/worker:
     dependencies:
-      '@maicro/core':
+      '@vidalo/core':
         specifier: workspace:*
         version: link:../../packages/core
     devDependencies:

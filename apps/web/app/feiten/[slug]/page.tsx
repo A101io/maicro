@@ -14,7 +14,7 @@ export const metadata: Metadata = { robots: { index: false } };
  * feiten.{domain}, wrapped in a thin preview bar.
  *
  * Only the signed-in owner sees it. It renders whatever facts were last saved,
- * confirmed or not, and it is served from Maicro's own domain: open to anyone,
+ * confirmed or not, and it is served from Vidalo's own domain: open to anyone,
  * it would let whoever last claimed a business show their version of it here.
  */
 export default async function FactsPreviewPage({ params }: { params: Promise<{ slug: string }> }) {

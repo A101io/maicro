@@ -3,8 +3,8 @@ import { fromUrl } from "@/lib/lang-paths";
 
 /**
  * /en/... is the same page in English: rewrite to the Dutch route and tell
- * the page which language to render (x-maicro-lang) and which route it is
- * (x-maicro-route, for hreflang and the language switch).
+ * the page which language to render (x-vidalo-lang) and which route it is
+ * (x-vidalo-route, for hreflang and the language switch).
  */
 export function middleware(req: NextRequest) {
   const fromPath = fromUrl(req.nextUrl.pathname);
@@ -12,12 +12,12 @@ export function middleware(req: NextRequest) {
   // the rewritten Dutch route: without this the second pass sets "nl" over the
   // first pass's "en". A visitor sending the header themselves only changes
   // the language of their own page.
-  const prior = req.headers.get("x-maicro-lang");
-  const keep = fromPath.lang === "nl" && prior === "en" && req.headers.get("x-maicro-route") === fromPath.route;
+  const prior = req.headers.get("x-vidalo-lang");
+  const keep = fromPath.lang === "nl" && prior === "en" && req.headers.get("x-vidalo-route") === fromPath.route;
   const { lang, route } = keep ? { lang: "en" as const, route: fromPath.route } : fromPath;
   const headers = new Headers(req.headers);
-  headers.set("x-maicro-lang", lang);
-  headers.set("x-maicro-route", route);
+  headers.set("x-vidalo-lang", lang);
+  headers.set("x-vidalo-route", route);
   if (lang === "nl" || keep) return NextResponse.next({ request: { headers } });
   const url = req.nextUrl.clone();
   url.pathname = route;

@@ -1,4 +1,4 @@
-import type { Stip as StipColour } from "@maicro/core/types";
+import type { Stip as StipColour } from "@vidalo/core/types";
 
 export type Tone = StipColour | "blue" | "ink";
 

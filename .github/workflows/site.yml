@@ -20,7 +20,7 @@ jobs:
   build:
     runs-on: ubuntu-latest
     env:
-      MAICRO_MOCK: "1"
+      VIDALO_MOCK: "1"
       PUBLIC_BASE_URL: http://localhost:3000
     steps:
       - uses: actions/checkout@v4
@@ -30,10 +30,10 @@ jobs:
           node-version: 22
           cache: pnpm
       - run: pnpm install --frozen-lockfile
-      - run: pnpm --filter @maicro/web build
+      - run: pnpm --filter @vidalo/web build
       - name: Start the app
         run: |
-          pnpm --filter @maicro/web start -p 3000 > web.log 2>&1 &
+          pnpm --filter @vidalo/web start -p 3000 > web.log 2>&1 &
           for i in $(seq 1 60); do curl -sf -o /dev/null http://localhost:3000/ && exit 0; sleep 1; done
           cat web.log; exit 1
       - run: node scripts/site/snapshot.mjs http://localhost:3000 out/site

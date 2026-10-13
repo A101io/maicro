@@ -34,7 +34,7 @@ const securityHeaders = [
 ];
 
 const nextConfig: NextConfig = {
-  transpilePackages: ["@maicro/core"],
+  transpilePackages: ["@vidalo/core"],
   experimental: { serverActions: { bodySizeLimit: "1mb" } },
   serverExternalPackages: ["postgres"],
   async headers() {

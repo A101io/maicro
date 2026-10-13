@@ -1,8 +1,8 @@
 import type { Metadata } from "next";
 import Link from "next/link";
 import { notFound } from "next/navigation";
-import { SECTOR_SLUGS, type SectorSlug } from "@maicro/core/types";
-import { isSectorSlug } from "@maicro/core/prompts";
+import { SECTOR_SLUGS, type SectorSlug } from "@vidalo/core/types";
+import { isSectorSlug } from "@vidalo/core/prompts";
 import { pageMetadata } from "@/lib/seo";
 import { getI18n, localizeHref } from "@/lib/i18n";
 import { SiteHeader } from "@/components/SiteHeader";

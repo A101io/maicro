@@ -3,7 +3,7 @@
  * GitHub Pages. Pages only serves files, and the app is a Next.js server, so
  * this crawls it page by page instead of exporting it.
  *
- *   MAICRO_MOCK=1 PUBLIC_BASE_URL=http://localhost:3000 pnpm --filter @maicro/web start &
+ *   VIDALO_MOCK=1 PUBLIC_BASE_URL=http://localhost:3000 pnpm --filter @vidalo/web start &
  *   node scripts/site/snapshot.mjs http://localhost:3000 out/site
  *
  * What the copy does and does not do:
@@ -39,7 +39,7 @@ const base = (process.argv[2] ?? "http://localhost:3000").replace(/\/$/, "");
 const out = path.resolve(process.argv[3] ?? "out/site");
 
 const DEMO = { userId: "mock-eigenaar@bakkerijdevries.nl", email: "eigenaar@bakkerijdevries.nl" };
-const cookies = new Map([["maicro_mock_session", encodeURIComponent(JSON.stringify(DEMO))]]);
+const cookies = new Map([["vidalo_mock_session", encodeURIComponent(JSON.stringify(DEMO))]]);
 const cookieHeader = () => [...cookies].map(([k, v]) => `${k}=${v}`).join("; ");
 
 const SKIP = ["/api/", "/auth/", "/_next/"];

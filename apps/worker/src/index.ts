@@ -1,11 +1,11 @@
 /**
- * Maicro worker: job loop + cron tick + facts-page HTTP server in one process.
+ * Vidalo worker: job loop + cron tick + facts-page HTTP server in one process.
  *
- *   MAICRO_MOCK=1 pnpm --filter @maicro/worker start
+ *   VIDALO_MOCK=1 pnpm --filter @vidalo/worker start
  *
- * Env: DATABASE_URL (or MAICRO_MOCK=1), FACTS_PORT (8787), WORKER_POLL_MS (2000),
+ * Env: DATABASE_URL (or VIDALO_MOCK=1), FACTS_PORT (8787), WORKER_POLL_MS (2000),
  * CRON_EVERY_MS (600000), WORKER_ONCE=1 (drain the queue, tick once, exit),
- * WORKER_NO_HTTP=1, WORKER_NO_CRON=1, WORKER_SEED=1 (mock demo business + setup job), MAICRO_OUT_DIR (out/).
+ * WORKER_NO_HTTP=1, WORKER_NO_CRON=1, WORKER_SEED=1 (mock demo business + setup job), VIDALO_OUT_DIR (out/).
  */
 import { getDb } from "./compat.js";
 import { cronTick } from "./cron.js";
@@ -51,7 +51,7 @@ function sleep(ms: number): Promise<void> {
 
 export async function main(): Promise<void> {
   const db = getDb();
-  log.info("worker.start", { mock: process.env.MAICRO_MOCK === "1", db: db.kind, pollMs: POLL_MS, cronMs: CRON_MS });
+  log.info("worker.start", { mock: process.env.VIDALO_MOCK === "1", db: db.kind, pollMs: POLL_MS, cronMs: CRON_MS });
   if (process.env.WORKER_SEED === "1") await seedDemo();
 
   if (process.env.WORKER_ONCE === "1") {
