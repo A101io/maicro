@@ -40,8 +40,6 @@ export const en: CopyShape = {
   landing: {
     hero: {
       h1: "What does AI say about your business?",
-      /** The words under the marker in the hero heading. */
-      h1Mark: "your business",
       sub: "In Haarlem, for 47 out of 100 businesses the answer is wrong, or the AI does not know them.",
       exampleLabel: "example",
       caption: "100 businesses in Haarlem · ChatGPT, Google AI and Copilot · 7 October 2026",
