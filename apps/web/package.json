@@ -13,11 +13,11 @@
   },
   "dependencies": {
     "@maicro/core": "workspace:*",
-    "@supabase/ssr": "^0.5.2",
-    "@supabase/supabase-js": "^2.47.10",
-    "next": "15.1.6",
-    "react": "19.0.0",
-    "react-dom": "19.0.0",
+    "@supabase/ssr": "^0.12.7",
+    "@supabase/supabase-js": "^2.117.3",
+    "next": "15.5.27",
+    "react": "19.3.0",
+    "react-dom": "19.3.0",
     "stripe": "^17.5.0"
   },
   "devDependencies": {
