@@ -622,7 +622,7 @@ export const copy = {
       lang: "NL",
       columns: [
         { title: "Product", links: [{ label: "Hoe het werkt", href: "/hoe-het-werkt" }, { label: "Waarom", href: "/waarom" }, { label: "AI-agents en OKF", href: "/straks" }, { label: "Voorbeeldrapport", href: "/#rapport" }, { label: "Prijs", href: "/prijzen" }, { label: "Per vak", href: "/#vak" }] },
-        { title: "Informatie", links: [{ label: "Wat we controleren", href: "/hoe-het-werkt#criteria" }, { label: "Vragen", href: "/#vragen" }, { label: "Contact", href: "mailto:hallo@maicro.nl" }] },
+        { title: "Informatie", links: [{ label: "Wat we controleren", href: "/hoe-het-werkt#criteria" }, { label: "Vragen", href: "/#vragen" }, { label: "Feiten over Vidalo", href: "/feiten" }, { label: "Contact", href: "mailto:hallo@maicro.nl" }] },
         { title: "Juridisch", links: [{ label: "Algemene voorwaarden", href: "/voorwaarden" }, { label: "Privacybeleid", href: "/privacy" }] },
       ],
       legal: "A101 B.V. (handelend als Vidalo) · Factorij 80, 3071 AV Rotterdam · KvK 42057858 · Prijzen excl. btw",
@@ -637,6 +637,14 @@ export const copy = {
    */
   /** Titles and descriptions for search engines and AI assistants, per page. */
   pages: {
+    /** /feiten: Vidalo's own facts page, the same page a customer gets, on our own site. */
+    ownFacts: {
+      crumb: "Feiten",
+      title: "Feiten over Vidalo: adres, openingstijden, diensten en prijzen",
+      description: "De feitenpagina van Vidalo zelf, gemaakt met dezelfde opzet als voor onze klanten: adres, openingstijden, wat we wel en niet doen, prijzen, met datum. Ook als schema.org en llms.txt.",
+      intro: "Wat we voor klanten maken, hebben we ook voor onszelf. Dit is onze eigen feitenpagina, met dezelfde opzet, dezelfde datum en dezelfde tekstversie voor AI-assistenten.",
+      textVersion: "Tekstversie voor AI-assistenten",
+    },
     home: {
       title: "Klopt wat ChatGPT over je bedrijf zegt? Gratis AI-controle",
       description: "Gratis controle: wat zeggen ChatGPT, Google AI en Copilot over je bedrijf? We vinden elke fout en de bron, en herstellen die bron. Goed zetten €149 eenmalig, goed houden €49 per maand, excl. btw.",

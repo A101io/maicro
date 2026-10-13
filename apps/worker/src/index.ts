@@ -5,7 +5,7 @@
  *
  * Env: DATABASE_URL (or MAICRO_MOCK=1), FACTS_PORT (8787), WORKER_POLL_MS (2000),
  * CRON_EVERY_MS (600000), WORKER_ONCE=1 (drain the queue, tick once, exit),
- * WORKER_NO_HTTP=1, WORKER_NO_CRON=1, WORKER_SEED=1 (mock demo business + setup job), MAICRO_OUT_DIR (out/).
+ * WORKER_NO_HTTP=1, WORKER_NO_CRON=1, WORKER_SEED=1 (mock demo business + setup job), WORKER_OWN=0 (skip Vidalo as its own customer), MAICRO_OUT_DIR (out/).
  */
 import type { Job } from "@maicro/core/db";
 import { getDb } from "./compat.js";
@@ -13,7 +13,7 @@ import { cronTick } from "./cron.js";
 import { startHttp } from "./http.js";
 import { handlerFor, validatePayload, JOB_KINDS, type JobKind } from "./jobs/index.js";
 import { errorMessage, log } from "./log.js";
-import { seedDemo } from "./seed.js";
+import { ensureOwnBusiness, seedDemo } from "./seed.js";
 
 const POLL_MS = Number(process.env.WORKER_POLL_MS ?? 2000);
 const CRON_MS = Number(process.env.CRON_EVERY_MS ?? 10 * 60 * 1000);
@@ -112,6 +112,7 @@ export async function main(): Promise<void> {
   const db = getDb();
   log.info("worker.start", { mock: process.env.MAICRO_MOCK === "1", db: db.kind, pollMs: POLL_MS, cronMs: CRON_MS });
   if (process.env.WORKER_SEED === "1") await seedDemo();
+  if (process.env.WORKER_OWN !== "0") await ensureOwnBusiness();
 
   if (process.env.WORKER_ONCE === "1") {
     // drain → tick → drain, so a seeded setup job gets its host poll / rechecks in the same run

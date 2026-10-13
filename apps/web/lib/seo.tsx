@@ -1,5 +1,7 @@
 import type { Metadata } from "next";
 import { PRICES, type CopyShape } from "@maicro/core/copy";
+import { buildJsonLd } from "@maicro/core/publisher";
+import { OWN_BUSINESS, OWN_FACTS, OWN_FACTS_PATH } from "@maicro/core/shared";
 import { localizeHref, type Lang } from "./lang-paths";
 
 /**
@@ -26,19 +28,27 @@ export function pageMetadata({ title, description, route, lang, absoluteTitle = 
   };
 }
 
+/** The own facts page's address on this site. */
+export const OWN_FACTS_URL = abs(OWN_FACTS_PATH);
+
+/**
+ * Vidalo's own structured data: the very LocalBusiness block the facts page
+ * renders for a customer, built from `OWN_FACTS`, plus what an Organization
+ * says about itself. Practise what we preach: our data comes from the same
+ * record and the same renderer as a customer's.
+ */
 export function organizationLd(copy: CopyShape) {
+  const facts = buildJsonLd(OWN_FACTS, OWN_BUSINESS, OWN_FACTS_URL);
   return {
-    "@context": "https://schema.org",
-    "@type": "Organization",
+    ...facts,
+    "@type": ["Organization", "LocalBusiness"],
     "@id": `${SITE}/#organization`,
     name: copy.brand,
     legalName: "A101 B.V.",
     url: SITE,
-    email: "hallo@maicro.nl",
     description: copy.tagline,
-    address: { "@type": "PostalAddress", streetAddress: "Factorij 80", postalCode: "3071 AV", addressLocality: "Rotterdam", addressCountry: "NL" },
-    identifier: { "@type": "PropertyValue", propertyID: "KvK", value: "42057858" },
-    areaServed: "NL",
+    identifier: { "@type": "PropertyValue", propertyID: "KvK", value: OWN_BUSINESS.kvk },
+    subjectOf: OWN_FACTS_URL,
   };
 }
 

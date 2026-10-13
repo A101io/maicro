@@ -67,6 +67,8 @@ document.addEventListener("click", (e) => {
   for (const el of main.querySelectorAll("section h2, section .lead, section h2 + p")) {
     if (hero && hero.contains(el)) continue;
     if (el.closest("[data-motion]")) continue;
+    // Server-rendered documents (the facts page) are plain: no reveal, so copies and crawlers see every heading at once.
+    if (el.closest("[data-static]")) continue;
     if (belowFold(el)) prepare(el, el, el.tagName === "H2" ? RISE : RISE_SM, { duration: 800 });
   }
 
