@@ -12,6 +12,7 @@ import { PriceBlock } from "@/components/PriceBlock";
 import { Faq } from "@/components/Faq";
 import { ReportHeaderRow, ReportRow } from "@/components/ReportRow";
 import { CountUp } from "@/components/CountUp";
+import { HeroViz } from "@/components/HeroViz";
 
 const L = copy.landing;
 const severities: Severity[] = ["afhaker", "misleider", "verwarring"];
@@ -40,26 +41,8 @@ export default function LandingPage() {
             </p>
             <ScanField id="hero" className="enter max-w-[440px]" style={{ "--d": "180ms" } as React.CSSProperties} />
           </div>
-          <div className="enter flex flex-col gap-4 lg:col-span-7" style={{ "--d": "120ms" } as React.CSSProperties}>
-            <div className="scan-sweep grid grid-cols-10 gap-2 rounded-[20px] bg-panel p-4 sm:gap-3 sm:p-[26px]">
-              {L.hero.grid.split("").map((c, i) => (
-                // Ripple from the top-left corner: delay by row + column.
-                <span key={i} aria-hidden className={`dot-in dot-hover aspect-square rounded-full ${c === "r" ? "bg-rood" : c === "g" ? "bg-groen" : "bg-grijs"}`} style={{ "--i": Math.floor(i / 10) + (i % 10) } as React.CSSProperties} />
-              ))}
-            </div>
-            <div className="flex flex-wrap justify-between gap-x-4 gap-y-2 text-[13px] text-muted">
-              <span>
-                <span className="tag mr-2">{L.hero.exampleLabel}</span>
-                {L.hero.caption}
-              </span>
-              <span className="flex flex-wrap gap-4">
-                {(["rood", "grijs", "groen"] as const).map((t) => (
-                  <span key={t} className="flex items-center gap-1.5">
-                    <Stip tone={t} /> {L.hero.legend[t]}
-                  </span>
-                ))}
-              </span>
-            </div>
+          <div className="enter lg:col-span-7" style={{ "--d": "120ms" } as React.CSSProperties}>
+            <HeroViz />
           </div>
         </section>
 
