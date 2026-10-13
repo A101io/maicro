@@ -6,7 +6,7 @@
  * Fallbacks: when a core export is missing at runtime (another package still
  * in progress), a minimal local implementation is used and a warning logged.
  */
-import * as dbModule from "@maicro/core/db";
+import { getDb as sharedGetDb } from "@maicro/core/shared";
 import * as scannerModule from "@maicro/core/scanner";
 import * as promptsModule from "@maicro/core/prompts";
 import type { Db } from "@maicro/core/db";
@@ -15,11 +15,14 @@ import { log } from "./log.js";
 
 type AnyModule = Record<string, unknown>;
 
+/**
+ * Core's handle: the invocation's own on Cloudflare (withDb, cloudflare.ts),
+ * the process-wide one under Node. Reading `@maicro/core/db`'s module-level
+ * `db` directly skipped the scope, and the cron tick's monthly step failed on
+ * Cloudflare with "Cannot perform I/O on behalf of a different request".
+ */
 export function getDb(): Db {
-  const m = dbModule as unknown as AnyModule;
-  if (m.db && typeof m.db === "object") return m.db as Db;
-  if (typeof m.getDb === "function") return (m.getDb as () => Db)();
-  return m as unknown as Db;
+  return sharedGetDb();
 }
 
 export interface RunScanOptions {

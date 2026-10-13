@@ -9,3 +9,6 @@ out/
 # Cloudflare build output
 .open-next/
 .wrangler/
+
+# Local wrangler dev secrets
+.dev.vars

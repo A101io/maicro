@@ -120,9 +120,15 @@ async function persist(state: ScanJobState) {
   }
 }
 
-/** Current waiting-room state: memory first, then the latest `scan.progress` event (other process). */
+/**
+ * Current waiting-room state. Memory answers only once the scan runs in this
+ * process; a scan still "queued" here may be running elsewhere (the queue
+ * consumer on Cloudflare), so then the latest stored event decides.
+ */
 export async function getScanState(token: string): Promise<ScanJobState | null> {
-  return progressMap().get(token) ?? readScanState(token, getDb());
+  const mem = progressMap().get(token);
+  if (mem && mem.status !== "queued") return mem;
+  return (await readScanState(token, getDb())) ?? mem ?? null;
 }
 
 /** Create the waiting-room state (status queued). Call before the scan is started or queued. */
