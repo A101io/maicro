@@ -56,6 +56,22 @@ export const copy = {
       legend: { rood: "minstens één fout", grijs: "niet gevonden", groen: "alles klopt" },
       /** 100 dots, row by row (r = rood, g = groen, x = grijs). */
       grid: "rggrrxrggrxrrggrxrggrxrrggrxrggrxrrggrxrrggrxrggrxgrrgrxrggrrxgrgrxrgrgrxgrrgrxgrrgrxgrgrxgrgrxrggrx",
+      /** The animated hero: one answer, built from four sources, put right at the source. */
+      viz: {
+        label: "Zo werkt het: een AI bouwt een antwoord uit bronnen. Eén verouderde bron maakte het antwoord fout. Maicro herstelt die bron en het antwoord klopt weer.",
+        question: "Is Bakkerij De Vries op zondag open?",
+        engine: "ChatGPT",
+        wrong: "Ja, zondag van 9:00 tot 17:00.",
+        right: "Nee, op zondag gesloten.",
+        sources: [
+          { name: "Eigen website", meta: "zondag gesloten" },
+          { name: "Google-profiel", meta: "zondag gesloten" },
+          { name: "openingstijden.nl", meta: "zondag 9–17 · uit 2022", fixed: "bijgewerkt: gesloten" },
+          { name: "Krantenbericht", meta: "naamgenoot, Heemstede" },
+        ],
+        maicro: ["Controleert de bronnen", "Fout gevonden: openingstijden.nl", "Bron hersteld · antwoord klopt"],
+        caption: "Voorbeeld: één verouderde bron bepaalt het antwoord. Wij herstellen die bron.",
+      },
     },
     veranderd: {
       h2: "Je klanten googelen niet meer. Ze vragen.",
