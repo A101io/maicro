@@ -11,6 +11,9 @@ export const DEFAULT_LANG: Lang = "nl";
 /** First path segment: Dutch route → English URL. Segments not listed keep their name. */
 const EN_SLUGS: Record<string, string> = {
   prijzen: "pricing",
+  waarom: "why",
+  "hoe-het-werkt": "how-it-works",
+  straks: "whats-next",
   vak: "sectors",
   voorwaarden: "terms",
   inloggen: "login",

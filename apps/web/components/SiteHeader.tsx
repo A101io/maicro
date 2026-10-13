@@ -22,8 +22,8 @@ export async function SiteHeader({ variant = "full", right }: { variant?: "full"
   const links =
     variant === "full"
       ? [
-          { href: "/#werkt", label: n.how },
-          { href: "/#criteria", label: n.criteria },
+          { href: "/hoe-het-werkt", label: n.how },
+          { href: "/waarom", label: n.why },
           { href: "/#vak", label: n.sectors },
           { href: "/#prijs", label: n.pricing },
           { href: "/#vragen", label: n.faq },

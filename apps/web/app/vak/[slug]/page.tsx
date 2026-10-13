@@ -3,6 +3,7 @@ import Link from "next/link";
 import { notFound } from "next/navigation";
 import { SECTOR_SLUGS, type SectorSlug } from "@maicro/core/types";
 import { isSectorSlug } from "@maicro/core/prompts";
+import { pageMetadata } from "@/lib/seo";
 import { getI18n, localizeHref } from "@/lib/i18n";
 import { SiteHeader } from "@/components/SiteHeader";
 import { SiteFooter } from "@/components/SiteFooter";
@@ -20,14 +21,9 @@ export function generateStaticParams(): { slug: SectorSlug }[] {
 export async function generateMetadata({ params }: { params: Promise<{ slug: string }> }): Promise<Metadata> {
   const { slug } = await params;
   if (!isSectorSlug(slug)) return {};
-  const { copy, href } = await getI18n();
+  const { copy, lang } = await getI18n();
   const p = copy.sectorPages[slug];
-  const route = `/vak/${slug}`;
-  return {
-    title: `${p.short}: ${p.h1}`,
-    description: p.intro,
-    alternates: { canonical: href(route), languages: { nl: localizeHref(route, "nl"), en: localizeHref(route, "en"), "x-default": localizeHref(route, "nl") } },
-  };
+  return pageMetadata({ title: `${p.short}: ${p.h1}`, description: p.intro, route: `/vak/${slug}`, lang });
 }
 
 export default async function SectorPage({ params }: { params: Promise<{ slug: string }> }) {

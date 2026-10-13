@@ -15,6 +15,7 @@ export const en: CopyShape = {
   nav: {
     wordmark: "maicro",
     how: "How it works",
+    why: "Why",
     criteria: "Criteria",
     sectors: "By trade",
     pricing: "Pricing",
@@ -574,6 +575,18 @@ export const en: CopyShape = {
       footnote: "¹ Fixes at third-party sources can take up to 14 days.",
       multi: "More than 10 locations? Get in touch.",
     },
+    /** The check band between sections, and the links to the explainer pages. */
+    cta: {
+      h2: "What does AI say about your business?",
+      body: "Two minutes, free, no account. You see right away which answers are wrong and where they come from.",
+    },
+    more: {
+      lead: "Want to know more?",
+      why: "Why AI sometimes gets it wrong",
+      how: "How it works in detail",
+      next: "What changes next",
+    },
+    sectorsLine: "Questions for your trade:",
     vragen: {
       h2: "Questions",
       items: [
@@ -597,8 +610,8 @@ export const en: CopyShape = {
       resultTagline: "AI check for businesses. What ChatGPT, Google AI and Copilot say about you is right.",
       lang: "EN",
       columns: [
-        { title: "Product", links: [{ label: "How it works", href: "/#werkt" }, { label: "Example report", href: "/#rapport" }, { label: "Pricing", href: "/prijzen" }, { label: "By trade", href: "/#vak" }] },
-        { title: "Information", links: [{ label: "What we check", href: "/#criteria" }, { label: "Questions", href: "/#vragen" }, { label: "Contact", href: "mailto:hallo@maicro.nl" }] },
+        { title: "Product", links: [{ label: "How it works", href: "/hoe-het-werkt" }, { label: "Why", href: "/waarom" }, { label: "AI agents and OKF", href: "/straks" }, { label: "Example report", href: "/#rapport" }, { label: "Pricing", href: "/prijzen" }, { label: "By trade", href: "/#vak" }] },
+        { title: "Information", links: [{ label: "What we check", href: "/hoe-het-werkt#criteria" }, { label: "Questions", href: "/#vragen" }, { label: "Contact", href: "mailto:hallo@maicro.nl" }] },
         { title: "Legal", links: [{ label: "Terms and conditions", href: "/voorwaarden" }, { label: "Privacy policy", href: "/privacy" }] },
       ],
       legal: "A101 B.V. (trading as Maicro) · Factorij 80, 3071 AV Rotterdam · KvK (Dutch Chamber of Commerce) 42057858 · Prices excl. VAT",
@@ -611,6 +624,36 @@ export const en: CopyShape = {
    * Terms and privacy. DRAFT: written from what the code does, not reviewed by
    * a lawyer. `draft` renders a visible notice on both pages until it is false.
    */
+  /** Titles and descriptions for search engines and AI assistants, per page. */
+  pages: {
+    home: {
+      title: "Is what ChatGPT says about your business right? Free AI check",
+      description: "Free check: what do ChatGPT, Google AI and Copilot say about your business? We find every error and its source, and fix that source. Set it right €149 once, keep it right €49 a month, excl. VAT.",
+    },
+    why: {
+      crumb: "Why",
+      title: "Why AI assistants get your business wrong",
+      description: "How ChatGPT, Google AI and Copilot put together an answer about your business, why an old directory listing often wins, and what that costs a business.",
+      h1: "Why AI sometimes gets your business wrong",
+      intro: "An AI assistant does not know you. For every question it gathers what is online about you and turns it into one answer. Here is how that works, where it goes wrong and what you can do about it.",
+    },
+    how: {
+      crumb: "How it works",
+      title: "How Maicro works: record, publish, check, fix",
+      description: "Record your details once, publish them the same everywhere, check every question twenty times a month with ChatGPT, Google AI and Copilot, and fix errors at the source with proof.",
+      h1: "How Maicro works",
+      intro: "Five minutes of work for you at the start. After that we check every month what AI assistants say about you, and fix every error at its source.",
+    },
+    next: {
+      crumb: "What's next",
+      title: "AI agents, OKF, llms.txt and MCP explained for business owners",
+      description: "Soon AI assistants will talk to each other and to your business. What do OKF (Open Knowledge Format), schema.org, llms.txt, MCP and A2A mean, and what should you do? Plainly explained.",
+      h1: "Soon, assistants talk to each other",
+      intro: "What changes when AI assistants do not just answer but also arrange things, and which agreements are being made for it now. Without jargon.",
+    },
+    home_crumb: "Maicro",
+  },
+
   legal: {
     draft: true,
     draftNotice: "Draft. This text has not yet been legally reviewed and may change.",

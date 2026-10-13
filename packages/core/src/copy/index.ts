@@ -28,6 +28,7 @@ export const copy = {
   nav: {
     wordmark: "maicro",
     how: "Zo werkt het",
+    why: "Waarom",
     criteria: "Criteria",
     sectors: "Per vak",
     pricing: "Prijs",
@@ -587,6 +588,18 @@ export const copy = {
       footnote: "¹ Herstel bij bronnen van derden kan tot 14 dagen duren.",
       multi: "Meer dan 10 vestigingen? Neem contact op.",
     },
+    /** The check band between sections, and the links to the explainer pages. */
+    cta: {
+      h2: "Wat zegt de AI over jouw bedrijf?",
+      body: "Twee minuten, gratis, zonder account. Je ziet meteen welke antwoorden niet kloppen en waar ze vandaan komen.",
+    },
+    more: {
+      lead: "Meer weten?",
+      why: "Waarom AI soms fout antwoordt",
+      how: "Hoe het precies werkt",
+      next: "Wat er straks verandert",
+    },
+    sectorsLine: "Eigen vragen per vak:",
     vragen: {
       h2: "Vragen",
       items: [
@@ -610,8 +623,8 @@ export const copy = {
       resultTagline: "AI-controle voor bedrijven. Wat ChatGPT, Google AI en Copilot over je zeggen, klopt.",
       lang: "NL",
       columns: [
-        { title: "Product", links: [{ label: "Hoe het werkt", href: "/#werkt" }, { label: "Voorbeeldrapport", href: "/#rapport" }, { label: "Prijs", href: "/prijzen" }, { label: "Per vak", href: "/#vak" }] },
-        { title: "Informatie", links: [{ label: "Wat we controleren", href: "/#criteria" }, { label: "Vragen", href: "/#vragen" }, { label: "Contact", href: "mailto:hallo@maicro.nl" }] },
+        { title: "Product", links: [{ label: "Hoe het werkt", href: "/hoe-het-werkt" }, { label: "Waarom", href: "/waarom" }, { label: "AI-agents en OKF", href: "/straks" }, { label: "Voorbeeldrapport", href: "/#rapport" }, { label: "Prijs", href: "/prijzen" }, { label: "Per vak", href: "/#vak" }] },
+        { title: "Informatie", links: [{ label: "Wat we controleren", href: "/hoe-het-werkt#criteria" }, { label: "Vragen", href: "/#vragen" }, { label: "Contact", href: "mailto:hallo@maicro.nl" }] },
         { title: "Juridisch", links: [{ label: "Algemene voorwaarden", href: "/voorwaarden" }, { label: "Privacybeleid", href: "/privacy" }] },
       ],
       legal: "A101 B.V. (handelend als Maicro) · Factorij 80, 3071 AV Rotterdam · KvK 42057858 · Prijzen excl. btw",
@@ -624,6 +637,36 @@ export const copy = {
    * Terms and privacy. DRAFT: written from what the code does, not reviewed by
    * a lawyer. `draft` renders a visible notice on both pages until it is false.
    */
+  /** Titles and descriptions for search engines and AI assistants, per page. */
+  pages: {
+    home: {
+      title: "Klopt wat ChatGPT over je bedrijf zegt? Gratis AI-controle",
+      description: "Gratis controle: wat zeggen ChatGPT, Google AI en Copilot over je bedrijf? We vinden elke fout en de bron, en herstellen die bron. Goed zetten €149 eenmalig, goed houden €49 per maand, excl. btw.",
+    },
+    why: {
+      crumb: "Waarom",
+      title: "Waarom AI-assistenten fout antwoorden over je bedrijf",
+      description: "Hoe ChatGPT, Google AI en Copilot een antwoord over je bedrijf in elkaar zetten, waarom een oude gidsvermelding vaak wint, en wat dat een bedrijf kost.",
+      h1: "Waarom de AI soms fout antwoordt over je bedrijf",
+      intro: "Een AI-assistent kent je niet. Bij elke vraag haalt hij op wat er online over je staat en maakt er één antwoord van. Hier lees je hoe dat gaat, waar het misgaat en wat je eraan kunt doen.",
+    },
+    how: {
+      crumb: "Zo werkt het",
+      title: "Zo werkt Maicro: vastleggen, publiceren, controleren, herstellen",
+      description: "Je gegevens één keer vastleggen, overal hetzelfde publiceren, elke maand twintig keer per vraag controleren bij ChatGPT, Google AI en Copilot, en fouten aan de bron herstellen met bewijs.",
+      h1: "Zo werkt Maicro",
+      intro: "Vijf minuten werk voor jou bij de start. Daarna controleren we elke maand wat AI-assistenten over je zeggen, en herstellen we elke fout bij de bron.",
+    },
+    next: {
+      crumb: "Straks",
+      title: "AI-agents, OKF, llms.txt en MCP uitgelegd voor ondernemers",
+      description: "Straks overleggen AI-assistenten met elkaar en met je bedrijf. Wat betekenen OKF (Open Knowledge Format), schema.org, llms.txt, MCP en A2A, en wat moet je ermee? Gewoon uitgelegd.",
+      h1: "Straks praten assistenten met elkaar",
+      intro: "Wat er verandert als AI-assistenten niet alleen antwoorden maar ook regelen, en welke afspraken daarvoor nu gemaakt worden. Zonder vakjargon.",
+    },
+    home_crumb: "Maicro",
+  },
+
   legal: {
     draft: true,
     draftNotice: "Concept. Deze tekst is nog niet juridisch gecontroleerd en kan veranderen.",

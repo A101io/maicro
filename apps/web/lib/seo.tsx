@@ -1,0 +1,120 @@
+import type { Metadata } from "next";
+import { PRICES, type CopyShape } from "@maicro/core/copy";
+import { localizeHref, type Lang } from "./lang-paths";
+
+/**
+ * Metadata and structured data, one place. Every public page says the same
+ * thing three ways: to people (the page), to search engines (title,
+ * description, canonical, hreflang, Open Graph) and to AI assistants
+ * (JSON-LD and /llms.txt). Only what the page itself shows goes in here.
+ */
+export const SITE = (process.env.PUBLIC_BASE_URL ?? "https://maicro.nl").replace(/\/$/, "");
+const abs = (path: string) => SITE + (path === "/" ? "" : path);
+
+/** Title, description, canonical, both languages and the share card for one route. */
+export function pageMetadata({ title, description, route, lang, absoluteTitle = false }: { title: string; description: string; route: string; lang: Lang; absoluteTitle?: boolean }): Metadata {
+  const url = abs(localizeHref(route, lang));
+  return {
+    title: absoluteTitle ? { absolute: title } : title,
+    description,
+    alternates: {
+      canonical: url,
+      languages: { nl: abs(localizeHref(route, "nl")), en: abs(localizeHref(route, "en")), "x-default": abs(route) },
+    },
+    openGraph: { title, description, url, siteName: "Maicro", locale: lang === "en" ? "en_GB" : "nl_NL", alternateLocale: lang === "en" ? "nl_NL" : "en_GB", type: "website" },
+    twitter: { card: "summary_large_image", title, description },
+  };
+}
+
+export function organizationLd(copy: CopyShape) {
+  return {
+    "@context": "https://schema.org",
+    "@type": "Organization",
+    "@id": `${SITE}/#organization`,
+    name: copy.brand,
+    legalName: "A101 B.V.",
+    url: SITE,
+    email: "hallo@maicro.nl",
+    description: copy.tagline,
+    address: { "@type": "PostalAddress", streetAddress: "Factorij 80", postalCode: "3071 AV", addressLocality: "Rotterdam", addressCountry: "NL" },
+    identifier: { "@type": "PropertyValue", propertyID: "KvK", value: "42057858" },
+    areaServed: "NL",
+  };
+}
+
+export function websiteLd(copy: CopyShape, lang: Lang) {
+  return { "@context": "https://schema.org", "@type": "WebSite", "@id": `${SITE}/#website`, url: abs(localizeHref("/", lang)), name: copy.brand, inLanguage: lang, publisher: { "@id": `${SITE}/#organization` } };
+}
+
+/** The service and its two prices, exactly as on the price block (excl. btw). */
+export function serviceLd(copy: CopyShape, lang: Lang) {
+  const P = copy.landing.prijs;
+  const offer = (name: string, price: number, monthly: boolean) => ({
+    "@type": "Offer",
+    name,
+    price: price.toFixed(2),
+    priceCurrency: "EUR",
+    priceSpecification: {
+      "@type": "UnitPriceSpecification",
+      price: price.toFixed(2),
+      priceCurrency: "EUR",
+      valueAddedTaxIncluded: false,
+      ...(monthly ? { unitCode: "MON", billingDuration: "P1M" } : {}),
+    },
+    url: abs(localizeHref("/prijzen", lang)),
+    availability: "https://schema.org/InStock",
+  });
+  return {
+    "@context": "https://schema.org",
+    "@type": "Service",
+    name: copy.pages.home.title,
+    description: copy.pages.home.description,
+    provider: { "@id": `${SITE}/#organization` },
+    areaServed: { "@type": "Country", name: "Nederland" },
+    audience: { "@type": "BusinessAudience" },
+    serviceType: "AI answer monitoring and correction for local businesses",
+    offers: [offer(P.setup.name, PRICES.setupEur, false), offer(P.monitor.name, PRICES.monitorEurPerMonth, true)],
+  };
+}
+
+export function faqLd(items: readonly { q: string; a: string }[]) {
+  return {
+    "@context": "https://schema.org",
+    "@type": "FAQPage",
+    mainEntity: items.map((it) => ({ "@type": "Question", name: it.q, acceptedAnswer: { "@type": "Answer", text: it.a } })),
+  };
+}
+
+export function breadcrumbLd(copy: CopyShape, lang: Lang, crumbs: { name: string; route: string }[]) {
+  const all = [{ name: copy.pages.home_crumb, route: "/" }, ...crumbs];
+  return {
+    "@context": "https://schema.org",
+    "@type": "BreadcrumbList",
+    itemListElement: all.map((c, i) => ({ "@type": "ListItem", position: i + 1, name: c.name, item: abs(localizeHref(c.route, lang)) })),
+  };
+}
+
+/** The glossary on /straks as terms an assistant can quote. */
+export function termsLd(copy: CopyShape, lang: Lang) {
+  const A = copy.landing.agents;
+  return {
+    "@context": "https://schema.org",
+    "@type": "DefinedTermSet",
+    name: A.termsTitle,
+    url: abs(localizeHref("/straks", lang)),
+    inLanguage: lang,
+    hasDefinedTerm: A.terms.map((t) => ({ "@type": "DefinedTerm", name: t.term, description: t.body })),
+  };
+}
+
+/** One <script type="application/ld+json"> per object; "<" escaped so text can never close the tag. */
+export function JsonLd({ data }: { data: object | object[] }) {
+  const list = Array.isArray(data) ? data : [data];
+  return (
+    <>
+      {list.map((d, i) => (
+        <script key={i} type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(d).replace(/</g, "\\u003c") }} />
+      ))}
+    </>
+  );
+}
