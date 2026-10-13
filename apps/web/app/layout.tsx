@@ -21,6 +21,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
         {children}
         {/* Scroll motion; hides nothing on its own, so the page is whole without it. */}
         <script src="/motion.js" defer />
+        <script src="/ask.js" defer />
       </body>
     </html>
   );

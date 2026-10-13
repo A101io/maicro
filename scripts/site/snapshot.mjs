@@ -11,7 +11,8 @@
  *   internal link is rewritten to its file, so it works under any base path
  *   (`https://<org>.github.io/maicro/`).
  * - The app's JavaScript is stripped: nothing hydrates, nothing is saved.
- *   The one script kept is public/motion.js, the scroll motion, which works
+ *   The scripts kept are public/motion.js (scroll motion) and public/ask.js
+ *   (the "Vraag het zelf" simulator); like motion.js, they work
  *   on plain HTML and hides nothing if it fails.
  *   Forms are pointed at the page a visitor would land on (the scan form at
  *   the example report, checkout at the welcome page).
@@ -28,6 +29,9 @@ import { copyFile, mkdir, readdir, readFile, rm, writeFile } from "node:fs/promi
 import path from "node:path";
 import { execSync } from "node:child_process";
 import { fileURLToPath } from "node:url";
+
+/** Plain scripts that work without React and stay in the static copy. */
+const KEPT_SCRIPTS = ["motion.js", "ask.js"];
 
 const here = path.dirname(fileURLToPath(import.meta.url));
 const repo = path.resolve(here, "../..");
@@ -115,7 +119,10 @@ async function crawl(start) {
 }
 
 function rewrite(html) {
-  html = html.replace(/<script\b[^>]*>[\s\S]*?<\/script>/g, (tag) => (tag.includes('src="/motion.js"') ? tag.replace('src="/motion.js"', 'src="motion.js"') : ""));
+  html = html.replace(/<script\b[^>]*>[\s\S]*?<\/script>/g, (tag) => {
+    const kept = KEPT_SCRIPTS.find((f) => tag.includes(`src="/${f}"`));
+    return kept ? tag.replace(`src="/${kept}"`, `src="${kept}"`) : "";
+  });
   html = html.replace(/<link\b[^>]*\bas="script"[^>]*\/?>/g, "");
   html = html.replaceAll('"/_next/static/', '"assets/');
   html = html.replace(/href="(\/[^"]*)"/g, (_, url) => {
@@ -163,7 +170,7 @@ async function main() {
     }
   }
   await copyFile(path.join(repo, "apps/web/app/icon.svg"), path.join(out, "icon.svg"));
-  await copyFile(path.join(repo, "apps/web/public/motion.js"), path.join(out, "motion.js"));
+  for (const f of KEPT_SCRIPTS) await copyFile(path.join(repo, "apps/web/public", f), path.join(out, f));
   await writeFile(path.join(out, ".nojekyll"), "");
   await writeFile(path.join(out, "robots.txt"), "User-agent: *\nDisallow: /\n");
 

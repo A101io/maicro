@@ -13,6 +13,7 @@ import { Faq } from "@/components/Faq";
 import { ReportHeaderRow, ReportRow } from "@/components/ReportRow";
 import { CountUp } from "@/components/CountUp";
 import { HeroViz } from "@/components/HeroViz";
+import { AskSim } from "@/components/AskSim";
 import { SceneRow } from "@/components/viz/Scene";
 import { RegelViz } from "@/components/viz/RegelViz";
 import { BelViz } from "@/components/viz/BelViz";
@@ -124,6 +125,15 @@ export default function LandingPage() {
                 </div>
               ))}
             </div>
+          </div>
+        </section>
+
+        {/* 2b Vraag het zelf */}
+        <section id="probeer" className="ground-cream">
+          <div className="wrap section flex flex-col gap-10">
+            <SectionHead h2={L.ask.h2} body={L.ask.body} />
+            <AskSim />
+            <p className="fine">{L.ask.caption}</p>
           </div>
         </section>
 
