@@ -1,5 +1,5 @@
 import Link from "next/link";
-import type { SectorSlug } from "@maicro/core/types";
+import type { SectorSlug } from "@vidalo/core/types";
 import { getI18n } from "@/lib/i18n";
 
 /** One sector card on the landing: name, decisive facts, example question; links to /vak/[slug]. */

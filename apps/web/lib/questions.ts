@@ -1,6 +1,6 @@
-import type { FactKey, Finding } from "@maicro/core/types";
-import { describeValue } from "@maicro/core/scanner";
-import type { CopyShape } from "@maicro/core/copy";
+import type { FactKey, Finding } from "@vidalo/core/types";
+import { describeValue } from "@vidalo/core/scanner";
+import type { CopyShape } from "@vidalo/core/copy";
 
 const DAYS = ["maandag", "dinsdag", "woensdag", "donderdag", "vrijdag", "zaterdag", "zondag"];
 

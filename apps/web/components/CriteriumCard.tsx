@@ -1,5 +1,5 @@
-import type { Severity } from "@maicro/core/types";
-import { CRITERIA } from "@maicro/core/criteria";
+import type { Severity } from "@vidalo/core/types";
+import { CRITERIA } from "@vidalo/core/criteria";
 import { getI18n } from "@/lib/i18n";
 import { Stip, type Tone } from "./Stip";
 

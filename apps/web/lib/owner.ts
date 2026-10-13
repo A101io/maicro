@@ -1,7 +1,7 @@
 import { redirect } from "next/navigation";
 import { getSession, getOwnedBusiness, type Session } from "./session";
-import type { BusinessRecord } from "@maicro/core/db";
-import { isVerifiedOwner } from "@maicro/core/shared";
+import type { BusinessRecord } from "@vidalo/core/db";
+import { isVerifiedOwner } from "@vidalo/core/shared";
 import { getI18n } from "./i18n";
 
 /** Session + owned business, or redirect to /inloggen. */

@@ -34,7 +34,7 @@ export async function pingIndexNow(urls: string[]): Promise<IndexNowResult> {
     console.log(JSON.stringify({ msg: "indexnow.skip", reason: key ? "no urls" : "no INDEXNOW_KEY", urls }));
     return { skipped: true, urls };
   }
-  if (process.env.MAICRO_MOCK === "1") {
+  if (process.env.VIDALO_MOCK === "1") {
     console.log(JSON.stringify({ msg: "indexnow.mock", urls }));
     return { skipped: true, urls };
   }

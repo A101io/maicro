@@ -1,9 +1,9 @@
 "use client";
 
 import { useState } from "react";
-import type { Facts, Hours, PriceItem } from "@maicro/core/types";
-import { SECTOR_LIST } from "@maicro/core/prompts";
-import { copyFor, type CopyShape, type Lang } from "@maicro/core/copy";
+import type { Facts, Hours, PriceItem } from "@vidalo/core/types";
+import { SECTOR_LIST } from "@vidalo/core/prompts";
+import { copyFor, type CopyShape, type Lang } from "@vidalo/core/copy";
 import { saveFacts } from "./actions";
 
 type FactsCopy = CopyShape["facts"];

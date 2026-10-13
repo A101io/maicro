@@ -76,7 +76,7 @@ export function safeWebUrl(raw: string | null | undefined): string | null {
 }
 
 export function defaultFactsHost(business: Pick<Business, "slug">): string {
-  const suffix = process.env.FACTS_HOST_SUFFIX || "maicro.nl";
+  const suffix = process.env.FACTS_HOST_SUFFIX || "vidalo.nl";
   return `${business.slug}.feiten.${suffix}`;
 }
 

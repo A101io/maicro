@@ -1,0 +1,35 @@
+// The web app as a Cloudflare Worker (OpenNext). Deployed only by
+// .github/workflows/deploy.yml, by hand (workflow_dispatch). Never connect
+// Cloudflare "Workers Builds": it deploys on every push.
+//
+// Secrets (DATABASE_URL, STRIPE_*, RESEND_API_KEY, ...) are set with
+// `wrangler secret put`, never here; docs/secrets-and-keys.md lists them.
+{
+  "$schema": "./node_modules/wrangler/config-schema.json",
+  "name": "vidalo-web",
+  "main": "worker.ts",
+  "compatibility_date": "2026-10-01",
+  "compatibility_flags": ["nodejs_compat", "global_fetch_strictly_public"],
+  "assets": { "directory": ".open-next/assets", "binding": "ASSETS" },
+  "observability": { "enabled": true },
+  "upload_source_maps": true,
+  // workers.dev stays on until a domain is bound: adding routes turns it off
+  // silently (Sitty lost two deploys to that), so it is written down here.
+  "workers_dev": true,
+  "vars": { "VIDALO_MOCK": "0", "PUBLIC_BASE_URL": "https://vidalo-web.julian-devriend.workers.dev" },
+  // Hyperdrive pools the Supabase connections (one handle per request,
+  // worker.ts). Create it once with the pooler URL, then put its id here:
+  //   wrangler hyperdrive create vidalo-db --connection-string="postgres://..."
+  // "hyperdrive": [{ "binding": "HYPERDRIVE", "id": "<id>" }],
+  // Free scans go to the background worker through this queue.
+  "queues": { "producers": [{ "binding": "SCAN_QUEUE", "queue": "vidalo-scans" }] },
+  "env": {
+    // Mock data, no keys, no database: the site as it looks today, on Cloudflare.
+    "preview": {
+      "name": "vidalo-web-preview",
+      "workers_dev": true,
+      "vars": { "VIDALO_MOCK": "1", "PUBLIC_BASE_URL": "https://vidalo-web-preview.julian-devriend.workers.dev" },
+      "queues": { "producers": [] }
+    }
+  }
+}

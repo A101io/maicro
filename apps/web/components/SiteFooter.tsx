@@ -1,6 +1,7 @@
 import Link from "next/link";
 import { getI18n } from "@/lib/i18n";
 import { LangSwitch } from "@/components/LangSwitch";
+import { Logo } from "@/components/Logo";
 
 /**
  * Footer. `variant="full"`: four columns + legal line (landing, result).
@@ -24,9 +25,7 @@ export async function SiteFooter({ variant = "full", note, tagline }: { variant?
       <div className="wrap flex flex-col gap-10 pb-10 pt-14">
         <div className="grid grid-cols-1 gap-8 sm:grid-cols-2 lg:grid-cols-[1.4fr_1fr_1fr_1fr]">
           <div className="flex flex-col items-start gap-2.5">
-            <span className="text-[22px] font-extrabold" style={{ letterSpacing: "-0.5px" }}>
-              {copy.nav.wordmark}
-            </span>
+            <Logo size={22} />
             <span className="max-w-[28ch] text-[14px] leading-[1.5] text-muted">{tagline ?? f.tagline}</span>
             {note ? <span className="text-[13px] text-muted">{note}</span> : <LangSwitch />}
           </div>

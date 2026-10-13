@@ -3,8 +3,8 @@
 import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
-import { copyFor, type CopyShape, type Lang } from "@maicro/core/copy";
-import { ENGINE_LABEL, type Engine } from "@maicro/core/types";
+import { copyFor, type CopyShape, type Lang } from "@vidalo/core/copy";
+import { ENGINE_LABEL, type Engine } from "@vidalo/core/types";
 import { localizeHref } from "@/lib/lang-paths";
 import type { ScanProgressStep } from "@/lib/core";
 

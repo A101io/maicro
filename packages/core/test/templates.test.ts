@@ -14,7 +14,7 @@ import { business, finding } from "./worker-fixtures";
 
 const BANNED = /\b(GEO|AEO|LLM|LLMs|prompt|prompts|credits|garantie|gegarandeerd|zichtbaarheid|ranking|optimaliseren)\b/i;
 
-const links = { dashboardUrl: "https://maicro.nl/dashboard", factsPageUrl: "https://feiten.bakkerijjansen.nl/", resultUrl: "https://maicro.nl/scan/bakkerij-jansen-haarlem" };
+const links = { dashboardUrl: "https://vidalo.nl/dashboard", factsPageUrl: "https://feiten.bakkerijjansen.nl/", resultUrl: "https://vidalo.nl/scan/bakkerij-jansen-haarlem" };
 const ctx = { business: { name: business.name, place: business.place, ownerEmail: business.ownerEmail, kvk: business.kvk }, factsPageUrl: "https://feiten.bakkerijjansen.nl/" };
 
 const notFoundFinding = { ...finding, id: "f2", verdict: "not_found" as const, wrongValue: "niet gevonden", sourceType: "none" as const, sourceUrl: null, frequency: 8 };
@@ -25,8 +25,8 @@ const instableFinding = { ...finding, id: undefined, status: undefined, firstSee
 const all: Record<string, Mail | { subject: string; text: string }> = {
   welcome: welcomeEmail({
     business,
-    cname: { host: "feiten.bakkerijjansen.nl", target: "feiten.maicro.nl" },
-    links: { ...links, confirmFactsUrl: "https://maicro.nl/dashboard/feiten", googleConnectUrl: "https://maicro.nl/dashboard/google" },
+    cname: { host: "feiten.bakkerijjansen.nl", target: "feiten.vidalo.nl" },
+    links: { ...links, confirmFactsUrl: "https://vidalo.nl/dashboard/feiten", googleConnectUrl: "https://vidalo.nl/dashboard/google" },
   }),
   baseline: baselineSummaryEmail({ business, checkedAt: "2026-10-02T03:00:00Z", totalAnswers: 100, wrongAnswers: 1, findings: [finding], engines: ["chatgpt", "gemini", "perplexity", "google_ai", "copilot"], links }),
   baselineClean: baselineSummaryEmail({ business, checkedAt: "2026-10-02T03:00:00Z", totalAnswers: 100, wrongAnswers: 0, findings: [], engines: ["chatgpt"], links }),
@@ -100,8 +100,8 @@ const all: Record<string, Mail | { subject: string; text: string }> = {
   }),
   unfixableNotFound: unfixableNoticeEmail({ business, finding: notFoundFinding, note: "AI noemt je na 60 dagen nog steeds niet. Je feitenpagina en profielen staan goed; we blijven elke maand controleren.", triedDays: 61, links }),
   reportClean: monthlyReportEmail({ business, month: "oktober 2026", checkedAt: "2026-10-07T03:00:00Z", totalAnswers: 12, wrongAnswers: 0, resolved: 0, inProgress: 0, unfixable: 0, proofCards: [], openFindings: [], engines: ["chatgpt"], links }),
-  followup7: followUpEmail({ business, wrongAnswers: 3, totalAnswers: 12, example: finding, links: { ...links, unsubscribeUrl: "https://maicro.nl/afmelden?b=b1&t=tok" }, priceSetupEur: 149, priceMonitorEur: 49 }, 7),
-  followup21: followUpEmail({ business, wrongAnswers: 3, totalAnswers: 12, example: finding, links: { ...links, unsubscribeUrl: "https://maicro.nl/afmelden?b=b1&t=tok" }, priceSetupEur: 149, priceMonitorEur: 49 }, 21),
+  followup7: followUpEmail({ business, wrongAnswers: 3, totalAnswers: 12, example: finding, links: { ...links, unsubscribeUrl: "https://vidalo.nl/afmelden?b=b1&t=tok" }, priceSetupEur: 149, priceMonitorEur: 49 }, 7),
+  followup21: followUpEmail({ business, wrongAnswers: 3, totalAnswers: 12, example: finding, links: { ...links, unsubscribeUrl: "https://vidalo.nl/afmelden?b=b1&t=tok" }, priceSetupEur: 149, priceMonitorEur: 49 }, 21),
   unfixable: unfixableNoticeEmail({ business, finding: { ...finding, sourceType: "none", sourceUrl: null }, note: "Dit antwoord komt uit het geheugen van het model, niet van een bron die wij kunnen aanpassen.", triedDays: 45, links }),
   correction: correctionRequestEmail(finding, ctx),
   correctionFollowUp: correctionFollowUpEmail(finding, ctx, "2026-10-02T10:00:00Z"),
@@ -135,7 +135,7 @@ describe("email templates", () => {
     expect(t).toMatch(/2\. Eén DNS-regel/);
     expect(t).toMatch(/3\. Log één keer in bij Google/);
     expect(t).toMatch(/4\. Wij doen de rest/);
-    expect(t).toContain("feiten.bakkerijjansen.nl  →  feiten.maicro.nl");
+    expect(t).toContain("feiten.bakkerijjansen.nl  →  feiten.vidalo.nl");
   });
 
   it("status line follows the messaging brief", () => {
@@ -190,7 +190,7 @@ describe("email templates", () => {
     expect(all.followup21!.subject).toBe('Nog steeds "10:00 tot 14:00"');
     expect(all.followup7!.text).toContain("149 euro eenmalig");
     // Commercial mail: both follow-ups carry the opt-out link.
-    for (const m of [all.followup7!, all.followup21!]) expect(m.text).toContain("Afmelden: https://maicro.nl/afmelden?b=b1&t=tok");
+    for (const m of [all.followup7!, all.followup21!]) expect(m.text).toContain("Afmelden: https://vidalo.nl/afmelden?b=b1&t=tok");
   });
 
   it("correction request carries wrong value, correct value, reference and one reason", () => {
@@ -210,6 +210,6 @@ describe("email templates", () => {
   });
 
   it("html version exists for customer mails", () => {
-    expect((all.report as Mail).html).toContain("<a href=\"https://maicro.nl/dashboard\">");
+    expect((all.report as Mail).html).toContain("<a href=\"https://vidalo.nl/dashboard\">");
   });
 });

@@ -7,11 +7,11 @@ const read = (k: string): string | undefined => {
 
 export const env = {
   get mock(): boolean {
-    return read("MAICRO_MOCK") === "1" || !read("DATABASE_URL");
+    return read("VIDALO_MOCK") === "1" || !read("DATABASE_URL");
   },
-  /** Engines answer for real (and cost money) unless MAICRO_MOCK=1, whatever the database. */
+  /** Engines answer for real (and cost money) unless VIDALO_MOCK=1, whatever the database. */
   get realEngines(): boolean {
-    return read("MAICRO_MOCK") !== "1";
+    return read("VIDALO_MOCK") !== "1";
   },
   /**
    * Free scans the whole site may start per rolling 24 hours while the engines

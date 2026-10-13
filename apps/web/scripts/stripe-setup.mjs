@@ -1,14 +1,14 @@
 /**
- * Sets up Maicro's Stripe account: the two prices, the 21% BTW tax rate and
+ * Sets up Vidalo's Stripe account: the two prices, the 21% BTW tax rate and
  * the webhook endpoint. Checks by default; changes nothing without --apply.
  *
- *   STRIPE_SECRET_KEY=sk_test_... MAICRO_STRIPE_ACCOUNT=acct_... \
- *   PUBLIC_BASE_URL=https://maicro.nl pnpm stripe:setup [--apply] [--live]
+ *   STRIPE_SECRET_KEY=sk_test_... VIDALO_STRIPE_ACCOUNT=acct_... \
+ *   PUBLIC_BASE_URL=https://vidalo.nl pnpm stripe:setup [--apply] [--live]
  *
  * Guards, because a valid key for the wrong account is silent:
- * - MAICRO_STRIPE_ACCOUNT must name the account the key belongs to, or the
+ * - VIDALO_STRIPE_ACCOUNT must name the account the key belongs to, or the
  *   script stops before reading anything else. The first run without it
- *   prints the key's account, so you can check it is Maicro's.
+ *   prints the key's account, so you can check it is Vidalo's.
  * - The accounts of A101's other products are refused outright.
  * - A live key needs --live as well as --apply.
  * - Idempotent: prices are found by lookup key, the tax rate by metadata,
@@ -24,14 +24,14 @@ const OTHER_A101_ACCOUNTS = {
   acct_1TyIM8EQK4LIWEDd: "Sonable",
 };
 const PRICES = [
-  { lookup: "maicro_setup_eur_149", product: "Maicro Goed zetten", amount: 14900, recurring: null, env: "STRIPE_PRICE_SETUP" },
-  { lookup: "maicro_monitor_eur_49", product: "Maicro Goed houden", amount: 4900, recurring: { interval: "month" }, env: "STRIPE_PRICE_MONITOR" },
+  { lookup: "vidalo_setup_eur_149", product: "Vidalo Goed zetten", amount: 14900, recurring: null, env: "STRIPE_PRICE_SETUP" },
+  { lookup: "vidalo_monitor_eur_49", product: "Vidalo Goed houden", amount: 4900, recurring: { interval: "month" }, env: "STRIPE_PRICE_MONITOR" },
 ];
 
 const args = new Set(process.argv.slice(2));
 const apply = args.has("--apply");
 const key = process.env.STRIPE_SECRET_KEY;
-const pinned = process.env.MAICRO_STRIPE_ACCOUNT;
+const pinned = process.env.VIDALO_STRIPE_ACCOUNT;
 const base = (process.env.PUBLIC_BASE_URL ?? "").replace(/\/$/, "");
 const say = (s = "") => console.log(s);
 const fail = (s) => {
@@ -59,10 +59,10 @@ async function main() {
   const account = await stripe.accounts.retrieve();
   const name = account.settings?.dashboard?.display_name ?? account.business_profile?.name ?? "(no name)";
   say(`Key belongs to ${account.id} (${name}), ${live ? "LIVE" : "test"} mode.`);
-  if (OTHER_A101_ACCOUNTS[account.id]) fail(`${account.id} is ${OTHER_A101_ACCOUNTS[account.id]}'s Stripe account, not Maicro's. Use Maicro's key.`);
-  if (!pinned) fail(`MAICRO_STRIPE_ACCOUNT is not set. If ${account.id} (${name}) is Maicro's account, set MAICRO_STRIPE_ACCOUNT=${account.id} and run again.`);
-  if (pinned !== account.id) fail(`key is for ${account.id} (${name}) but MAICRO_STRIPE_ACCOUNT is ${pinned}. Wrong key or wrong pin; nothing changed.`);
-  say(`✓ account matches MAICRO_STRIPE_ACCOUNT\n`);
+  if (OTHER_A101_ACCOUNTS[account.id]) fail(`${account.id} is ${OTHER_A101_ACCOUNTS[account.id]}'s Stripe account, not Vidalo's. Use Vidalo's key.`);
+  if (!pinned) fail(`VIDALO_STRIPE_ACCOUNT is not set. If ${account.id} (${name}) is Vidalo's account, set VIDALO_STRIPE_ACCOUNT=${account.id} and run again.`);
+  if (pinned !== account.id) fail(`key is for ${account.id} (${name}) but VIDALO_STRIPE_ACCOUNT is ${pinned}. Wrong key or wrong pin; nothing changed.`);
+  say(`✓ account matches VIDALO_STRIPE_ACCOUNT\n`);
 
   const env = {};
   let missing = 0;
@@ -72,7 +72,7 @@ async function main() {
   for (const p of PRICES) {
     let price = found.data.find((x) => x.lookup_key === p.lookup);
     if (!price && apply) {
-      const product = await stripe.products.create({ name: p.product, tax_code: "txcd_10000000", metadata: { maicro: p.lookup } });
+      const product = await stripe.products.create({ name: p.product, tax_code: "txcd_10000000", metadata: { vidalo: p.lookup } });
       price = await stripe.prices.create({
         product: product.id,
         currency: "eur",
@@ -95,9 +95,9 @@ async function main() {
 
   // 3. The 21% BTW tax rate, exclusive (prices are shown excl. btw).
   const rates = await stripe.taxRates.list({ active: true, limit: 100 });
-  let rate = rates.data.find((r) => r.metadata?.maicro === "btw21");
+  let rate = rates.data.find((r) => r.metadata?.vidalo === "btw21");
   if (!rate && apply) {
-    rate = await stripe.taxRates.create({ display_name: "BTW", description: "BTW 21% Nederland", percentage: 21, inclusive: false, country: "NL", jurisdiction: "NL", tax_type: "vat", metadata: { maicro: "btw21" } });
+    rate = await stripe.taxRates.create({ display_name: "BTW", description: "BTW 21% Nederland", percentage: 21, inclusive: false, country: "NL", jurisdiction: "NL", tax_type: "vat", metadata: { vidalo: "btw21" } });
     say(`+ created tax rate BTW 21%: ${rate.id}`);
   }
   if (rate) {
@@ -128,7 +128,7 @@ async function main() {
       }
       say(`✓ webhook ${url} → ${hook.id} (its signing secret is in the dashboard; it is shown only once, at creation)`);
     } else if (apply) {
-      hook = await stripe.webhookEndpoints.create({ url, enabled_events: events, description: "Maicro" });
+      hook = await stripe.webhookEndpoints.create({ url, enabled_events: events, description: "Vidalo" });
       say(`+ created webhook ${hook.id} for ${url}`);
       env.STRIPE_WEBHOOK_SECRET = hook.secret;
     } else {

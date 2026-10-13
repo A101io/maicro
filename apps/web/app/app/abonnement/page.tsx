@@ -1,5 +1,5 @@
 import { getI18n } from "@/lib/i18n";
-import { isVerifiedOwner } from "@maicro/core/shared";
+import { isVerifiedOwner } from "@vidalo/core/shared";
 import { Stip } from "@/components/Stip";
 import { requireOwner } from "@/lib/owner";
 import { ready } from "@/lib/db";

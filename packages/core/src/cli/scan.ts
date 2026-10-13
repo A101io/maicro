@@ -8,7 +8,7 @@
  * The CSV has one "name,place" per line (header optional). For every business a
  * JSON report and a Dutch markdown summary are written to out/scans/.
  *
- * MAICRO_MOCK=1 runs everything offline with deterministic synthetic answers.
+ * VIDALO_MOCK=1 runs everything offline with deterministic synthetic answers.
  */
 import { mkdir, readFile, writeFile } from "node:fs/promises";
 import path from "node:path";
@@ -89,7 +89,7 @@ function printUsage(): void {
   pnpm scan --name "Bakkerij De Vries" --place Haarlem [--kind free|baseline|monthly] [--engines chatgpt,gemini] [--samples 3] [--json out.json]
   pnpm scan --list businesses.csv [--kind free] [--out out/scans]
 
-Zet MAICRO_MOCK=1 om zonder API-sleutels te draaien.`);
+Zet VIDALO_MOCK=1 om zonder API-sleutels te draaien.`);
 }
 
 const SOURCE_LABEL: Record<Finding["sourceType"], string> = {
@@ -250,7 +250,7 @@ async function readList(file: string): Promise<{ name: string; place: string }[]
 
 async function main(): Promise<void> {
   const args = parseArgs(process.argv.slice(2));
-  if (process.env.MAICRO_MOCK === "1") console.log("(mock-modus: synthetische antwoorden, geen API-aanroepen)\n");
+  if (process.env.VIDALO_MOCK === "1") console.log("(mock-modus: synthetische antwoorden, geen API-aanroepen)\n");
 
   if (args.list) {
     const rows = await readList(args.list);

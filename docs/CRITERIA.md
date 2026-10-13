@@ -1,4 +1,4 @@
-# Maicro scancriteria en sectoren
+# Vidalo scancriteria en sectoren
 
 
 De scan beoordeelt per vraag of een AI-antwoord over een bedrijf klopt, niet klopt of ontbreekt, op twaalf feitcategorieën die een klant tot kopen of afhaken brengen. Elk criterium is gekozen omdat het aantoonbaar vaak fout gaat, verifieerbaar is tegen de eigen opgave van de ondernemer, en herstelbaar bij de bron. Per sector verschilt welke feiten doorslaggevend zijn; daarom krijgt elke sector een eigen vragenset.

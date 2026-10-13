@@ -4,10 +4,10 @@
  * the hero numbers. Three states by colour: red/orange, green, grey.
  * Never a score: only counts.
  */
-import type { Engine, Finding, ScanReport, Severity, Stip } from "@maicro/core/types";
-import { ENGINE_LABEL } from "@maicro/core/types";
-import type { CopyShape } from "@maicro/core/copy";
-import { findingSeverity } from "@maicro/core/scanner";
+import type { Engine, Finding, ScanReport, Severity, Stip } from "@vidalo/core/types";
+import { ENGINE_LABEL } from "@vidalo/core/types";
+import type { CopyShape } from "@vidalo/core/copy";
+import { findingSeverity } from "@vidalo/core/scanner";
 import type { ReportRowData } from "@/components/ReportRow";
 import type { SourceStatusTone } from "@/components/SourceRow";
 import { questionFor, recommendationQuestionFor, wrongText, correctText } from "./questions";

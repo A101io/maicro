@@ -4,8 +4,8 @@ import { transitionStatus } from "@/lib/core";
 import { env } from "@/lib/env";
 import { getStripe } from "@/lib/stripe";
 import { getSession, getOwnedBusiness } from "@/lib/session";
-import { isVerifiedOwner } from "@maicro/core/shared";
-import { copyFor, PRICES } from "@maicro/core/copy";
+import { isVerifiedOwner } from "@vidalo/core/shared";
+import { copyFor, PRICES } from "@vidalo/core/copy";
 import { localizeHref } from "@/lib/lang-paths";
 import { langFromReferer } from "@/lib/request-lang";
 

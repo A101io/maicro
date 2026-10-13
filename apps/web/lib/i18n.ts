@@ -1,12 +1,12 @@
 import { headers } from "next/headers";
-import { copyFor } from "@maicro/core/copy";
+import { copyFor } from "@vidalo/core/copy";
 import { DEFAULT_LANG, LANGS, localizeHref, type Lang } from "./lang-paths";
 
 export { localizeHref, type Lang };
 
 /** The language this request renders in (set by middleware.ts). */
 export async function getLang(): Promise<Lang> {
-  const h = (await headers()).get("x-maicro-lang");
+  const h = (await headers()).get("x-vidalo-lang");
   return (LANGS as readonly string[]).includes(h ?? "") ? (h as Lang) : DEFAULT_LANG;
 }
 
@@ -23,5 +23,5 @@ export async function getI18n() {
 
 /** The Dutch route of this request, for hreflang and the language switch. */
 export async function getRoute(): Promise<string> {
-  return (await headers()).get("x-maicro-route") ?? "/";
+  return (await headers()).get("x-vidalo-route") ?? "/";
 }

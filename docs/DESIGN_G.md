@@ -28,9 +28,9 @@ Open them in a browser (they are self-contained HTML; ignore the `support.js`/`x
 --blue      #2563EB   (one accent: primary button, links on hover)
 ```
 
-Font: **Manrope** 400/500/600/800 via Google Fonts (`next/font/google`). Base 17px / line-height 1.5. Headings 800 weight, tight tracking: h1 56–64px (`letter-spacing:-2px`, lh 1.02), h2 34–40px (`-1px`, lh 1.1), card titles 20px 700. Max content width 1168px, side padding 40px desktop / 16px mobile. Radii: cards 18px, panels 24px, buttons/inputs 12px, pills 999px.
+Font: **Plus Jakarta Sans** 400/500/600/700/800 via Google Fonts (`next/font/google`; replaced Manrope in Oct 2026 to match the Vidalo logo). Base 17px / line-height 1.5. Headings 800 weight, tight tracking: h1 56–64px (`letter-spacing:-2px`, lh 1.02), h2 34–40px (`-1px`, lh 1.1), card titles 20px 700. Max content width 1168px, side padding 40px desktop / 16px mobile. Radii: cards 18px, panels 24px, buttons/inputs 12px, pills 999px.
 
-**Warm pass (Oct 2026, option 1, chosen by Julian: "te klinisch en saai").** The grey and white page became warmer: `--line #E7E3DC`, `--panel #F4F1EC`, `--panel-2 #FBF8F3`, and three section grounds `--cream #FBF6EE`, `--sky #EEF4FF`, `--mint #EDF7F1` (classes `ground-cream|sky|mint|warm` in `globals.css`). The hero has a soft three-colour glow (`.hero-glow`), the dark sections are deep blue `#0F172A` with blue and green light, the hero's key words sit under a yellow marker (`--sun`, `copy.landing.hero.h1Mark`), cards are rounder (22px, panels 28px) with a soft shadow. These override the "no gradients, no shadows" rule below; the rest still holds. Looping scenes (`components/viz`) explain each step and are styled in `app/scenes.css`.
+**Warm pass (Oct 2026, option 1, chosen by Julian: "te klinisch en saai").** The grey and white page became warmer: `--line #E7E3DC`, `--panel #F4F1EC`, `--panel-2 #FBF8F3`, and three section grounds `--cream #FBF6EE`, `--sky #EEF4FF`, `--mint #EDF7F1` (classes `ground-cream|sky|mint|warm` in `globals.css`). The hero has a soft three-colour glow (`.hero-glow`), the dark sections are deep blue `#0F172A` with blue and green light, cards are rounder (22px, panels 28px) with a soft shadow. These override the "no gradients, no shadows" rule below; the rest still holds. Looping scenes (`components/viz`) explain each step and are styled in `app/scenes.css`.
 
 Rules kept from the brief: one primary (blue) button per view; no gradients, no shadows except a soft one on the floating result card; no dark mode; no emoji; no exclamation marks; status colours only in dots, pills and report rows, never as section backgrounds.
 
@@ -44,7 +44,7 @@ Rules kept from the brief: one primary (blue) button per view; no gradients, no 
 - **CriteriumCard** (3 cards: afhakers / misleiders / verwarring) + colour legend.
 - **SectorCard** (11): sector name, one-line "doorslaggevend feit", link to `/vak/[slug]`.
 - **PriceBlock**: two plans, "Excl. btw · geen opzegtermijn".
-- **Footer**: `A101 B.V. (handelend als Maicro) · Factorij 80, 3071 AV Rotterdam · KvK 42057858 · Prijzen excl. btw`. No btw-nummer.
+- **Footer**: `A101 B.V. (handelend als Vidalo) · Factorij 80, 3071 AV Rotterdam · KvK 42057858 · Prijzen excl. btw`. No btw-nummer.
 
 ## Landing (`/`) — section order, anchors
 
@@ -53,7 +53,7 @@ Rules kept from the brief: one primary (blue) button per view; no gradients, no 
 3. `#leest` Zo leest AI over je bedrijf — the agent explainer for laypeople (how an assistant assembles an answer from sources; grey "AI kent je niet" case).
 4. Snippers — "Het antwoord is uit snippers gebouwd. De helft klopt niet." (sources with numbers from Insites 10k audit).
 5. Geen loket — "Je kunt het antwoord niet aanpassen. Wel de bronnen."
-6. `#werkt` Zo werkt Maicro — controleren, vinden, herstellen, bewijzen.
+6. `#werkt` Zo werkt Vidalo — controleren, vinden, herstellen, bewijzen.
 7. `#criteria` Twaalf feiten die een klant laten komen, of afhaken — 3 CriteriumCards + legend (from `docs/CRITERIA.md`).
 8. `#vak` Per vak andere vragen, andere fouten — 11 SectorCards → `/vak/[slug]`.
 9. `#rapport` Zo ziet je rapport eruit — sample report incl. grey row.
@@ -64,7 +64,7 @@ Rules kept from the brief: one primary (blue) button per view; no gradients, no 
 14. Slot — "Welke kleur heeft jouw stip?" + ScanField.
 15. Footer.
 
-Nav: maicro wordmark · Zo werkt het (#werkt) · Criteria (#criteria) · Per vak (#vak) · Prijs (#prijs) · Vragen (#vragen) · Inloggen.
+Nav: Vidalo logo (`components/Logo.tsx`: the mark, a blue dot with one corner at the bottom left rounded at 10 %, plus the wordmark "vidalo") · Zo werkt het (#werkt) · Criteria (#criteria) · Per vak (#vak) · Prijs (#prijs) · Vragen (#vragen) · Inloggen.
 
 ## Result (`/r/[id]`)
 
@@ -82,4 +82,4 @@ Not designed yet in G; follow the earlier mobile boards' structure (stack everyt
 
 - Landing, result (3 states), 11 sector pages, dashboard shell all in G.
 - Playwright screenshots at 1280 and 390 for `/`, `/r/[demo]` (red + grey), `/vak/loodgieters-installateurs` stored in `out/screenshots/`.
-- `pnpm -r typecheck && pnpm -r test && MAICRO_MOCK=1 pnpm e2e:mock && pnpm --filter web build` green.
+- `pnpm -r typecheck && pnpm -r test && VIDALO_MOCK=1 pnpm e2e:mock && pnpm --filter web build` green.

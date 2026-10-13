@@ -10,7 +10,7 @@ jobs:
   check:
     runs-on: ubuntu-latest
     env:
-      MAICRO_MOCK: "1"
+      VIDALO_MOCK: "1"
     steps:
       - uses: actions/checkout@v4
       - uses: pnpm/action-setup@v4
@@ -46,3 +46,25 @@ jobs:
           sudo -u postgres psql -c "alter user postgres password 'postgres'"
       - run: pnpm install --frozen-lockfile
       - run: pnpm verify:pg
+
+  cloudflare:
+    # The Cloudflare build (OpenNext) and both Worker bundles, without
+    # deploying: a change that breaks them should fail here, not at deploy.
+    runs-on: ubuntu-latest
+    env:
+      VIDALO_MOCK: "1"
+      PUBLIC_BASE_URL: https://vidalo-web-preview.julian-devriend.workers.dev
+    steps:
+      - uses: actions/checkout@v4
+      - uses: pnpm/action-setup@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: pnpm
+      - run: pnpm install --frozen-lockfile
+      - run: pnpm cf:build
+        working-directory: apps/web
+      - run: pnpm exec wrangler deploy --dry-run --env preview --outdir ../../out/cf-web
+        working-directory: apps/web
+      - run: ../web/node_modules/.bin/wrangler deploy --dry-run --outdir ../../out/cf-worker
+        working-directory: apps/worker

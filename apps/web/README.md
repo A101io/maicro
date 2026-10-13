@@ -1,16 +1,16 @@
-# @maicro/web
+# @vidalo/web
 
-Next.js 15 (app router) front-end for Maicro: landing page, free scan, result
+Next.js 15 (app router) front-end for Vidalo: landing page, free scan, result
 page, Stripe checkout, magic-link login and the owner dashboard.
 
 ## Run
 
 ```sh
 pnpm install                                  # at the repo root
-MAICRO_MOCK=1 pnpm --filter @maicro/web dev   # http://localhost:3000
+VIDALO_MOCK=1 pnpm --filter @vidalo/web dev   # http://localhost:3000
 ```
 
-With `MAICRO_MOCK=1` (or no `DATABASE_URL`) the app runs fully offline on
+With `VIDALO_MOCK=1` (or no `DATABASE_URL`) the app runs fully offline on
 core's own mock mode (`MemDb` + deterministic mock engines):
 
 - a demo owner business is seeded on first request (login
@@ -32,8 +32,8 @@ hero field.
 ## Checks
 
 ```sh
-pnpm --filter @maicro/web typecheck
-MAICRO_MOCK=1 pnpm --filter @maicro/web build
+pnpm --filter @vidalo/web typecheck
+VIDALO_MOCK=1 pnpm --filter @vidalo/web build
 ```
 
 Both pass without any API keys. Every external SDK (Stripe, Supabase,

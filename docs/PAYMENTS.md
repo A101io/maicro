@@ -34,14 +34,14 @@ late payer resumes instead of churning.
 
 ## Setting it up
 
-1. A Stripe account that is Maicro's (not Sitty's `acct_1UA8rHEGTq7D30VV`,
+1. A Stripe account that is Vidalo's (not Sitty's `acct_1UA8rHEGTq7D30VV`,
    not Sonable's `acct_1TyIM8EQK4LIWEDd`; the script refuses both).
 2. Test mode first:
    ```bash
    STRIPE_SECRET_KEY=sk_test_... PUBLIC_BASE_URL=https://<site> pnpm stripe:setup
    ```
-   The first run prints the key's account and stops. If it is Maicro's, add
-   `MAICRO_STRIPE_ACCOUNT=acct_...` and run again to see what is missing;
+   The first run prints the key's account and stops. If it is Vidalo's, add
+   `VIDALO_STRIPE_ACCOUNT=acct_...` and run again to see what is missing;
    add `--apply` to create it. It prints the env lines for the web app:
    `STRIPE_PRICE_SETUP`, `STRIPE_PRICE_MONITOR`, `STRIPE_TAX_RATE_ID`,
    `STRIPE_WEBHOOK_SECRET` (shown once, at creation).
@@ -56,4 +56,4 @@ late payer resumes instead of churning.
 Checked: the billing rules (10 tests, with a control that fails if an
 unpaid SEPA checkout starts the service); every page in mock mode.
 Not checked: a real Stripe Checkout, webhook delivery and the portal. This
-container cannot reach Stripe, and there is no Maicro key yet.
+container cannot reach Stripe, and there is no Vidalo key yet.

@@ -3,7 +3,7 @@ import { fromUrl } from "./lang-paths";
 
 /**
  * The language of the page a form was posted from. API routes sit outside the
- * middleware (no x-maicro-lang), so they read it off the Referer: a POST from
+ * middleware (no x-vidalo-lang), so they read it off the Referer: a POST from
  * /en/... answers and redirects in English. No or foreign Referer: Dutch.
  */
 export function langFromReferer(req: Request): Lang {

@@ -15,7 +15,6 @@
   --cream: #fbf6ee;
   --sky: #eef4ff;
   --mint: #edf7f1;
-  --sun: #fde68a;
   --red: #e11d48;
   --red-bg: #fdecea;
   --green: #2f855a;
@@ -31,7 +30,7 @@
   html {
     background: var(--bg);
     color: var(--ink);
-    font-family: var(--font-manrope), Manrope, system-ui, sans-serif;
+    font-family: var(--font-jakarta), "Plus Jakarta Sans", system-ui, sans-serif;
     font-size: 17px;
     line-height: 1.5;
     -webkit-font-smoothing: antialiased;
@@ -286,7 +285,7 @@ a.pill:hover { background: var(--panel); }
 /* ------------------------------------------------------------------------
  * Hero visual (components/HeroViz.tsx): one 12s loop, CSS for the boxes and
  * SVG/SMIL for the lines and particles. Percentages below are moments in the
- * loop: 6% question, 10–22% thinking, 24% wrong answer, 42–52% Maicro draws
+ * loop: 6% question, 10–22% thinking, 24% wrong answer, 42–52% Vidalo draws
  * its line, 55% the source is fixed, 64% the right answer, 94% fade, repeat.
  * --------------------------------------------------------------------- */
 .viz {
@@ -346,7 +345,7 @@ a.pill:hover { background: var(--panel); }
 .viz-typing i { width: 0.45em; height: 0.45em; border-radius: 9999px; background: var(--grey); }
 .viz-wrong { color: var(--red); }
 .viz-right { color: var(--green-ink); }
-.viz-maicro {
+.viz-vidalo {
   display: flex;
   align-items: center;
   gap: 0.75em;
@@ -356,7 +355,7 @@ a.pill:hover { background: var(--panel); }
   border-radius: 9999px;
   font-size: 0.92em;
 }
-.viz-maicro-mark { font-weight: 800; letter-spacing: -0.02em; color: var(--blue); }
+.viz-vidalo-mark { font-weight: 800; letter-spacing: -0.02em; color: var(--blue); }
 .viz-swap-3 > * { color: var(--ink); font-size: 1em; opacity: 0; }
 .viz-swap-3 > :last-child { opacity: 1; }
 .viz-repair { stroke-dasharray: none; }
@@ -384,7 +383,7 @@ a.pill:hover { background: var(--panel); }
   .viz-swap-3 > :nth-child(1) { animation: viz-m1 12s linear infinite; }
   .viz-swap-3 > :nth-child(2) { animation: viz-m2 12s linear infinite; }
   .viz-swap-3 > :nth-child(3) { animation: viz-m3 12s linear infinite; }
-  .viz-maicro { animation: viz-maicro 12s linear infinite; }
+  .viz-vidalo { animation: viz-vidalo 12s linear infinite; }
 
   @keyframes viz-cycle { 0% { opacity: 0; } 3% { opacity: 1; } 95% { opacity: 1; } 100% { opacity: 0; } }
   @keyframes viz-q { 0%, 1% { opacity: 0; translate: 0 10px; } 7%, 100% { opacity: 1; translate: none; } }
@@ -411,7 +410,7 @@ a.pill:hover { background: var(--panel); }
   @keyframes viz-m1 { 0%, 40% { opacity: 1; } 42%, 100% { opacity: 0; } }
   @keyframes viz-m2 { 0%, 41% { opacity: 0; } 43%, 57% { opacity: 1; } 59%, 100% { opacity: 0; } }
   @keyframes viz-m3 { 0%, 58% { opacity: 0; } 60%, 100% { opacity: 1; } }
-  @keyframes viz-maicro {
+  @keyframes viz-vidalo {
     0%, 40% { box-shadow: 0 0 0 0 rgb(37 99 235 / 0); }
     43% { box-shadow: 0 0 0 0 rgb(37 99 235 / 0.4); }
     52%, 100% { box-shadow: 0 0 0 0.8em rgb(37 99 235 / 0); }
@@ -424,7 +423,7 @@ a.pill:hover { background: var(--panel); }
 
 /* ------------------------------------------------------------------------
  * Warm pass (option 1, Oct 2026): tinted grounds, a glow behind the hero,
- * deep-blue dark sections, a marker under the hero's key words and cards
+ * deep-blue dark sections, and cards
  * that sit on their ground with a soft shadow.
  * --------------------------------------------------------------------- */
 .ground-cream { background: var(--cream); }
@@ -454,12 +453,6 @@ a.pill:hover { background: var(--panel); }
     radial-gradient(45% 60% at 85% 0%, rgb(37 99 235 / 0.35), transparent 70%),
     radial-gradient(40% 50% at 0% 100%, rgb(47 133 90 / 0.18), transparent 70%),
     #0f172a !important;
-}
-.marker {
-  background: linear-gradient(transparent 62%, var(--sun) 62%, var(--sun) 92%, transparent 92%);
-  padding: 0 0.06em;
-  -webkit-box-decoration-break: clone;
-  box-decoration-break: clone;
 }
 .card, .card-sm { box-shadow: 0 1px 2px rgb(17 24 39 / 0.04), 0 12px 32px -26px rgb(17 24 39 / 0.35); }
 /* The hero glow bleeds past the page edge on purpose; it must not widen the page. */

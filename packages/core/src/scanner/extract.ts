@@ -5,7 +5,7 @@
  *
  * Two strategies:
  *  - LLM (OpenAI chat completion, model EXTRACTION_MODEL, strict JSON schema
- *    validated with zod) when an OPENAI_API_KEY exists and MAICRO_MOCK != 1.
+ *    validated with zod) when an OPENAI_API_KEY exists and VIDALO_MOCK != 1.
  *  - Rules (regexes for phone numbers, "gesloten"/"open", time ranges, ja/nee)
  *    in mock mode, so the pipeline works offline. Also the fallback when the
  *    LLM call fails.
@@ -92,7 +92,7 @@ export function extractRecommendation(answerText: string, facts: Facts, prompt: 
 
 /** Pick the extraction mode from the environment. */
 export function defaultExtractMode(): ExtractMode {
-  if (process.env.MAICRO_MOCK === "1") return "rules";
+  if (process.env.VIDALO_MOCK === "1") return "rules";
   return process.env.OPENAI_API_KEY ? "llm" : "rules";
 }
 

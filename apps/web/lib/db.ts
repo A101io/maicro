@@ -12,4 +12,4 @@ export function serviceDb(): Db {
 
 export { getDb, ready };
 export type { Db };
-export type { BusinessRecord } from "@maicro/core/db";
+export type { BusinessRecord } from "@vidalo/core/db";

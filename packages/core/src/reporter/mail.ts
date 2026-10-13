@@ -1,5 +1,5 @@
 /**
- * sendMail: Resend when RESEND_API_KEY is set and MAICRO_MOCK != 1;
+ * sendMail: Resend when RESEND_API_KEY is set and VIDALO_MOCK != 1;
  * otherwise an .eml file in out/mail/ plus a log line.
  */
 import { mkdir, writeFile } from "node:fs/promises";
@@ -25,11 +25,11 @@ export interface MailResult {
 }
 
 export function defaultFrom(): string {
-  return process.env.EMAIL_FROM || "Maicro <controle@maicro.nl>";
+  return process.env.EMAIL_FROM || "Vidalo <controle@vidalo.nl>";
 }
 
 function useResend(): boolean {
-  return Boolean(process.env.RESEND_API_KEY) && process.env.MAICRO_MOCK !== "1";
+  return Boolean(process.env.RESEND_API_KEY) && process.env.VIDALO_MOCK !== "1";
 }
 
 function safeName(s: string): string {
@@ -45,12 +45,12 @@ export function toEml(input: MailInput, id: string): string {
     input.replyTo ? `Reply-To: ${input.replyTo}` : null,
     `Subject: ${input.subject}`,
     `Date: ${date}`,
-    `Message-ID: <${id}@maicro.nl>`,
+    `Message-ID: <${id}@vidalo.nl>`,
     "MIME-Version: 1.0",
     ...Object.entries(input.headers ?? {}).map(([k, v]) => `${k}: ${v}`),
   ].filter(Boolean);
   if (input.html) {
-    const boundary = `----maicro-${id}`;
+    const boundary = `----vidalo-${id}`;
     return [
       ...headers,
       `Content-Type: multipart/alternative; boundary="${boundary}"`,
@@ -96,7 +96,7 @@ export async function sendMail(input: MailInput): Promise<MailResult> {
   }
 
   const id = `${Date.now()}-${Math.random().toString(36).slice(2, 8)}`;
-  const dir = path.resolve(process.env.MAICRO_OUT_DIR ?? "out", "mail");
+  const dir = path.resolve(process.env.VIDALO_OUT_DIR ?? "out", "mail");
   await mkdir(dir, { recursive: true });
   const file = path.join(dir, `${new Date().toISOString().replace(/[:.]/g, "-")}-${safeName(input.subject)}.eml`);
   await writeFile(file, toEml(input, id), "utf8");

@@ -193,7 +193,7 @@ export interface WelcomeData {
 }
 
 export function welcomeEmail(d: WelcomeData): Mail {
-  const subject = `Welkom bij Maicro: 4 stappen voor ${d.business.name}`;
+  const subject = `Welkom bij Vidalo: 4 stappen voor ${d.business.name}`;
   const dns = d.cname
     ? `2. Eén DNS-regel
    Maak bij je domeinbeheerder een CNAME aan:
@@ -223,7 +223,7 @@ Je overzicht: ${d.links.dashboardUrl}
 Vragen? Antwoord op deze mail.
 
 Groet,
-Maicro
+Vidalo
 `;
   return mail(subject, text);
 }
@@ -281,7 +281,7 @@ Elke fout controleren we opnieuw zodra de bron is aangepast. Je hoort van ons al
 Je overzicht: ${d.links.dashboardUrl}
 
 Groet,
-Maicro
+Vidalo
 `;
   return mail(subject, text);
 }
@@ -320,7 +320,7 @@ We blijven dit antwoord elke maand controleren.
 Je overzicht: ${d.links.dashboardUrl}
 
 Groet,
-Maicro
+Vidalo
 `;
   return mail(subject, text);
 }
@@ -396,7 +396,7 @@ ${stip ? `\n${stip}\n` : ""}${nf ? `\n${nf}\n` : ""}${proofs ? `\nHersteld deze 
 Alle antwoorden, met datum en bron: ${d.links.dashboardUrl}
 
 Groet,
-Maicro
+Vidalo
 `;
   return mail(subject, text);
 }
@@ -434,7 +434,7 @@ Het volledige resultaat, met de bron van elke fout: ${d.links.resultUrl}
 Zelf oplossen kan: de bronnen staan erbij. Liever dat wij het doen? Instellen kost ${d.priceSetupEur} euro eenmalig, bewaking ${d.priceMonitorEur} euro per maand, maandelijks opzegbaar. Prijzen excl. btw.
 
 Groet,
-Maicro
+Vidalo
 
 Geen mails meer hierover? Afmelden: ${d.links.unsubscribeUrl}
 `;
@@ -450,7 +450,7 @@ Resultaat: ${d.links.resultUrl}
 Dit is de laatste mail hierover. Wil je dat wij de bronnen herstellen, dan regel je dat via de link. Zo niet, dan laten we je met rust.
 
 Groet,
-Maicro
+Vidalo
 
 Geen mails meer hierover? Afmelden: ${d.links.unsubscribeUrl}
 `;
@@ -493,7 +493,7 @@ Wat nu: we laten dit antwoord in je overzicht staan en controleren het elke maan
 Je overzicht: ${d.links.dashboardUrl}
 
 Groet,
-Maicro
+Vidalo
 `;
   return mail(subject, text);
 }

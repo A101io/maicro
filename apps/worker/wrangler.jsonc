@@ -1,0 +1,26 @@
+// The background worker as a Cloudflare Worker (src/cloudflare.ts): jobs,
+// the cron tick, free scans from the website, and customers' facts pages.
+// Deployed only by .github/workflows/deploy.yml, by hand. Never connect
+// Cloudflare "Workers Builds". Secrets via `wrangler secret put`; the list is
+// in docs/secrets-and-keys.md.
+{
+  "$schema": "../web/node_modules/wrangler/config-schema.json",
+  "name": "vidalo-worker",
+  "main": "src/cloudflare.ts",
+  "compatibility_date": "2026-10-01",
+  "compatibility_flags": ["nodejs_compat"],
+  "observability": { "enabled": true },
+  "workers_dev": true,
+  "vars": { "VIDALO_MOCK": "0", "FACTS_HOST_SUFFIX": "vidalo.nl" },
+  "triggers": {
+    // Every minute: run queued jobs. Every ten minutes: the cron tick
+    // (monthly scans, rechecks, host polls, follow-ups). src/cloudflare.ts
+    // tells them apart by the expression.
+    "crons": ["* * * * *", "*/10 * * * *"]
+  },
+  "queues": {
+    "consumers": [{ "queue": "vidalo-scans", "max_batch_size": 1, "max_retries": 2 }]
+  }
+  // Same Hyperdrive as apps/web/wrangler.jsonc, once it exists:
+  // "hyperdrive": [{ "binding": "HYPERDRIVE", "id": "<id>" }]
+}

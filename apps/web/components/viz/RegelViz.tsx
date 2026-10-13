@@ -1,9 +1,9 @@
 import { getI18n } from "@/lib/i18n";
-import { Chip, Maicro, Scene, Tick, type Tone } from "./Scene";
+import { Chip, Vidalo, Scene, Tick, type Tone } from "./Scene";
 
 /**
  * An AI assistant orders for a customer and skips the business a stale
- * directory calls closed (16s). Then Maicro fixes the directory and the same
+ * directory calls closed (16s). Then Vidalo fixes the directory and the same
  * order goes to that business.
  */
 export async function RegelViz() {
@@ -78,7 +78,7 @@ export async function RegelViz() {
               <span className="sc-meta">{S.item}</span>
               <span className="sc-bad">{S.lost}</span>
             </div>
-            <Maicro text={S.maicro} data-show="0.55-0.72" data-pulse="0.56" />
+            <Vidalo text={S.vidalo} data-show="0.55-0.72" data-pulse="0.56" />
             <div className="sc-card sc-receipt is-good" data-show="0.78">
               <span className="sc-card-head">{S.receipt}</span>
               <strong>{S.you.name}</strong>

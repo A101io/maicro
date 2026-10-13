@@ -78,9 +78,9 @@ describe("renderFactsPage", () => {
     expect(p.html).not.toContain("A <b> & C");
   });
 
-  it("falls back to the maicro host when none is given", () => {
+  it("falls back to the vidalo host when none is given", () => {
     const p = renderFactsPage(facts, business);
-    expect(p.canonicalUrl).toBe("https://bakkerij-jansen-haarlem.feiten.maicro.nl/");
+    expect(p.canonicalUrl).toBe("https://bakkerij-jansen-haarlem.feiten.vidalo.nl/");
   });
 
   it("formats Dutch dates", () => {

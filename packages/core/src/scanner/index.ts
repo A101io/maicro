@@ -4,11 +4,12 @@
  *
  *   const report = await runScan({ businessId, kind: "free" });
  *
- * Mock mode (MAICRO_MOCK=1 or no keys) runs the whole pipeline offline with
+ * Mock mode (VIDALO_MOCK=1 or no keys) runs the whole pipeline offline with
  * deterministic synthetic answers.
  */
 import { ENGINES, visibilityFor, type Engine, type Facts, type Finding, type InstableFinding, type Prompt, type ScanKind, type ScanReport, type Sample, type SectorSlug } from "../types";
-import { db as defaultDb, type Db, type FindingInput } from "../db";
+import { type Db, type FindingInput } from "../db";
+import { getDb } from "../shared/db.js";
 import { generatePrompts, selectFreeScanPrompts } from "../prompts";
 import { attributeAll, type AttributionContext } from "./attribute";
 import { compare, groupKey, type ComparableSample, type CompareResult } from "./compare";
@@ -28,6 +29,7 @@ export type { EngineClient, AskContext, EngineAnswer } from "./engines";
 export * from "./resolve";
 export * from "./onboard";
 export * from "./stip";
+export * from "./progress";
 
 /** Defaults per scan kind (ARCHITECTURE.md workflows A and C). */
 export const SCAN_DEFAULTS: Record<ScanKind, { engines: Engine[]; samplesPerPrompt: number }> = {
@@ -47,7 +49,7 @@ export interface RunScanOptions {
   promptIds?: string[];
   /** Engine clients to use instead of the registry (tests, worker-injected adapters). */
   clients?: EngineClient[];
-  /** Parallel engine calls (default MAICRO_CONCURRENCY or 4). */
+  /** Parallel engine calls (default VIDALO_CONCURRENCY or 4). */
   concurrency?: number;
   db?: Db;
   /** Progress callback: which prompt is being asked (result page shows this). */
@@ -126,7 +128,7 @@ async function sampleAll(
 }
 
 function attributionContext(business: { domain: string | null; slug: string; name: string; factsHost?: string | null }, facts: Facts): AttributionContext {
-  const suffix = process.env.FACTS_HOST_SUFFIX ?? "maicro.nl";
+  const suffix = process.env.FACTS_HOST_SUFFIX ?? "vidalo.nl";
   return {
     business,
     factsHost: business.factsHost ?? `${business.slug}.feiten.${suffix}`,
@@ -154,11 +156,11 @@ function engineStats(engines: Engine[], samples: Pick<Sample, "id" | "engine">[]
 
 /** Run a scan end-to-end and persist everything. */
 export async function runScan(opts: RunScanOptions): Promise<ScanReport> {
-  const db = opts.db ?? defaultDb;
+  const db = opts.db ?? getDb();
   const defaults = SCAN_DEFAULTS[opts.kind];
   const engines = opts.engines?.length ? opts.engines : defaults.engines;
-  const samplesPerPrompt = opts.samplesPerPrompt ?? Number(process.env.MAICRO_SAMPLES ?? defaults.samplesPerPrompt);
-  const concurrency = opts.concurrency ?? Number(process.env.MAICRO_CONCURRENCY ?? 4);
+  const samplesPerPrompt = opts.samplesPerPrompt ?? Number(process.env.VIDALO_SAMPLES ?? defaults.samplesPerPrompt);
+  const concurrency = opts.concurrency ?? Number(process.env.VIDALO_CONCURRENCY ?? 4);
 
   const business = await db.getBusiness(opts.businessId);
   if (!business) throw new Error(`business ${opts.businessId} not found`);
@@ -316,7 +318,7 @@ function assembleReport(args: {
 
 /** Rebuild the ScanReport for a stored scan run (result page, emails). */
 export async function buildReport(scanRunId: string, dbOverride?: Db): Promise<ScanReport> {
-  const db = dbOverride ?? defaultDb;
+  const db = dbOverride ?? getDb();
   const scanRun = await db.getScanRun(scanRunId);
   if (!scanRun) throw new Error(`scan_run ${scanRunId} not found`);
   const business = await db.getBusiness(scanRun.businessId);

@@ -1,4 +1,4 @@
-import type { Job } from "@maicro/core/db";
+import type { Job } from "@vidalo/core/db";
 import { email, fixes, followup, operatorTask, publish, recheck, report, sync } from "./misc.js";
 import { scan } from "./scan.js";
 import { setup } from "./setup.js";

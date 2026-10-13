@@ -1,5 +1,5 @@
 /**
- * All Dutch customer-facing copy for Maicro: web, result page, dashboard and
+ * All Dutch customer-facing copy for Vidalo: web, result page, dashboard and
  * e-mail subjects. One file so wording stays consistent with docs/MESSAGING.md.
  *
  * Rules (see docs/CONTRACT.md): informal "je", no GEO/AEO/LLM/prompt/credits/
@@ -15,7 +15,7 @@ export const PRICES = {
 } as const;
 
 export const copy = {
-  brand: "Maicro",
+  brand: "Vidalo",
   tagline: "Je klanten vragen het aan ChatGPT. Wij zorgen dat het antwoord klopt.",
   engines: {
     chatgpt: "ChatGPT",
@@ -26,7 +26,7 @@ export const copy = {
   },
 
   nav: {
-    wordmark: "maicro",
+    wordmark: "vidalo",
     how: "Zo werkt het",
     why: "Waarom",
     criteria: "Criteria",
@@ -53,8 +53,6 @@ export const copy = {
   landing: {
     hero: {
       h1: "Wat zegt AI over jouw bedrijf?",
-      /** The words under the marker in the hero heading. */
-      h1Mark: "jouw bedrijf",
       sub: "In Haarlem klopt het bij 47 van de 100 bedrijven niet, of de AI kent ze niet.",
       exampleLabel: "voorbeeld",
       caption: "100 Haarlemse bedrijven · ChatGPT, Google AI en Copilot · 7 oktober 2026",
@@ -63,7 +61,7 @@ export const copy = {
       grid: "rggrrxrggrxrrggrxrggrxrrggrxrggrxrrggrxrrggrxrggrxgrrgrxrggrrxgrgrxrgrgrxgrrgrxgrrgrxgrgrxgrgrxrggrx",
       /** The animated hero: one answer, built from four sources, put right at the source. */
       viz: {
-        label: "Zo werkt het: een AI bouwt een antwoord uit bronnen. Eén verouderde bron maakte het antwoord fout. Maicro herstelt die bron en het antwoord klopt weer.",
+        label: "Zo werkt het: een AI bouwt een antwoord uit bronnen. Eén verouderde bron maakte het antwoord fout. Vidalo herstelt die bron en het antwoord klopt weer.",
         question: "Is Bakkerij De Vries op zondag open?",
         engine: "ChatGPT",
         wrong: "Ja, zondag van 9:00 tot 17:00.",
@@ -74,7 +72,7 @@ export const copy = {
           { name: "openingstijden.nl", meta: "zondag 9–17 · uit 2022", fixed: "bijgewerkt: gesloten" },
           { name: "Krantenbericht", meta: "naamgenoot, Heemstede" },
         ],
-        maicro: ["Controleert de bronnen", "Fout gevonden: openingstijden.nl", "Bron hersteld · antwoord klopt"],
+        vidalo: ["Controleert de bronnen", "Fout gevonden: openingstijden.nl", "Bron hersteld · antwoord klopt"],
         caption: "Voorbeeld: één verouderde bron bepaalt het antwoord. Wij herstellen die bron.",
       },
     },
@@ -143,7 +141,7 @@ export const copy = {
     },
     loket: {
       h2: "Je kunt het antwoord niet aanpassen. Wel de bronnen.",
-      body: "Er is geen loket bij ChatGPT of Google dat het antwoord corrigeert. De enige weg die werkt: vind de bron waar de AI het vandaan haalde, en herstel die. Dat is precies wat Maicro doet.",
+      body: "Er is geen loket bij ChatGPT of Google dat het antwoord corrigeert. De enige weg die werkt: vind de bron waar de AI het vandaan haalde, en herstel die. Dat is precies wat Vidalo doet.",
       timeline: [
         { stip: "rood", text: "openingstijden.nl zegt: zondag 9–17", meta: "bron gevonden" },
         { stip: "oranje", text: "Correctie ingediend, bewijs bewaard", meta: "dag 1" },
@@ -152,7 +150,7 @@ export const copy = {
       ],
     },
     werkt: {
-      h2: "Zo werkt Maicro",
+      h2: "Zo werkt Vidalo",
       sub: "Jij doet vijf minuten werk bij de start. De rest loopt vanzelf, elke maand.",
       steps: [
         { n: "1", tone: "ink", title: "Vastleggen", body: "Je gegevens één keer goed: adres, telefoon, openingstijden, wat je wel en niet doet. Wij vullen vooraf in, jij bevestigt.", meta: "Jij: 5 minuten" },
@@ -253,7 +251,7 @@ export const copy = {
     },
     missie: {
       h2: "Ieder bedrijf verdient een plek in het antwoord.",
-      body: "De meeste bedrijven in Nederland zijn klein, hebben een eenvoudige website of geen, en staan in geen enkele bron die een AI leest. Niet fout, maar onzichtbaar. Een grijze stip. Maicro geeft ze een feitenpagina die AI kan lezen, zet ze in de gidsen die AI gebruikt, en controleert of ze daarna genoemd worden.",
+      body: "De meeste bedrijven in Nederland zijn klein, hebben een eenvoudige website of geen, en staan in geen enkele bron die een AI leest. Niet fout, maar onzichtbaar. Een grijze stip. Vidalo geeft ze een feitenpagina die AI kan lezen, zet ze in de gidsen die AI gebruikt, en controleert of ze daarna genoemd worden.",
       timeline: [
         { stip: "grijs", text: "“Ik kan niets vinden over Installatiebedrijf Hendriks.”", meta: "dag 0" },
         { stip: "oranje", text: "Feitenpagina live, Google en gidsen gevuld", meta: "dag 2" },
@@ -410,7 +408,7 @@ export const copy = {
         { term: "A2A (Agent2Agent)", body: "Een open protocol, in 2025 gepubliceerd door Google, waarmee AI-assistenten van verschillende bedrijven met elkaar overleggen en taken aan elkaar doorgeven." },
         { term: "Bestellen via een assistent", body: "Afspraken waarmee een assistent namens de klant kan bestellen en betalen, zoals het Agentic Commerce Protocol van OpenAI en Stripe uit 2025." },
       ],
-      usTitle: "Wat Maicro daarmee doet",
+      usTitle: "Wat Vidalo daarmee doet",
       us: [
         { title: "Nu al", body: "Je feitenpagina staat er in drie vormen: als gewone pagina, als schema.org-gegevens en als llms.txt. Dezelfde feiten, met datum, op je eigen domein." },
         { title: "Zodra het zich zet", body: "Nieuwe formaten zoals OKF volgen we. Wordt een formaat echt gebruikt, dan zetten we je feiten er ook in. Jij hoeft daar niets voor te doen." },
@@ -419,7 +417,7 @@ export const copy = {
       footnote: "Zo staan de afspraken nu (oktober 2026). Welke het worden, bepalen wij niet; dat je feiten klaarstaan wel.",
     },
     /**
-     * The looping scenes (components/viz). Each shows one thing Maicro does and
+     * The looping scenes (components/viz). Each shows one thing Vidalo does and
      * what it costs a business when nobody does it. Fictional businesses, real
      * patterns; every scene says so in its caption.
      */
@@ -427,7 +425,7 @@ export const copy = {
       regel: {
         h3: "Straks bestelt de AI. Wie volgens de gegevens dicht is, valt af.",
         body: "Een klant laat de AI-assistent bestellen. Die zoekt bakkers, kijkt wie zondag open is en kiest. Staat er in één gids nog dat je zondag dicht bent, dan doe je niet mee. Niemand vertelt het je.",
-        label: "Voorbeeld: een klant laat een AI-assistent croissants bestellen voor zondag. Bakkerij Smit is zondag open, maar een gids uit 2021 zegt gesloten. De assistent bestelt bij een andere bakker. Nadat Maicro die gids heeft hersteld, gaat de bestelling naar Bakkerij Smit.",
+        label: "Voorbeeld: een klant laat een AI-assistent croissants bestellen voor zondag. Bakkerij Smit is zondag open, maar een gids uit 2021 zegt gesloten. De assistent bestelt bij een andere bakker. Nadat Vidalo die gids heeft hersteld, gaat de bestelling naar Bakkerij Smit.",
         phaseWrong: "Met een verouderde gids",
         phaseRight: "Na herstel aan de bron",
         ask: "Regel voor zondag 12 croissants bij een bakker in Haarlem.",
@@ -444,13 +442,13 @@ export const copy = {
         item: "12 croissants · zondag 9:00 · €21,60",
         lost: "Bakkerij Smit hoorde er nooit van.",
         won: "De klant komt bij jou.",
-        maicro: "Gids uit 2021 gevonden · openingstijden hersteld",
+        vidalo: "Gids uit 2021 gevonden · openingstijden hersteld",
         caption: "Voorbeeld met fictieve bakkers. De klant ziet geen lijst, alleen de bestelling.",
       },
       bel: {
         h3: "Eén oud nummer in drie gidsen. Wie belt, krijgt niemand.",
         body: "De AI geeft het nummer dat het vaakst voorkomt. Staat je oude nummer nog in drie gidsen, dan belt de klant dat. Hij hoort “niet in gebruik” en belt de volgende.",
-        label: "Voorbeeld: een klant vraagt Copilot het nummer van Fysiotherapie Van Dijk en krijgt het oude nummer, dat nog in drie gidsen staat. De klant hoort dat het nummer niet in gebruik is, en zo gaat het met elke beller. Maicro past de drie gidsen aan; daarna geeft Copilot het juiste nummer en komt de klant binnen.",
+        label: "Voorbeeld: een klant vraagt Copilot het nummer van Fysiotherapie Van Dijk en krijgt het oude nummer, dat nog in drie gidsen staat. De klant hoort dat het nummer niet in gebruik is, en zo gaat het met elke beller. Vidalo past de drie gidsen aan; daarna geeft Copilot het juiste nummer en komt de klant binnen.",
         ask: "Wat is het nummer van Fysiotherapie Van Dijk?",
         engine: "Copilot",
         wrong: "038 – 421 07 33",
@@ -468,13 +466,13 @@ export const copy = {
           { name: "Cylex Nederland", stale: true },
           { name: "Google-profiel", stale: false },
         ],
-        maicro: "Oud nummer in 3 gidsen · aangepast",
+        vidalo: "Oud nummer in 3 gidsen · aangepast",
         caption: "Voorbeeld met een fictieve praktijk. Hoeveel klanten het zijn, ziet niemand: ze bellen gewoon een ander.",
       },
       gidsen: {
         h3: "Eén keer vastleggen, overal hetzelfde",
         body: "Zolang zestien bronnen drie verschillende nummers noemen, kiest de AI er zelf een. Wij zetten je feitenpagina live en sturen dezelfde gegevens naar Google, Bing, Apple en dertien Nederlandse gidsen. Dan valt er niets meer te kiezen.",
-        label: "Voorbeeld: zestien bronnen noemen drie verschillende telefoonnummers en ChatGPT, Google AI en Copilot geven een oud nummer. Maicro publiceert een feitenpagina en zet dezelfde gegevens in alle zestien bronnen. Daarna klopt het antwoord bij alle drie.",
+        label: "Voorbeeld: zestien bronnen noemen drie verschillende telefoonnummers en ChatGPT, Google AI en Copilot geven een oud nummer. Vidalo publiceert een feitenpagina en zet dezelfde gegevens in alle zestien bronnen. Daarna klopt het antwoord bij alle drie.",
         before: "16 bronnen · 3 verschillende nummers",
         after: "16 bronnen · één versie van de feiten",
         factsTitle: "Feitenpagina",
@@ -624,11 +622,11 @@ export const copy = {
       lang: "NL",
       columns: [
         { title: "Product", links: [{ label: "Hoe het werkt", href: "/hoe-het-werkt" }, { label: "Waarom", href: "/waarom" }, { label: "AI-agents en OKF", href: "/straks" }, { label: "Voorbeeldrapport", href: "/#rapport" }, { label: "Prijs", href: "/prijzen" }, { label: "Per vak", href: "/#vak" }] },
-        { title: "Informatie", links: [{ label: "Wat we controleren", href: "/hoe-het-werkt#criteria" }, { label: "Vragen", href: "/#vragen" }, { label: "Contact", href: "mailto:hallo@maicro.nl" }] },
+        { title: "Informatie", links: [{ label: "Wat we controleren", href: "/hoe-het-werkt#criteria" }, { label: "Vragen", href: "/#vragen" }, { label: "Contact", href: "mailto:hallo@vidalo.nl" }] },
         { title: "Juridisch", links: [{ label: "Algemene voorwaarden", href: "/voorwaarden" }, { label: "Privacybeleid", href: "/privacy" }] },
       ],
-      legal: "A101 B.V. (handelend als Maicro) · Factorij 80, 3071 AV Rotterdam · KvK 42057858 · Prijzen excl. btw",
-      copyright: "© 2026 Maicro. Alle rechten voorbehouden.",
+      legal: "A101 B.V. (handelend als Vidalo) · Factorij 80, 3071 AV Rotterdam · KvK 42057858 · Prijzen excl. btw",
+      copyright: "© 2026 Vidalo. Alle rechten voorbehouden.",
       reportNote: "Deze rapportlink werkt 30 dagen.",
     },
   },
@@ -652,9 +650,9 @@ export const copy = {
     },
     how: {
       crumb: "Zo werkt het",
-      title: "Zo werkt Maicro: vastleggen, publiceren, controleren, herstellen",
+      title: "Zo werkt Vidalo: vastleggen, publiceren, controleren, herstellen",
       description: "Je gegevens één keer vastleggen, overal hetzelfde publiceren, elke maand twintig keer per vraag controleren bij ChatGPT, Google AI en Copilot, en fouten aan de bron herstellen met bewijs.",
-      h1: "Zo werkt Maicro",
+      h1: "Zo werkt Vidalo",
       intro: "Vijf minuten werk voor jou bij de start. Daarna controleren we elke maand wat AI-assistenten over je zeggen, en herstellen we elke fout bij de bron.",
     },
     next: {
@@ -664,17 +662,17 @@ export const copy = {
       h1: "Straks praten assistenten met elkaar",
       intro: "Wat er verandert als AI-assistenten niet alleen antwoorden maar ook regelen, en welke afspraken daarvoor nu gemaakt worden. Zonder vakjargon.",
     },
-    home_crumb: "Maicro",
+    home_crumb: "Vidalo",
   },
 
   legal: {
     draft: true,
     draftNotice: "Concept. Deze tekst is nog niet juridisch gecontroleerd en kan veranderen.",
     updated: "Laatst bijgewerkt: 9 oktober 2026",
-    contact: "Vragen? Mail ons op hallo@maicro.nl.",
+    contact: "Vragen? Mail ons op hallo@vidalo.nl.",
     terms: {
       title: "Algemene voorwaarden",
-      intro: "Deze voorwaarden gelden voor elke controle en elk abonnement van Maicro, een handelsnaam van A101 B.V.",
+      intro: "Deze voorwaarden gelden voor elke controle en elk abonnement van Vidalo, een handelsnaam van A101 B.V.",
       sections: [
         { h: "Wat we doen", p: ["We vragen AI-assistenten zoals ChatGPT, Google AI en Copilot wat ze over je bedrijf zeggen, vergelijken dat met de gegevens die jij bevestigt en laten zien waar een fout vandaan komt.", "Met een betaald plan publiceren we een feitenpagina, zetten we je gegevens in Google, Bing, Apple en Nederlandse gidsen, en vragen we bronnen met een fout om die te herstellen."] },
         { h: "Wat we niet beloven", p: ["Niemand bepaalt wat een AI-assistent antwoordt. We herstellen de bronnen waar die antwoorden uit komen. Antwoorden uit het geheugen van een model veranderen pas bij een nieuwe modelversie.", "Herstel bij een andere website of gids hangt af van die partij en kan tot 14 dagen of langer duren."] },
@@ -687,7 +685,7 @@ export const copy = {
     },
     privacy: {
       title: "Privacybeleid",
-      intro: "Maicro is een handelsnaam van A101 B.V. Hier staat welke gegevens we gebruiken, waarom, en met wie we ze delen.",
+      intro: "Vidalo is een handelsnaam van A101 B.V. Hier staat welke gegevens we gebruiken, waarom, en met wie we ze delen.",
       sections: [
         { h: "Welke gegevens", p: ["Over je bedrijf: naam, plaats, adres, telefoonnummer, website, openingstijden, diensten en andere gegevens die je bevestigt. Dit zijn meestal geen persoonsgegevens, behalve als je bedrijf je eigen naam draagt.", "Over jou: je e-mailadres, om in te loggen en je rapporten te sturen. Bij betalen verwerkt Stripe je betaalgegevens; wij zien die niet.", "Over de controle: de vragen die we stellen, de antwoorden van AI-assistenten en de bronnen die ze noemen."] },
         { h: "Waarom", p: ["Om de controle uit te voeren, fouten te herstellen, je te mailen over je rapport en je abonnement te factureren. Na een gratis controle sturen we je na 7 en na 21 dagen nog een herinnering; wil je die niet, mail ons dan. De grondslag is de overeenkomst met jou, en voor een gratis controle ons gerechtvaardigd belang om je een rapport te kunnen geven."] },
@@ -704,7 +702,7 @@ export const copy = {
     button: "Afmelden",
     doneH1: "Je bent afgemeld",
     doneBody: "We sturen je hierover geen mails meer.",
-    invalid: "Deze afmeldlink klopt niet of is verlopen. Mail ons op hallo@maicro.nl, dan regelen we het.",
+    invalid: "Deze afmeldlink klopt niet of is verlopen. Mail ons op hallo@vidalo.nl, dan regelen we het.",
   },
 
   scanBusy: {
@@ -1428,9 +1426,9 @@ export const copy = {
   checkout: {
     mockNotice: "Betaling gesimuleerd (geen Stripe-sleutel ingesteld).",
     cancelled: "Je betaling is niet afgerond. Er is niets afgeschreven. Je kunt het hieronder opnieuw proberen.",
-    error: "Afrekenen lukt nu even niet. Er is niets afgeschreven. Probeer het later opnieuw of mail ons op hallo@maicro.nl.",
-    productSetup: "Maicro Goed zetten (eenmalig)",
-    productMonitor: "Maicro Goed houden (per maand)",
+    error: "Afrekenen lukt nu even niet. Er is niets afgeschreven. Probeer het later opnieuw of mail ons op hallo@vidalo.nl.",
+    productSetup: "Vidalo Goed zetten (eenmalig)",
+    productMonitor: "Vidalo Goed houden (per maand)",
   },
 
   pricing: {
@@ -1467,17 +1465,17 @@ export const copy = {
   },
 
   welcome: {
-    h1: "Welkom bij Maicro",
+    h1: "Welkom bij Vidalo",
     body: "Je betaling is gelukt. Vier dingen, dan zijn we binnen 48 uur live.",
     processingH1: "Bedankt, je betaling wordt verwerkt",
     processingBody: "Bij een incasso duurt het een paar werkdagen voor het geld binnen is. Je kunt alvast de stappen hieronder doen; we starten zodra de betaling rond is.",
     failedH1: "Je betaling is niet gelukt",
-    failedBody: "Er is niets afgeschreven. Probeer het opnieuw vanaf je rapport, of mail ons op hallo@maicro.nl.",
+    failedBody: "Er is niets afgeschreven. Probeer het opnieuw vanaf je rapport, of mail ons op hallo@vidalo.nl.",
     receipt: (amount: string, email: string | null) => `Je betaalde ${amount} incl. btw.${email ? ` De factuur staat in je mail (${email}).` : ""}`,
     steps: [
       { title: "Log één keer in bij Google", body: "Met het account van je Google-bedrijfsprofiel. Zo weten we dat jij de eigenaar bent.", href: "/app/google", cta: "Inloggen bij Google" },
       { title: "Bevestig je gegevens", body: "Controleer adres, telefoon, openingstijden en wat je wel en niet doet.", href: "/app/gegevens", cta: "Gegevens bevestigen" },
-      { title: "Kies je domein", body: "Eén DNS-regel op je eigen domein, of laat Maicro een domein registreren.", href: "/app/domein", cta: "Domein instellen" },
+      { title: "Kies je domein", body: "Eén DNS-regel op je eigen domein, of laat Vidalo een domein registreren.", href: "/app/domein", cta: "Domein instellen" },
       { title: "Wacht op de eerste controle", body: "Daarna krijg je elke maand een rapport. Je hoeft niets te installeren.", href: "/app", cta: "Naar je overzicht" },
     ],
     loginHint: "Je ontvangt een inloglink per e-mail. Geen wachtwoord nodig.",
@@ -1598,9 +1596,9 @@ export const copy = {
     recordName: "Naam",
     recordValue: "Waarde",
     checkButton: "Controleer DNS",
-    verified: (host: string) => `${host} wijst naar Maicro. Je feitenpagina is live.`,
+    verified: (host: string) => `${host} wijst naar Vidalo. Je feitenpagina is live.`,
     notYet: "We zien de DNS-regel nog niet. DNS-wijzigingen kunnen tot een uur duren. We controleren elke 10 minuten opnieuw.",
-    optionB: "Laat Maicro een domein registreren",
+    optionB: "Laat Vidalo een domein registreren",
     optionBHint: (name: string) => `We registreren ${name} en richten alles in. Je hoeft niets te doen.`,
     optionBButton: "Registreer voor mij",
     optionBQueued: "We registreren het domein en laten je weten als het live is.",
@@ -1633,7 +1631,7 @@ export const copy = {
       error: "Er ging iets mis bij Google. Probeer het nog een keer.",
     },
     retry: "Opnieuw proberen",
-    contact: "Lukt het niet? Mail ons op hallo@maicro.nl, dan koppelen we het samen.",
+    contact: "Lukt het niet? Mail ons op hallo@vidalo.nl, dan koppelen we het samen.",
   },
 
   factsPage: {
@@ -1675,8 +1673,8 @@ export const copy = {
       monthlyAllOk: (total: number) => `${total} van ${total} antwoorden kloppen`,
       monthly: (found: number, fixed: number, pending: number) => `${found} ${found === 1 ? "fout" : "fouten"} gevonden, ${fixed} hersteld, ${pending} in behandeling`,
       resolved: (business: string) => `Hersteld: ${business}`,
-      welcome: "Welkom bij Maicro: vier stappen tot je eerste controle",
-      login: "Je inloglink voor Maicro",
+      welcome: "Welkom bij Vidalo: vier stappen tot je eerste controle",
+      login: "Je inloglink voor Vidalo",
     },
   },
 } as const;

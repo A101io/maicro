@@ -1,11 +1,11 @@
-# SETUP_STATUS — Maicro
+# SETUP_STATUS — Vidalo
 
 Baseline v3 (project-setup-baseline) · last checked 13 Oct 2026 · a compliance aid, **not legal advice**.
 Status: `✓verified` (observed, evidence + date) · `written` (code exists, not proven on real infrastructure) · `blocked` (names what it needs) · `open` · `n/a` (reason).
 
 ## Project facts
-- Product: Maicro (name under review, see go-live J1). Company: A101 B.V. (handelend als Maicro), Factorij 80, 3071 AV Rotterdam, KvK 42057858, VAT NL869514192B01 (not shown on the site by design: footer has no btw-nummer).
-- Domain: none yet (`maicro.nl` assumed in copy). Support: hallo@maicro.nl (mailbox not verified to exist).
+- Product: Vidalo (name under review, see go-live J1). Company: A101 B.V. (handelend als Vidalo), Factorij 80, 3071 AV Rotterdam, KvK 42057858, VAT NL869514192B01 (not shown on the site by design: footer has no btw-nummer).
+- Domain: none yet (`vidalo.nl` assumed in copy). Support: hallo@vidalo.nl (mailbox not verified to exist).
 - Audience: B2B (Dutch businesses). Languages: NL + EN.
 - Stack: Next.js 15 (apps/web), worker (apps/worker), core (packages/core), Supabase `bbynmqvaxpjdnkaasutd` (eu-west-1). Hosting planned Vercel + Fly/Railway (CLAUDE.md wins over the Cloudflare default).
 - Accounts: yes (magic link + Google verification). Payments: Stripe (account not created). AI: yes, as a tool to ask questions (OpenAI, Google, Perplexity, SerpAPI). Outbound email: Resend. Native app: no.
@@ -14,7 +14,7 @@ Status: `✓verified` (observed, evidence + date) · `written` (code exists, not
 ## R. Required
 | # | Step | Status | Evidence | Date |
 |---|---|---|---|---|
-| R1 | Supabase | ✓verified | Project read back by ref: `maicro`, eu-west-1, ACTIVE_HEALTHY. RLS on all 11 tables; advisors: only INFO "RLS enabled, no policy" on the 4 internal tables (intended). Transaction test, rolled back: anon sees 0 business, stranger 0, **control: owner 1** and own event 1. | 13 Oct |
+| R1 | Supabase | ✓verified | Project read back by ref: `vidalo`, eu-west-1, ACTIVE_HEALTHY. RLS on all 11 tables; advisors: only INFO "RLS enabled, no policy" on the 4 internal tables (intended). Transaction test, rolled back: anon sees 0 business, stranger 0, **control: owner 1** and own event 1. | 13 Oct |
 | R2 | Legal pages + footer | blocked | Drafts at `/voorwaarden`, `/privacy` with a "Concept" banner; footer identity line present. Needs: De Boer Legal masters uploaded, `/legal/terms|privacy|cookies` NL + EN, "Cookie settings" link, counsel review. | 13 Oct |
 | R3 | Fixed header | ✓verified | Playwright, 2000px scroll: header `top 0`, sticky, z 40, visible at 1280 and 390 (`out/screenshots/r3-header-*.png`). Mobile menu (`<details>`) opens, follows a link and closes (`r3-menu-390.png`). `[id]{scroll-margin-top:88px}`. | 13 Oct |
 
@@ -26,7 +26,7 @@ Status: `✓verified` (observed, evidence + date) · `written` (code exists, not
 | A3 | Legal-compliance guidelines | written | `docs/legal-compliance-guidelines.md` (claims, never-use, VAT, cookies, DPIA, open questions) | 13 Oct |
 | A4 | Secrets and keys | written | `docs/secrets-and-keys.md` | 13 Oct |
 | A5 | Secret hygiene | ✓verified | `.env.example` complete; `pnpm scan:secrets` in CI; control: a planted `sk_live_…` made it exit 1. No service-role key in `NEXT_PUBLIC_*`. | 13 Oct |
-| A6 | Project ref guard | ✓verified | CLAUDE.md lists Maicro, Sitty and Sonable refs; every MCP call this session used `bbynmqvaxpjdnkaasutd`. | 13 Oct |
+| A6 | Project ref guard | ✓verified | CLAUDE.md lists Vidalo, Sitty and Sonable refs; every MCP call this session used `bbynmqvaxpjdnkaasutd`. | 13 Oct |
 
 ## B. Supabase hardening
 | # | Step | Status | Evidence | Date |
@@ -41,9 +41,9 @@ Status: `✓verified` (observed, evidence + date) · `written` (code exists, not
 | # | Step | Status | Evidence | Date |
 |---|---|---|---|---|
 | D1 | CI on every PR | ✓verified | `ci.yml`: secret scan, typecheck, tests, mock pipeline, Postgres. No linter configured yet. | 13 Oct |
-| D2 | Deploy | blocked | Only the GitHub Pages preview deploys (`site.yml`). Production hosting: Julian (go-live J3). | |
-| D3 | No empty env overrides | ✓verified | Workflows set no `NEXT_PUBLIC_*`; live checkout refuses without `STRIPE_TAX_RATE_ID`. | 13 Oct |
-| D4 | Verify deployed bundle | open | Needs a production deploy. | |
+| D2 | Deploy | written | Cloudflare Workers (Julian, 13 Oct): `vidalo-web` via OpenNext, `vidalo-worker` for cron, the scan queue and facts pages; `deploy.yml` manual, preview or production, never Workers Builds. Verified locally in workerd against real Postgres: every route NL+EN, a free scan through the queue to its report, both crons, a facts page; one handle per request (control without it: every second request 500). Blocked on the Cloudflare token + account id on the GitHub environments. | 13 Oct |
+| D3 | No empty env overrides | ✓verified | Workflows set no `NEXT_PUBLIC_*`; live checkout refuses without `STRIPE_TAX_RATE_ID`; production without `DATABASE_URL`/Hyperdrive answers 503 instead of mock data (verified in workerd, and the deploy verifier fails on it). | 13 Oct |
+| D4 | Verify deployed bundle | written | `scripts/verify-deploy.mjs` as the last deploy step: health, NL and EN landing, pricing, llms.txt, sitemap, 404; prints status and bytes for each. Passes on the local preview, fails (with the reason) on a database-less production. | 13 Oct |
 | D5 | Domain | blocked | Julian (J2). | |
 | D6 | Launch gate | open | Julian, 13 Oct: the GitHub Pages preview (mock data) stays public until there is a domain. The gate (coming-soon on `/`, `/legal/*` reachable, invariant test) comes with the production deploy. | 13 Oct |
 | D7 | Security headers + CSP | written | HSTS, nosniff, Referrer-Policy, X-Frame-Options, Permissions-Policy seen via `curl -I` on dev; CSP production-only (`next.config.ts`). | 13 Oct |
@@ -69,7 +69,7 @@ Status: `✓verified` (observed, evidence + date) · `written` (code exists, not
 ## G. Support and email
 | # | Step | Status | Evidence | Date |
 |---|---|---|---|---|
-| G1 | Support channel | blocked | hallo@maicro.nl used everywhere; needs the domain and a real mailbox. | |
+| G1 | Support channel | blocked | hallo@vidalo.nl used everywhere; needs the domain and a real mailbox. | |
 | G2 | Transactional email | blocked | Resend code + one-click unsubscribe (RFC 8058) written; DNS (SPF/DKIM/DMARC) needs the domain. | |
 
 ## H. Operations
@@ -99,9 +99,9 @@ Status: `✓verified` (observed, evidence + date) · `written` (code exists, not
 ## C. Conditional
 | # | Step | Status | Evidence | Date |
 |---|---|---|---|---|
-| C1 | Payments | blocked | Code done (`docs/PAYMENTS.md`, wrong-account guard). Needs Maicro's own Stripe account. | |
+| C1 | Payments | blocked | Code done (`docs/PAYMENTS.md`, wrong-account guard). Needs Vidalo's own Stripe account. | |
 | C2 | Accounts + personal data | open | Export / delete my data not built. | |
-| C3 | AI features | written | Maicro asks AI providers; it does not chat with customers. Spend capped by `FREE_SCANS_PER_DAY`. | |
+| C3 | AI features | written | Vidalo asks AI providers; it does not chat with customers. Spend capped by `FREE_SCANS_PER_DAY`. | |
 | C4 | B2C | n/a | B2B only. | |
 | C5 | Native app | n/a | | |
 | C6 | New brand | blocked | Trademark check before the domain; name under review. | |

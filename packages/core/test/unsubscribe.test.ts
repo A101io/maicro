@@ -21,7 +21,7 @@ describe("follow-up mails respect the opt-out", () => {
   beforeEach(async () => {
     db = new MemDb();
     setDb(db);
-    process.env.MAICRO_OUT_DIR = await mkdtemp(path.join(tmpdir(), "maicro-unsub-"));
+    process.env.VIDALO_OUT_DIR = await mkdtemp(path.join(tmpdir(), "vidalo-unsub-"));
   });
 
   async function scannedBusiness() {
