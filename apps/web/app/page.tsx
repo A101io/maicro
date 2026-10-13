@@ -41,9 +41,13 @@ export default function LandingPage() {
       <SiteHeader />
       <main>
         {/* 1 Hero */}
-        <section className="wrap grid grid-cols-1 items-center gap-10 pb-16 pt-6 sm:pt-10 lg:grid-cols-12 lg:gap-12 lg:pb-24">
+        <section className="hero-glow wrap grid grid-cols-1 items-center gap-10 pb-16 pt-6 sm:pt-10 lg:grid-cols-12 lg:gap-12 lg:pb-24">
           <div className="flex flex-col gap-6 lg:col-span-5 lg:gap-7">
-            <h1 className="h1 enter">{L.hero.h1}</h1>
+            <h1 className="h1 enter">
+              {L.hero.h1.split(L.hero.h1Mark)[0]}
+              <span className="marker">{L.hero.h1Mark}</span>
+              {L.hero.h1.split(L.hero.h1Mark)[1]}
+            </h1>
             <p className="enter max-w-[36ch] text-[18px] leading-[1.5] text-ink-2 sm:text-[19px]" style={{ "--d": "90ms" } as React.CSSProperties}>
               {L.hero.sub}
             </p>
@@ -155,7 +159,7 @@ export default function LandingPage() {
         </section>
 
         {/* 4 Snippers */}
-        <section className="bg-panel-2">
+        <section className="ground-cream">
           <div className="wrap section flex flex-col gap-10">
             <SectionHead h2={L.snippers.h2} body={L.snippers.body} />
             <div data-motion="stagger" className="grid grid-cols-1 gap-3.5 sm:grid-cols-2 lg:grid-cols-4">
@@ -207,7 +211,7 @@ export default function LandingPage() {
         </section>
 
         {/* 6 Zo werkt Maicro */}
-        <section id="werkt" className="bg-panel-2">
+        <section id="werkt" className="ground-sky">
           <div className="wrap section flex flex-col gap-10">
             <div className="flex flex-wrap items-end justify-between gap-6">
               <h2 className="h2">{L.werkt.h2}</h2>
@@ -271,7 +275,7 @@ export default function LandingPage() {
         </section>
 
         {/* 8 Per vak */}
-        <section id="vak" className="bg-panel-2">
+        <section id="vak" className="ground-mint">
           <div className="wrap section flex flex-col gap-9">
             <SectionHead h2={L.vak.h2} body={L.vak.body} />
             <div data-motion="stagger" className="grid grid-cols-1 gap-3.5 sm:grid-cols-2 lg:grid-cols-4">
@@ -312,7 +316,7 @@ export default function LandingPage() {
         </section>
 
         {/* 10 Bewijs */}
-        <section className="bg-panel-2">
+        <section className="ground-cream">
           <div className="wrap section flex flex-col gap-8">
             <h2 className="h2">{L.bewijs.h2}</h2>
             <div data-motion="stagger" className="grid grid-cols-1 gap-4 md:grid-cols-3">
@@ -357,7 +361,7 @@ export default function LandingPage() {
         </section>
 
         {/* 11b Elke maand */}
-        <section className="bg-panel-2">
+        <section className="ground-sky">
           <div className="wrap section flex flex-col gap-10">
             <SectionHead h2={V.drift.h2} body={V.drift.body} />
             <DriftViz />
@@ -375,7 +379,7 @@ export default function LandingPage() {
         <Faq />
 
         {/* 14 Slot */}
-        <section className="bg-panel-2">
+        <section className="ground-warm">
           <div className="wrap section flex flex-col items-center gap-6 text-center">
             <h2 className="h2 max-w-[20ch] text-[34px] sm:text-[42px] lg:text-[48px]">{L.slot.h2}</h2>
             <p className="max-w-[44ch] text-[18px] text-ink-2">{L.slot.body}</p>

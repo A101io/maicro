@@ -9,7 +9,7 @@ export function SiteFooter({ variant = "full", note, tagline }: { variant?: "ful
   const f = copy.landing.footer;
   if (variant === "short") {
     return (
-      <footer className="border-t-[1.5px] border-line bg-panel-2">
+      <footer className="border-t-[1.5px] border-line ground-cream">
         <div className="wrap flex flex-wrap justify-between gap-x-6 gap-y-2 py-10 text-[13px] text-muted">
           <span>{f.legal}</span>
           <span>{note ?? f.copyright}</span>
@@ -18,7 +18,7 @@ export function SiteFooter({ variant = "full", note, tagline }: { variant?: "ful
     );
   }
   return (
-    <footer className="border-t-[1.5px] border-line bg-panel-2">
+    <footer className="border-t-[1.5px] border-line ground-cream">
       <div className="wrap flex flex-col gap-10 pb-10 pt-14">
         <div className="grid grid-cols-1 gap-8 sm:grid-cols-2 lg:grid-cols-[1.4fr_1fr_1fr_1fr]">
           <div className="flex flex-col items-start gap-2.5">

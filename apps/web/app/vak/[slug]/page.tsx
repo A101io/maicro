@@ -82,7 +82,7 @@ export default async function SectorPage({ params }: { params: Promise<{ slug: s
         </section>
 
         {/* Three facts */}
-        <section className="bg-panel-2">
+        <section className="ground-sky">
           <div className="wrap section flex flex-col gap-9">
             <h2 className="h2 max-w-[22ch]">{S.factsH2(P.noun)}</h2>
             <div className="grid grid-cols-1 gap-5 md:grid-cols-3">
@@ -192,7 +192,7 @@ export default async function SectorPage({ params }: { params: Promise<{ slug: s
         </section>
 
         {/* CTA */}
-        <section className="bg-panel-2">
+        <section className="ground-warm">
           <div className="wrap section flex flex-col items-center gap-6 text-center">
             <h2 className="h2 max-w-[22ch]">{S.ctaH2(P.nounYour)}</h2>
             <ScanField id="slot" className="max-w-[440px]" />
