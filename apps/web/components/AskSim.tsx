@@ -1,4 +1,4 @@
-import { copy } from "@maicro/core/copy";
+import { getI18n } from "@/lib/i18n";
 
 /**
  * "Vraag het zelf": a simulated conversation with an AI assistant. A visitor
@@ -11,7 +11,8 @@ import { copy } from "@maicro/core/copy";
  * one) and the switches. It starts after the page has loaded, so React has
  * long finished hydrating before it touches anything.
  */
-export function AskSim() {
+export async function AskSim() {
+  const { copy } = await getI18n();
   const A = copy.landing.ask;
   return (
     <div className="ask" data-ask>

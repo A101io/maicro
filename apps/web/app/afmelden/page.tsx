@@ -1,16 +1,20 @@
 import type { Metadata } from "next";
-import { copy } from "@maicro/core/copy";
+import { getCopy, getI18n } from "@/lib/i18n";
 import { verifyUnsubscribeToken } from "@maicro/core/shared";
 import { SiteHeader } from "@/components/SiteHeader";
 import { SiteFooter } from "@/components/SiteFooter";
 import { ready } from "@/lib/db";
 
-export const metadata: Metadata = { title: copy.unsubscribe.h1, robots: { index: false } };
+export async function generateMetadata(): Promise<Metadata> {
+  const copy = await getCopy();
+  return { title: copy.unsubscribe.h1, robots: { index: false } };
+}
 export const dynamic = "force-dynamic";
 
 /** The opt-out link in the follow-up mails lands here; the button does the unsubscribing. */
 export default async function UnsubscribePage({ searchParams }: { searchParams: Promise<{ b?: string; t?: string; klaar?: string; fout?: string }> }) {
   const sp = await searchParams;
+  const { copy } = await getI18n();
   const U = copy.unsubscribe;
   const valid = Boolean(sp.b && sp.t && verifyUnsubscribeToken(sp.b, sp.t));
   const business = valid ? await (await ready()).getBusiness(sp.b!) : null;

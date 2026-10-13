@@ -1,4 +1,4 @@
-import { copy } from "@maicro/core/copy";
+import { getI18n } from "@/lib/i18n";
 import { Chip, Dot, Scene, type Tone } from "./Scene";
 
 const ASKS = 20;
@@ -8,7 +8,8 @@ const ASKS = 20;
  * round says all is well; only the count shows the error that keeps coming
  * back.
  */
-export function ControleViz() {
+export async function ControleViz() {
+  const { copy } = await getI18n();
   const S = copy.landing.scenes.controle;
   return (
     <Scene seconds={14} label={S.label} caption={S.caption}>

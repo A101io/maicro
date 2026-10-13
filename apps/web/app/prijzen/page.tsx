@@ -1,15 +1,19 @@
 import type { Metadata } from "next";
-import { copy } from "@maicro/core/copy";
+import { getCopy, getI18n } from "@/lib/i18n";
 import { SiteHeader } from "@/components/SiteHeader";
 import { SiteFooter } from "@/components/SiteFooter";
 import { ScanField } from "@/components/ScanField";
 import { PriceBlock } from "@/components/PriceBlock";
 import { DriftViz } from "@/components/viz/DriftViz";
 
-export const metadata: Metadata = { title: copy.pricing.title, description: copy.pricing.lead };
+export async function generateMetadata(): Promise<Metadata> {
+  const copy = await getCopy();
+  return { title: copy.pricing.title, description: copy.pricing.lead };
+}
 
 /** Pricing on its own page: the same two plans as the landing, plus how paying works. */
-export default function PricingPage() {
+export default async function PricingPage() {
+  const { copy } = await getI18n();
   const P = copy.pricing;
   return (
     <>

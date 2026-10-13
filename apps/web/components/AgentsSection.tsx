@@ -1,8 +1,9 @@
-import { copy } from "@maicro/core/copy";
+import { getI18n } from "@/lib/i18n";
 import { AgentTalkViz } from "@/components/viz/AgentTalkViz";
 
 /** Where this is going: assistants that ask each other, the terms, and what Maicro does with them. */
-export function AgentsSection() {
+export async function AgentsSection() {
+  const { copy } = await getI18n();
   const A = copy.landing.agents;
   return (
     <section id="straks" className="ground-mint">

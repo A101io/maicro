@@ -1,4 +1,4 @@
-import { copy } from "@maicro/core/copy";
+import { getI18n } from "@/lib/i18n";
 import { isVerifiedOwner } from "@maicro/core/shared";
 import { Stip } from "@/components/Stip";
 import { requireOwner } from "@/lib/owner";
@@ -24,6 +24,7 @@ async function nextPayment(subscriptionId: string | null): Promise<string | null
 export default async function BillingPage({ searchParams }: { searchParams: Promise<{ toegevoegd?: string }> }) {
   const sp = await searchParams;
   const { business, session } = await requireOwner("/app/abonnement");
+  const { copy } = await getI18n();
   const B = copy.billing;
   const events = await (await ready()).listEvents(business.id, 200);
   const lastPay = events.find((e) => e.type === "payment.processing" || e.type === "checkout.completed" || e.type === "checkout.mock");

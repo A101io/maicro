@@ -3,7 +3,7 @@ import Link from "next/link";
 import { notFound } from "next/navigation";
 import { SECTOR_SLUGS, type SectorSlug } from "@maicro/core/types";
 import { isSectorSlug } from "@maicro/core/prompts";
-import { copy } from "@maicro/core/copy";
+import { getI18n, localizeHref } from "@/lib/i18n";
 import { SiteHeader } from "@/components/SiteHeader";
 import { SiteFooter } from "@/components/SiteFooter";
 import { ScanField } from "@/components/ScanField";
@@ -20,16 +20,23 @@ export function generateStaticParams(): { slug: SectorSlug }[] {
 export async function generateMetadata({ params }: { params: Promise<{ slug: string }> }): Promise<Metadata> {
   const { slug } = await params;
   if (!isSectorSlug(slug)) return {};
+  const { copy, href } = await getI18n();
   const p = copy.sectorPages[slug];
-  return { title: `${p.short}: ${p.h1}`, description: p.intro, alternates: { canonical: `/vak/${slug}` } };
+  const route = `/vak/${slug}`;
+  return {
+    title: `${p.short}: ${p.h1}`,
+    description: p.intro,
+    alternates: { canonical: href(route), languages: { nl: localizeHref(route, "nl"), en: localizeHref(route, "en"), "x-default": localizeHref(route, "nl") } },
+  };
 }
 
 export default async function SectorPage({ params }: { params: Promise<{ slug: string }> }) {
   const { slug } = await params;
   if (!isSectorSlug(slug)) notFound();
+  const { copy, href } = await getI18n();
   const S = copy.sector;
   const P = copy.sectorPages[slug];
-  const questions = sectorQuestions(slug);
+  const questions = sectorQuestions(slug, copy);
 
   return (
     <>
@@ -43,7 +50,7 @@ export default async function SectorPage({ params }: { params: Promise<{ slug: s
                 {copy.sectorPages[s].short}
               </span>
             ) : (
-              <Link key={s} href={`/vak/${s}`} className="pill hover:border-ink">
+              <Link key={s} href={href(`/vak/${s}`)} className="pill hover:border-ink">
                 {copy.sectorPages[s].short}
               </Link>
             ),

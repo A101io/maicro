@@ -9,7 +9,7 @@ import { resolveBusiness as coreResolveBusiness, draftProvisionalFacts, prepareB
 import { renderFactsPage } from "@maicro/core/publisher";
 import { setBusinessStatus, setDb } from "@maicro/core/shared";
 import { ENGINE_LABEL, type BusinessStatus, type Engine, type ScanKind, type ScanReport } from "@maicro/core/types";
-import { copy } from "@maicro/core/copy";
+import type { CopyShape } from "@maicro/core/copy";
 import { env } from "./env";
 import { seedDemo } from "./demo";
 
@@ -98,7 +98,7 @@ export interface ScanJobState {
 export const FREE_SCAN_ENGINES: Engine[] = SCAN_DEFAULTS.free.engines;
 
 /** The ordered list of steps the waiting room shows; engines in scan order. */
-export function progressTemplate(engines: Engine[]): ScanProgressStep[] {
+export function progressTemplate(engines: Engine[], copy: CopyShape): ScanProgressStep[] {
   return [
     { key: "found", label: copy.scan.steps.found, done: false },
     ...engines.map((e) => ({ key: `ask:${e}`, label: copy.scan.steps.asking(ENGINE_LABEL[e]), done: false })),
@@ -145,8 +145,8 @@ export async function getScanState(token: string): Promise<ScanJobState | null> 
 }
 
 /** Create the waiting-room state (status queued). Call before `after(() => startFreeScan(...))`. */
-export async function createScanState(businessId: string, engines: Engine[] = FREE_SCAN_ENGINES): Promise<ScanJobState> {
-  const state: ScanJobState = { token: newScanToken(businessId), businessId, scanRunId: null, status: "queued", steps: progressTemplate(engines), error: null };
+export async function createScanState(businessId: string, copy: CopyShape, engines: Engine[] = FREE_SCAN_ENGINES): Promise<ScanJobState> {
+  const state: ScanJobState = { token: newScanToken(businessId), businessId, scanRunId: null, status: "queued", steps: progressTemplate(engines, copy), error: null };
   await persist(state);
   return state;
 }

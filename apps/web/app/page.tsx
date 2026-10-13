@@ -1,7 +1,8 @@
 import Link from "next/link";
 import type { Severity, Stip as StipColour } from "@maicro/core/types";
 import { SECTOR_LIST } from "@maicro/core/prompts";
-import { copy } from "@maicro/core/copy";
+import type { CopyShape } from "@maicro/core/copy";
+import { getI18n } from "@/lib/i18n";
 import { SiteHeader } from "@/components/SiteHeader";
 import { SiteFooter } from "@/components/SiteFooter";
 import { ScanField } from "@/components/ScanField";
@@ -23,11 +24,8 @@ import { ControleViz } from "@/components/viz/ControleViz";
 import { GevondenViz } from "@/components/viz/GevondenViz";
 import { DriftViz } from "@/components/viz/DriftViz";
 
-const L = copy.landing;
-const V = L.scenes;
-
 /** Organization data for search engines (baseline F2). No sameAs until there are real profiles to point at. */
-const ORGANIZATION = {
+const organization = (copy: CopyShape) => ({
   "@context": "https://schema.org",
   "@type": "Organization",
   name: copy.brand,
@@ -37,7 +35,7 @@ const ORGANIZATION = {
   description: copy.tagline,
   address: { "@type": "PostalAddress", streetAddress: "Factorij 80", postalCode: "3071 AV", addressLocality: "Rotterdam", addressCountry: "NL" },
   identifier: { "@type": "PropertyValue", propertyID: "KvK", value: "42057858" },
-};
+});
 const severities: Severity[] = ["afhaker", "misleider", "verwarring"];
 
 function SectionHead({ h2, body, id }: { h2: string; body: string; id?: string }) {
@@ -49,10 +47,13 @@ function SectionHead({ h2, body, id }: { h2: string; body: string; id?: string }
   );
 }
 
-export default function LandingPage() {
+export default async function LandingPage() {
+  const { copy, href } = await getI18n();
+  const L = copy.landing;
+  const V = L.scenes;
   return (
     <>
-      <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(ORGANIZATION) }} />
+      <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(organization(copy)) }} />
       <span id="top" />
       <SiteHeader />
       <main>
@@ -333,7 +334,7 @@ export default function LandingPage() {
               {L.rapport.rows.map((r) => (
                 <ReportRow key={r.q} compact row={{ question: r.q, said: r.said, tone: r.tone as "rood" | "grijs" | "groen", correct: r.right, source: r.source }} />
               ))}
-              <Link href="/r/voorbeeld" className="btn-link mt-3.5 self-start">
+              <Link href={href("/r/voorbeeld")} className="btn-link mt-3.5 self-start">
                 {L.rapport.link}
               </Link>
             </div>

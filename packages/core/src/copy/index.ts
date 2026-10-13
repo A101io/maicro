@@ -7,6 +7,8 @@
  * controleren · vinden · herstellen · laten zien.
  */
 
+import { en } from "./en.js";
+
 export const PRICES = {
   setupEur: 149,
   monitorEurPerMonth: 49,
@@ -1652,3 +1654,24 @@ type Widen<T> = T extends string
           : { readonly [K in keyof T]: Widen<T[K]> };
 export type CopyShape = Widen<typeof copy>;
 export default copy;
+
+export type Lang = "nl" | "en";
+
+/**
+ * English, with one Dutch part kept on purpose: the sector pages show the
+ * questions the scanner asks, and it asks them in Dutch (prompts/sectors.ts).
+ * The words filled into those Dutch templates stay Dutch too, so an English
+ * page shows a real Dutch question rather than a half-translated one.
+ */
+const english: CopyShape = {
+  ...en,
+  sector: { ...en.sector, placeholderPlace: copy.sector.placeholderPlace },
+  sectorPages: Object.fromEntries(
+    Object.entries(en.sectorPages).map(([slug, page]) => [slug, { ...page, sample: copy.sectorPages[slug as keyof typeof copy.sectorPages].sample }]),
+  ) as unknown as CopyShape["sectorPages"], // same keys as en.sectorPages, rebuilt entry by entry
+};
+
+/** The copy in one language. */
+export function copyFor(lang: Lang): CopyShape {
+  return lang === "en" ? english : copy;
+}

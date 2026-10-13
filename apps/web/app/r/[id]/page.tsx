@@ -1,7 +1,7 @@
 import type { Metadata } from "next";
 import { notFound } from "next/navigation";
 import type { ScanReport } from "@maicro/core/types";
-import { copy } from "@maicro/core/copy";
+import { getCopy, getI18n } from "@/lib/i18n";
 import { SiteHeader } from "@/components/SiteHeader";
 import { SiteFooter } from "@/components/SiteFooter";
 import { StipHero, Stip } from "@/components/Stip";
@@ -31,6 +31,7 @@ async function load(id: string): Promise<{ report: ScanReport; opts: BuildViewOp
 export async function generateMetadata({ params }: { params: Promise<{ id: string }> }): Promise<Metadata> {
   const { id } = await params;
   const loaded = await load(id);
+  const copy = await getCopy();
   if (!loaded) return { title: copy.result.notFound };
   return { title: copy.email.subjects.report(loaded.report.business.name), robots: { index: false } };
 }
@@ -41,7 +42,8 @@ export default async function ResultPage({ params, searchParams }: { params: Pro
   const loaded = await load(id);
   if (!loaded) notFound();
   const { report, opts, demo } = loaded;
-  const v = buildReportView(report, opts);
+  const { copy, href } = await getI18n();
+  const v = buildReportView(report, copy, opts);
   const R = copy.result;
   const grey = v.state === "grijs";
   const business = demo ? null : await (await ready()).getBusiness(report.business.id);
@@ -174,7 +176,7 @@ export default async function ResultPage({ params, searchParams }: { params: Pro
             </form>
             <p className="text-center text-[13px] text-muted">{v.plan.excl}</p>
             {!demo && !business?.ownerVerifiedAt && (
-              <a href={`/eigenaar/bevestigen?business=${encodeURIComponent(report.business.id)}`} className="text-center text-[14px] font-semibold text-blue">
+              <a href={href(`/eigenaar/bevestigen?business=${encodeURIComponent(report.business.id)}`)} className="text-center text-[14px] font-semibold text-blue">
                 {copy.owner.claimLink}
               </a>
             )}

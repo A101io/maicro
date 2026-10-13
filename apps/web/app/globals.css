@@ -464,3 +464,28 @@ a.pill:hover { background: var(--panel); }
 .card, .card-sm { box-shadow: 0 1px 2px rgb(17 24 39 / 0.04), 0 12px 32px -26px rgb(17 24 39 / 0.35); }
 /* The hero glow bleeds past the page edge on purpose; it must not widen the page. */
 main { overflow-x: clip; }
+
+/* NL · EN switch (components/LangSwitch.tsx). */
+.lang-switch { display: inline-flex; padding: 2px; border-radius: 999px; border: 1.5px solid var(--line); background: #fff; font-size: 13px; font-weight: 700; }
+.lang-switch a { padding: 3px 9px; border-radius: 999px; color: var(--muted); }
+.lang-switch a:hover { color: var(--ink); }
+.lang-switch a.is-current { background: var(--ink); color: #fff; }
+
+/* Mobile menu: a <details>, so it opens without script. */
+.site-menu { position: relative; }
+.site-menu-icon, .site-menu-icon::before, .site-menu-icon::after { display: block; width: 16px; height: 2px; border-radius: 2px; background: var(--ink); }
+.site-menu-icon { position: relative; }
+.site-menu-icon::before, .site-menu-icon::after { content: ""; position: absolute; left: 0; }
+.site-menu-icon::before { top: -5px; }
+.site-menu-icon::after { top: 5px; }
+.site-menu[open] .site-menu-icon { background: transparent; }
+.site-menu[open] .site-menu-icon::before { top: 0; rotate: 45deg; }
+.site-menu[open] .site-menu-icon::after { top: 0; rotate: -45deg; }
+.site-menu-panel {
+  position: fixed; left: 16px; right: 16px; top: 76px; z-index: 50;
+  display: flex; flex-direction: column; padding: 8px;
+  background: #fff; border: 1.5px solid var(--line); border-radius: 16px;
+  box-shadow: 0 20px 40px -24px rgb(17 24 39 / 0.45);
+}
+.site-menu-panel a { padding: 10px 12px; border-radius: 10px; font-weight: 700; }
+.site-menu-panel a:hover { background: var(--panel); color: var(--ink); }

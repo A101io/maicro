@@ -1,5 +1,5 @@
 import Link from "next/link";
-import { copy } from "@maicro/core/copy";
+import { getI18n } from "@/lib/i18n";
 import { SiteHeader } from "@/components/SiteHeader";
 import { SiteFooter } from "@/components/SiteFooter";
 import { ScanField } from "@/components/ScanField";
@@ -13,6 +13,7 @@ export default async function ChoosePage({ searchParams }: { searchParams: Promi
   const place = placeParam || parsed.place;
   const candidates = q ? await resolveBusiness(parsed.query, place) : [];
   const needsPlace = plaats === "1" || (candidates.length > 0 && candidates.every((c) => !c.place) && !place);
+  const { copy, href } = await getI18n();
   const c = copy.scan.choose;
   return (
     <>
@@ -53,7 +54,7 @@ export default async function ChoosePage({ searchParams }: { searchParams: Promi
               ))}
             </ul>
             <p className="mt-6 text-[14px]">
-              <Link href="/" className="btn-link">{c.back}</Link>
+              <Link href={href("/")} className="btn-link">{c.back}</Link>
             </p>
           </>
         ) : (

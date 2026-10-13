@@ -6,7 +6,7 @@
 import type { Facts, Hours, SectorSlug, Severity } from "@maicro/core/types";
 import { SECTORS, type SectorPromptTemplate } from "@maicro/core/prompts";
 import { criterium, type Criterium } from "@maicro/core/criteria";
-import { copy } from "@maicro/core/copy";
+import type { CopyShape } from "@maicro/core/copy";
 
 export interface SectorQuestion {
   text: string;
@@ -15,7 +15,7 @@ export interface SectorQuestion {
   kind: SectorPromptTemplate["kind"];
 }
 
-function placeholderFacts(slug: SectorSlug): Facts {
+function placeholderFacts(slug: SectorSlug, copy: CopyShape): Facts {
   const s = copy.sectorPages[slug].sample;
   const name = copy.sector.placeholderName;
   const place = copy.sector.placeholderPlace;
@@ -49,9 +49,9 @@ function placeholderFacts(slug: SectorSlug): Facts {
 }
 
 /** The sector's extra questions, in the order the scanner asks them. */
-export function sectorQuestions(slug: SectorSlug): SectorQuestion[] {
+export function sectorQuestions(slug: SectorSlug, copy: CopyShape): SectorQuestion[] {
   const pack = SECTORS[slug];
-  const facts = placeholderFacts(slug);
+  const facts = placeholderFacts(slug, copy);
   const xInPlace = `${facts.name} in ${facts.place}`;
   return pack.prompts(facts).map((p) => {
     const c = criterium(p.criterium);

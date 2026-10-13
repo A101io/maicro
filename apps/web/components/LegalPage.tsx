@@ -1,10 +1,11 @@
-import { copy } from "@maicro/core/copy";
+import { getI18n } from "@/lib/i18n";
 import { SiteHeader } from "@/components/SiteHeader";
 import { SiteFooter } from "@/components/SiteFooter";
 
 type Doc = { title: string; intro: string; sections: readonly { h: string; p: readonly string[] }[] };
 
-export function LegalPage({ doc }: { doc: Doc }) {
+export async function LegalPage({ doc }: { doc: Doc }) {
+  const { copy } = await getI18n();
   const l = copy.legal;
   return (
     <>

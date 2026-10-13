@@ -1,4 +1,4 @@
-import { copy } from "@maicro/core/copy";
+import { getI18n } from "@/lib/i18n";
 import { Dot, Scene } from "./Scene";
 
 /**
@@ -6,7 +6,8 @@ import { Dot, Scene } from "./Scene";
  * customer calls the first. After a facts page and the directories, the
  * recheck names the business.
  */
-export function GevondenViz() {
+export async function GevondenViz() {
+  const { copy } = await getI18n();
   const S = copy.landing.scenes.gevonden;
   return (
     <Scene seconds={14} label={S.label} caption={S.caption}>

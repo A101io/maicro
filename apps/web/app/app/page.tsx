@@ -1,5 +1,6 @@
 import Link from "next/link";
-import { copy } from "@maicro/core/copy";
+import type { CopyShape } from "@maicro/core/copy";
+import { getI18n } from "@/lib/i18n";
 import { ENGINE_LABEL } from "@maicro/core/types";
 import type { Channel, Finding, FindingStatus, Stip as StipColour } from "@maicro/core/types";
 import { Stip, StipRow } from "@/components/Stip";
@@ -15,7 +16,7 @@ const channelTone: Record<Channel["status"], StipColour> = { pending: "grijs", s
 
 const recheckDays: Record<Finding["sourceType"], number> = { owned_facts_page: 7, owned_website: 14, directory_api: 7, directory_form: 14, third_party: 30, other_entity: 30, none: 0 };
 
-function nextStep(f: Finding): string {
+function nextStep(f: Finding, copy: CopyShape): string {
   if (f.status === "resolved") return "";
   if (f.verdict === "not_found") return [copy.fixPathNotFound, f.status === "unfixable" ? "" : `Hercontrole ${dateShort(addDays(f.firstSeenAt, 21))}`].filter(Boolean).join(" ");
   if (f.status === "unfixable") return copy.fixPath.none;
@@ -36,6 +37,7 @@ export default async function DashboardPage({ searchParams }: { searchParams: Pr
   const sp = await searchParams;
   const { business } = await requireOwner();
   const data = await loadDashboard(business.id);
+  const { copy, href } = await getI18n();
   const d = copy.dashboard;
 
   const lastRun = data.scanRuns.find((r) => r.status === "done");
@@ -90,7 +92,7 @@ export default async function DashboardPage({ searchParams }: { searchParams: Pr
                   <Stip tone={s.done ? "groen" : "grijs"} size={12} />
                   <span className={s.done ? "text-muted" : "font-semibold"}>{s.label}</span>
                 </span>
-                <Link href={s.href} className="btn-link">
+                <Link href={href(s.href)} className="btn-link">
                   {s.done ? d.stepDone : d.stepTodo}
                 </Link>
               </li>
@@ -104,7 +106,7 @@ export default async function DashboardPage({ searchParams }: { searchParams: Pr
         <div className="flex items-baseline justify-between gap-4">
           <h2 className="h3">{d.sections.findings}</h2>
           {lastRun && (
-            <Link href={`/r/${lastRun.id}`} className="btn-link">
+            <Link href={href(`/r/${lastRun.id}`)} className="btn-link">
               {d.viewReport}
             </Link>
           )}
@@ -136,7 +138,7 @@ export default async function DashboardPage({ searchParams }: { searchParams: Pr
                       copy.sourceType[f.sourceType]
                     )}
                     {" · "}
-                    {d.nextStep}: {nextStep(f)}
+                    {d.nextStep}: {nextStep(f, copy)}
                   </p>
                 </div>
               </li>
@@ -174,7 +176,7 @@ export default async function DashboardPage({ searchParams }: { searchParams: Pr
       <section>
         <div className="flex items-baseline justify-between gap-4">
           <h2 className="h3">{d.sections.channels}</h2>
-          <Link href={`/feiten/${business.slug}`} className="btn-link">
+          <Link href={href(`/feiten/${business.slug}`)} className="btn-link">
             {d.factsPage}
           </Link>
         </div>

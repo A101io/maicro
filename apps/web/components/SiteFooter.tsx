@@ -1,11 +1,13 @@
 import Link from "next/link";
-import { copy } from "@maicro/core/copy";
+import { getI18n } from "@/lib/i18n";
+import { LangSwitch } from "@/components/LangSwitch";
 
 /**
  * Footer. `variant="full"`: four columns + legal line (landing, result).
  * `variant="short"`: one line, legal left and a note right (sector pages, grey result).
  */
-export function SiteFooter({ variant = "full", note, tagline }: { variant?: "full" | "short"; note?: string; tagline?: string }) {
+export async function SiteFooter({ variant = "full", note, tagline }: { variant?: "full" | "short"; note?: string; tagline?: string }) {
+  const { copy, href } = await getI18n();
   const f = copy.landing.footer;
   if (variant === "short") {
     return (
@@ -26,13 +28,13 @@ export function SiteFooter({ variant = "full", note, tagline }: { variant?: "ful
               {copy.nav.wordmark}
             </span>
             <span className="max-w-[28ch] text-[14px] leading-[1.5] text-muted">{tagline ?? f.tagline}</span>
-            {note ? <span className="text-[13px] text-muted">{note}</span> : <span className="rounded-lg border-[1.5px] border-line bg-white px-2.5 py-1 text-[13px] text-muted">{f.lang}</span>}
+            {note ? <span className="text-[13px] text-muted">{note}</span> : <LangSwitch />}
           </div>
           {f.columns.map((c) => (
             <div key={c.title} className="flex flex-col gap-2.5 text-[14px]">
               <span className="font-bold">{c.title}</span>
               {c.links.map((l) => (
-                <Link key={l.label} href={l.href} className="nav-link text-ink-2">
+                <Link key={l.label} href={href(l.href)} className="nav-link text-ink-2">
                   {l.label}
                 </Link>
               ))}

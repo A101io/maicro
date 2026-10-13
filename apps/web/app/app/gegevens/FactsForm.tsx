@@ -3,13 +3,13 @@
 import { useState } from "react";
 import type { Facts, Hours, PriceItem } from "@maicro/core/types";
 import { SECTOR_LIST } from "@maicro/core/prompts";
-import { copy } from "@maicro/core/copy";
+import { copyFor, type CopyShape, type Lang } from "@maicro/core/copy";
 import { saveFacts } from "./actions";
 
-const F = copy.facts;
+type FactsCopy = CopyShape["facts"];
 
 /** Chip input: a list of short strings; Enter or comma adds, × removes. */
-function ChipInput({ name, label, hint, initial }: { name: string; label: string; hint?: string; initial: string[] }) {
+function ChipInput({ name, label, hint, initial, F }: { name: string; label: string; hint?: string; initial: string[]; F: FactsCopy }) {
   const [items, setItems] = useState(initial);
   const [draft, setDraft] = useState("");
   const add = () => {
@@ -52,7 +52,7 @@ function ChipInput({ name, label, hint, initial }: { name: string; label: string
   );
 }
 
-function HoursRows({ initial }: { initial: Hours[] }) {
+function HoursRows({ initial, F }: { initial: Hours[]; F: FactsCopy }) {
   const [rows, setRows] = useState<Hours[]>(
     [0, 1, 2, 3, 4, 5, 6].map((d) => initial.find((h) => h.day === d) ?? { day: d as Hours["day"], open: "09:00", close: "17:00", closed: d === 6 }),
   );
@@ -87,7 +87,7 @@ function HoursRows({ initial }: { initial: Hours[] }) {
   );
 }
 
-function PriceRows({ initial }: { initial: PriceItem[] }) {
+function PriceRows({ initial, F }: { initial: PriceItem[]; F: FactsCopy }) {
   const [rows, setRows] = useState<PriceItem[]>(initial);
   return (
     <div className="space-y-2">
@@ -108,7 +108,7 @@ function PriceRows({ initial }: { initial: PriceItem[] }) {
   );
 }
 
-function UrgencyFields({ initial }: { initial: Facts["urgency"] }) {
+function UrgencyFields({ initial, F }: { initial: Facts["urgency"]; F: FactsCopy }) {
   const [available, setAvailable] = useState(Boolean(initial?.available));
   return (
     <div className="grid gap-4 sm:grid-cols-2">
@@ -139,7 +139,9 @@ function Group({ title, children }: { title: string; children: React.ReactNode }
   );
 }
 
-export function FactsForm({ facts }: { facts: Facts }) {
+export function FactsForm({ facts, lang }: { facts: Facts; lang: Lang }) {
+  const copy = copyFor(lang);
+  const F = copy.facts;
   const f = F.fields;
   return (
     <form action={saveFacts} className="space-y-4">
@@ -190,32 +192,32 @@ export function FactsForm({ facts }: { facts: Facts }) {
       </Group>
 
       <Group title={F.groups.hours}>
-        <HoursRows initial={facts.hours} />
+        <HoursRows initial={facts.hours} F={F} />
       </Group>
 
       <Group title={F.groups.services}>
-        <ChipInput name="servicesYes" label={f.servicesYes} initial={facts.servicesYes} />
-        <ChipInput name="servicesNo" label={f.servicesNo} initial={facts.servicesNo} />
+        <ChipInput name="servicesYes" label={f.servicesYes} initial={facts.servicesYes} F={F} />
+        <ChipInput name="servicesNo" label={f.servicesNo} initial={facts.servicesNo} F={F} />
       </Group>
 
       <Group title={F.groups.prices}>
-        <PriceRows initial={facts.prices} />
+        <PriceRows initial={facts.prices} F={F} />
       </Group>
 
       <Group title={F.groups.policies}>
-        <ChipInput name="policies" label={f.policies} hint={f.policiesHint} initial={facts.policies} />
+        <ChipInput name="policies" label={f.policies} hint={f.policiesHint} initial={facts.policies} F={F} />
       </Group>
 
       <Group title={F.groups.payment}>
-        <ChipInput name="paymentMethods" label={f.paymentMethods} initial={facts.paymentMethods} />
+        <ChipInput name="paymentMethods" label={f.paymentMethods} initial={facts.paymentMethods} F={F} />
       </Group>
 
       <Group title={F.groups.confusion}>
-        <ChipInput name="notConfusedWith" label={f.notConfusedWith} hint={f.notConfusedWithHint} initial={facts.notConfusedWith} />
+        <ChipInput name="notConfusedWith" label={f.notConfusedWith} hint={f.notConfusedWithHint} initial={facts.notConfusedWith} F={F} />
       </Group>
 
       <Group title={F.groups.area}>
-        <ChipInput name="serviceAreaPlaces" label={f.serviceAreaPlaces} hint={f.serviceAreaPlacesHint} initial={facts.serviceArea?.places ?? []} />
+        <ChipInput name="serviceAreaPlaces" label={f.serviceAreaPlaces} hint={f.serviceAreaPlacesHint} initial={facts.serviceArea?.places ?? []} F={F} />
         <div className="max-w-[220px]">
           <label htmlFor="serviceAreaRadiusKm" className="field-label">{f.serviceAreaRadiusKm}</label>
           <input id="serviceAreaRadiusKm" name="serviceAreaRadiusKm" type="number" min="1" step="1" defaultValue={facts.serviceArea?.radiusKm ?? ""} className="field-sm" />
@@ -223,11 +225,11 @@ export function FactsForm({ facts }: { facts: Facts }) {
       </Group>
 
       <Group title={F.groups.urgency}>
-        <UrgencyFields initial={facts.urgency} />
+        <UrgencyFields initial={facts.urgency} F={F} />
       </Group>
 
       <Group title={F.groups.credentials}>
-        <ChipInput name="credentials" label={f.credentials} hint={f.credentialsHint} initial={facts.credentials ?? []} />
+        <ChipInput name="credentials" label={f.credentials} hint={f.credentialsHint} initial={facts.credentials ?? []} F={F} />
       </Group>
 
       <Group title={F.groups.sector}>

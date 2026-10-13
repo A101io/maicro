@@ -26,6 +26,13 @@
  * screen, start from the top each time they scroll in and pause when they
  * leave. Their parts say when they move: data-show, data-draw, data-pulse.
  */
+// The mobile menu is a <details>: close it once a link in it is followed
+// (an anchor link keeps the page, so it would otherwise stay open).
+document.addEventListener("click", (e) => {
+  const link = e.target instanceof Element && e.target.closest(".site-menu-panel a");
+  if (link) link.closest("details")?.removeAttribute("open");
+});
+
 (() => {
   if (!("animate" in Element.prototype) || !("IntersectionObserver" in window)) return;
   if (window.matchMedia("(prefers-reduced-motion: reduce)").matches) return;

@@ -1,4 +1,4 @@
-import { copy } from "@maicro/core/copy";
+import { getI18n } from "@/lib/i18n";
 import { Chip, Scene } from "./Scene";
 
 /**
@@ -6,7 +6,8 @@ import { Chip, Scene } from "./Scene";
  * nothing readable and is passed over; the other has a facts page, answers
  * with a date and a source, and gets the order.
  */
-export function AgentTalkViz() {
+export async function AgentTalkViz() {
+  const { copy } = await getI18n();
   const S = copy.landing.agents.scene;
   const lanes = [
     { ...S.noFacts, tone: "grey" as const, t: 0.12, source: null as string | null },

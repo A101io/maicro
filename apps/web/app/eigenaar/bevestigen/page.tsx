@@ -1,6 +1,6 @@
 import type { Metadata } from "next";
 import { notFound } from "next/navigation";
-import { copy } from "@maicro/core/copy";
+import { getI18n } from "@/lib/i18n";
 import { SiteHeader } from "@/components/SiteHeader";
 import { SiteFooter } from "@/components/SiteFooter";
 import { ready } from "@/lib/db";
@@ -19,6 +19,7 @@ export default async function ClaimPage({ searchParams }: { searchParams: Promis
   const business = await (await ready()).getBusiness(sp.business);
   if (!business) notFound();
   const session = await getSession();
+  const { copy, href } = await getI18n();
   const O = copy.owner;
   const here = `/eigenaar/bevestigen?business=${encodeURIComponent(business.id)}`;
   return (
@@ -32,7 +33,7 @@ export default async function ClaimPage({ searchParams }: { searchParams: Promis
             {O.claimButton}
           </a>
         ) : (
-          <a href={`/inloggen?next=${encodeURIComponent(here)}&business=${encodeURIComponent(business.id)}`} className="btn-primary mt-8 inline-flex h-[52px]">
+          <a href={href(`/inloggen?next=${encodeURIComponent(here)}&business=${encodeURIComponent(business.id)}`)} className="btn-primary mt-8 inline-flex h-[52px]">
             {O.claimLogin}
           </a>
         )}

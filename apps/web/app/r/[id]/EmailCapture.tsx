@@ -1,7 +1,8 @@
-import { copy } from "@maicro/core/copy";
+import { getI18n } from "@/lib/i18n";
 
 /** "Stuur dit rapport naar mij": one field with a black Verstuur button. Plain POST. */
-export function EmailCapture({ scanRunId, businessId, sent, invalid }: { scanRunId: string; businessId: string; sent: boolean; invalid: boolean }) {
+export async function EmailCapture({ scanRunId, businessId, sent, invalid }: { scanRunId: string; businessId: string; sent: boolean; invalid: boolean }) {
+  const { copy } = await getI18n();
   const e = copy.result.email;
   return (
     <div className="flex flex-col gap-2.5">

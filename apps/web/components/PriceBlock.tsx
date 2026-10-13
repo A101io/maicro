@@ -1,5 +1,5 @@
 import Link from "next/link";
-import { copy } from "@maicro/core/copy";
+import { getI18n } from "@/lib/i18n";
 
 function Check({ light }: { light?: boolean }) {
   return (
@@ -10,7 +10,8 @@ function Check({ light }: { light?: boolean }) {
 }
 
 /** The two plans on the dark pricing band: Goed zetten (€149) and Goed houden (€49 per maand). */
-export function PriceBlock() {
+export async function PriceBlock() {
+  const { copy, href } = await getI18n();
   const P = copy.landing.prijs;
   return (
     <div className="flex flex-col gap-9">
@@ -40,7 +41,7 @@ export function PriceBlock() {
             ))}
           </ul>
           <p className="text-[13px] text-grijs">{P.setup.limit}</p>
-          <Link href="/#top" className="sheen mt-auto block rounded-btn border-[1.5px] border-white py-3.5 text-center text-[15px] font-extrabold text-white hover:border-blue-light hover:text-blue-light">
+          <Link href={href("/#top")} className="sheen mt-auto block rounded-btn border-[1.5px] border-white py-3.5 text-center text-[15px] font-extrabold text-white hover:border-blue-light hover:text-blue-light">
             {P.setup.button}
           </Link>
         </div>
@@ -62,14 +63,14 @@ export function PriceBlock() {
             ))}
           </ul>
           <p className="text-[13px] text-blue-light">{P.monitor.limit}</p>
-          <Link href="/#top" className="sheen mt-auto block rounded-btn bg-white py-3.5 text-center text-[15px] font-extrabold text-ink hover:text-blue">
+          <Link href={href("/#top")} className="sheen mt-auto block rounded-btn bg-white py-3.5 text-center text-[15px] font-extrabold text-ink hover:text-blue">
             {P.monitor.button}
           </Link>
         </div>
       </div>
       <div className="flex flex-wrap justify-between gap-5 text-[13px] text-grijs">
         <span>{P.footnote}</span>
-        <Link href="/#vragen" className="text-blue-light">
+        <Link href={href("/#vragen")} className="text-blue-light">
           {P.multi}
         </Link>
       </div>

@@ -1,4 +1,4 @@
-import { copy } from "@maicro/core/copy";
+import { getI18n } from "@/lib/i18n";
 
 /**
  * The landing hero's visual: what Maicro does, as one loop (12s).
@@ -32,7 +32,8 @@ const RED = "#E11D48";
 const GREEN = "#2F855A";
 const GREY = "#9CA3AF";
 
-export function HeroViz() {
+export async function HeroViz() {
+  const { copy } = await getI18n();
   const V = copy.landing.hero.viz;
   return (
     <figure className="m-0 flex flex-col gap-3">
