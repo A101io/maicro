@@ -43,7 +43,7 @@ Short. One action at a time. Real strings, not placeholders. End with one concre
 - `docs/ARCHITECTURE.md` — workflows A–E and the fix-path table.
 - `docs/CRITERIA.md` — the twelve criteria, severities, thresholds, the stipregel and the sector question sets (the scanner follows this literally).
 - `docs/MESSAGING.md` — every customer-facing rule and the Dutch copy. All strings live in `packages/core/src/copy/index.ts`.
-- `docs/DESIGN_G.md` — the visual spec (design G: Manrope, white/ink/one blue accent, 1.5px borders, status colours only in dots, pills and report rows; reference boards in `docs/design-g/*.html` are the source of truth for copy, order and layout). `docs/DESIGN_RESEARCH.md` §3–4 (serif/paper) is superseded.
+- `docs/DESIGN_G.md` — the visual spec (design G: Plus Jakarta Sans, white/ink/one blue accent, 1.5px borders, status colours only in dots, pills and report rows; reference boards in `docs/design-g/*.html` are the source of truth for copy, order and layout). `docs/DESIGN_RESEARCH.md` §3–4 (serif/paper) is superseded.
 
 ## Commands
 ```
