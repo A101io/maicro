@@ -6,7 +6,7 @@
  */
 import type { Engine, Finding, ScanReport, Severity, Stip } from "@maicro/core/types";
 import { ENGINE_LABEL } from "@maicro/core/types";
-import { copy } from "@maicro/core/copy";
+import type { CopyShape } from "@maicro/core/copy";
 import { findingSeverity } from "@maicro/core/scanner";
 import type { ReportRowData } from "@/components/ReportRow";
 import type { SourceStatusTone } from "@/components/SourceRow";
@@ -74,7 +74,7 @@ function keyOf(factKey: string, subject: string | null | undefined, rec = false)
 }
 
 /** Group findings and correct answers into one row per question. */
-function groupQuestions(report: ScanReport): QuestionGroup[] {
+function groupQuestions(report: ScanReport, copy: CopyShape): QuestionGroup[] {
   const { name, place } = report.business;
   const groups = new Map<string, QuestionGroup>();
   const get = (key: string, question: string) => {
@@ -92,7 +92,7 @@ function groupQuestions(report: ScanReport): QuestionGroup[] {
   for (const f of report.findings) {
     const rec = f.evidenceKind === "recommendation";
     const key = keyOf(f.factKey, f.subject, rec);
-    const q = rec ? recommendationQuestionFor(f.factKey, f.subject, place) : questionFor(f.factKey, f.subject, name, place);
+    const q = rec ? recommendationQuestionFor(f.factKey, f.subject, place, copy) : questionFor(f.factKey, f.subject, name, place);
     const g = groups.get(key) ?? get(key, q);
     g.findings.push(f);
   }
@@ -106,7 +106,7 @@ function groupQuestions(report: ScanReport): QuestionGroup[] {
   return [...groups.values()].sort((a, b) => rank(a) - rank(b));
 }
 
-function sourceLabel(f: Finding): { label: string; href: string | null } {
+function sourceLabel(f: Finding, copy: CopyShape): { label: string; href: string | null } {
   const T = copy.result.table;
   if (f.verdict === "not_found") return { label: T.noSource, href: null };
   if (f.evidenceKind === "recommendation" && !f.sourceUrl) return { label: T.noSource, href: null };
@@ -124,14 +124,14 @@ function dominant(findings: Finding[]): Finding | null {
   return [...findings].sort((a, b) => severityRank[findingSeverity(a)] - severityRank[findingSeverity(b)] || b.frequency - a.frequency)[0]!;
 }
 
-function rowFor(g: QuestionGroup): ReportRowData {
+function rowFor(g: QuestionGroup, copy: CopyShape): ReportRowData {
   const T = copy.result.table;
   const wrong = g.findings.filter((f) => f.verdict !== "not_found");
   const notFound = g.findings.filter((f) => f.verdict === "not_found");
   if (wrong.length) {
     const f = dominant(wrong)!;
     const rec = f.evidenceKind === "recommendation";
-    const src = sourceLabel(f);
+    const src = sourceLabel(f, copy);
     return {
       question: g.question,
       said: rec ? T.notNamed : wrongText(f),
@@ -150,9 +150,9 @@ function rowFor(g: QuestionGroup): ReportRowData {
   return { question: g.question, said: value, tone: "groen", correct: T.ok, source: T.none };
 }
 
-function cardFor(f: Finding, business: ScanReport["business"]): AnswerCardData {
+function cardFor(f: Finding, business: ScanReport["business"], copy: CopyShape): AnswerCardData {
   const A = copy.result.answerCard;
-  const question = f.evidenceKind === "recommendation" ? recommendationQuestionFor(f.factKey, f.subject, business.place) : questionFor(f.factKey, f.subject, business.name, business.place);
+  const question = f.evidenceKind === "recommendation" ? recommendationQuestionFor(f.factKey, f.subject, business.place, copy) : questionFor(f.factKey, f.subject, business.name, business.place);
   const engine = ENGINE_LABEL[f.engine];
   const caption = A.frequency(f.frequency, f.sampleCount) + (f.sourceType === "other_entity" ? ` · ${A.otherEntity}` : "");
   if (f.verdict === "not_found") return { question, engine, highlight: A.notFoundQuote, highlightTone: "grijs", caption };
@@ -160,7 +160,7 @@ function cardFor(f: Finding, business: ScanReport["business"]): AnswerCardData {
   return { question, engine, highlight: wrongText(f), highlightTone: "rood", caption };
 }
 
-function pickCards(findings: Finding[], business: ScanReport["business"], grey: boolean): AnswerCardData[] {
+function pickCards(findings: Finding[], business: ScanReport["business"], grey: boolean, copy: CopyShape): AnswerCardData[] {
   const sorted = [...findings].sort((a, b) => severityRank[findingSeverity(a)] - severityRank[findingSeverity(b)] || b.frequency - a.frequency);
   if (!grey) {
     // One card per question: the worst finding of each question first.
@@ -169,7 +169,7 @@ function pickCards(findings: Finding[], business: ScanReport["business"], grey: 
       const k = keyOf(f.factKey, f.subject, f.evidenceKind === "recommendation");
       return seen.has(k) ? false : (seen.add(k), true);
     });
-    return picks.slice(0, 3).map((f) => cardFor(f, business));
+    return picks.slice(0, 3).map((f) => cardFor(f, business, copy));
   }
   // Grey: show the three kinds of "AI kent je niet" when they exist: not named, not found, another business.
   const picks: Finding[] = [];
@@ -178,7 +178,7 @@ function pickCards(findings: Finding[], business: ScanReport["business"], grey: 
   add(sorted.find((f) => f.verdict === "not_found"));
   add(sorted.find((f) => f.sourceType === "other_entity"));
   for (const f of sorted) if (picks.length < 3) add(f);
-  return picks.slice(0, 3).map((f) => cardFor(f, business));
+  return picks.slice(0, 3).map((f) => cardFor(f, business, copy));
 }
 
 export interface BuildViewOptions {
@@ -190,12 +190,12 @@ export interface BuildViewOptions {
   kvk?: string | null;
 }
 
-export function buildReportView(report: ScanReport, opts: BuildViewOptions = {}): ReportView {
+export function buildReportView(report: ScanReport, copy: CopyShape, opts: BuildViewOptions = {}): ReportView {
   const R = copy.result;
   const grey = report.visibility === "unknown" || report.stip === "grijs";
   const state: ReportState = grey ? "grijs" : report.stip === "groen" ? "groen" : "rood";
-  const groups = groupQuestions(report);
-  const rows = groups.map(rowFor);
+  const groups = groupQuestions(report, copy);
+  const rows = groups.map((g) => rowFor(g, copy));
   const questions = rows.length;
   const wrongQuestions = rows.filter((r) => r.tone === "rood").length;
   const notFoundQuestions = rows.filter((r) => r.tone === "grijs").length;
@@ -223,10 +223,10 @@ export function buildReportView(report: ScanReport, opts: BuildViewOptions = {})
     return { name: ENGINE_LABEL[e.engine], text: e.skipped ? R.hero.engineSkipped : R.hero.engineCounts(e.correct, Math.max(0, e.wrong - other), e.notFound, other) };
   });
 
-  const cards = pickCards(report.findings, report.business, grey);
+  const cards = pickCards(report.findings, report.business, grey, copy);
 
   const all = groups.flatMap((g) => {
-    const row = rowFor(g);
+    const row = rowFor(g, copy);
     const fromFindings = g.findings.map((f) => ({
       question: g.question,
       engine: ENGINE_LABEL[f.engine],
@@ -238,7 +238,7 @@ export function buildReportView(report: ScanReport, opts: BuildViewOptions = {})
   });
 
   const instable = report.instable.map((f) => ({
-    question: f.evidenceKind === "recommendation" ? recommendationQuestionFor(f.factKey, f.subject, report.business.place) : questionFor(f.factKey, f.subject, report.business.name, report.business.place),
+    question: f.evidenceKind === "recommendation" ? recommendationQuestionFor(f.factKey, f.subject, report.business.place, copy) : questionFor(f.factKey, f.subject, report.business.name, report.business.place),
     engine: ENGINE_LABEL[f.engine],
     value: f.evidenceKind === "recommendation" ? R.table.notNamed : wrongText(f),
     note: copy.instableLine,
@@ -260,7 +260,7 @@ export function buildReportView(report: ScanReport, opts: BuildViewOptions = {})
     const bySource = new Map<string, { label: string; href: string | null; n: number }>();
     for (const f of report.findings) {
       if (f.verdict === "not_found") continue;
-      const src = sourceLabel(f);
+      const src = sourceLabel(f, copy);
       const k = src.href ?? src.label;
       const cur = bySource.get(k) ?? { label: src.label, href: src.href, n: 0 };
       cur.n += 1;
@@ -312,7 +312,7 @@ export function buildReportView(report: ScanReport, opts: BuildViewOptions = {})
       : report.findings
           .filter((f) => f.verdict !== "not_found")
           .map((f) => {
-            const src = sourceLabel(f);
+            const src = sourceLabel(f, copy);
             return `${src.label}: ${ENGINE_LABEL[f.engine]} ${copy.findingVerdict.wrong.toLowerCase()} “${f.evidenceKind === "recommendation" ? R.table.notNamed : wrongText(f)}”, het is ${correctText(f)}. ${f.verdict === "wrong" ? copy.fixPath[f.sourceType] : ""}`.trim();
           });
 

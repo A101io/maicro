@@ -5,7 +5,9 @@ import { env } from "@/lib/env";
 import { getStripe } from "@/lib/stripe";
 import { getSession, getOwnedBusiness } from "@/lib/session";
 import { isVerifiedOwner } from "@maicro/core/shared";
-import { copy, PRICES } from "@maicro/core/copy";
+import { copyFor, PRICES } from "@maicro/core/copy";
+import { localizeHref } from "@/lib/lang-paths";
+import { langFromReferer } from "@/lib/request-lang";
 
 export const runtime = "nodejs";
 
@@ -19,6 +21,10 @@ export const runtime = "nodejs";
  * Mock mode (no STRIPE_SECRET_KEY): marks the business paid and goes to /welkom.
  */
 export async function POST(req: Request) {
+  const lang = langFromReferer(req);
+  const copy = copyFor(lang);
+  // Pages we send people to, in the language they posted from.
+  const page = (path: string) => `${env.baseUrl}${localizeHref(path, lang)}`;
   const form = await req.formData();
   const businessId = String(form.get("business") ?? "");
   const scanRunId = String(form.get("scan") ?? "");
@@ -26,13 +32,13 @@ export async function POST(req: Request) {
   const plan = raw === "setup" ? "setup" : raw === "monitor_addon" ? "monitor_addon" : "monitor";
   const db = await ready();
   const business = await db.getBusiness(businessId);
-  const back = plan === "monitor_addon" ? `${env.baseUrl}/app/abonnement` : `${env.baseUrl}/r/${encodeURIComponent(scanRunId)}`;
-  if (!business) return NextResponse.redirect(`${env.baseUrl}/`, 303);
+  const back = plan === "monitor_addon" ? page(`/app/abonnement`) : page(`/r/${encodeURIComponent(scanRunId)}`);
+  if (!business) return NextResponse.redirect(page(`/`), 303);
 
   if (plan === "monitor_addon") {
     // Adding monitoring changes an existing customer's bill: owner only.
     const session = await getSession();
-    if (!session || !isVerifiedOwner(business, session.userId)) return NextResponse.redirect(`${env.baseUrl}/app/google?eerst=1`, 303);
+    if (!session || !isVerifiedOwner(business, session.userId)) return NextResponse.redirect(page(`/app/google?eerst=1`), 303);
   }
 
   const stripe = await getStripe();
@@ -44,7 +50,7 @@ export async function POST(req: Request) {
       await db.enqueueJob("setup", { businessId: business.id });
     }
     await db.logEvent(business.id, "checkout.mock", { plan });
-    return NextResponse.redirect(plan === "monitor_addon" ? `${env.baseUrl}/app/abonnement?toegevoegd=1` : `${env.baseUrl}/welkom?mock=1&business=${business.id}`, 303);
+    return NextResponse.redirect(plan === "monitor_addon" ? page(`/app/abonnement?toegevoegd=1`) : page(`/welkom?mock=1&business=${business.id}`), 303);
   }
 
   const taxRate = env.stripeTaxRateId;
@@ -66,7 +72,7 @@ export async function POST(req: Request) {
     mode: payment ? "payment" : "subscription",
     line_items: plan === "setup" ? [setupLine] : plan === "monitor" ? [monitorLine, setupLine] : [monitorLine],
     payment_method_types: payment ? ["ideal", "card"] : ["ideal", "card", "sepa_debit"],
-    locale: "nl",
+    locale: lang,
     tax_id_collection: { enabled: true },
     billing_address_collection: "required",
     allow_promotion_codes: false,
@@ -74,7 +80,7 @@ export async function POST(req: Request) {
     ...(payment ? { customer_creation: business.stripeCustomerId ? undefined : ("always" as const), invoice_creation: { enabled: true } } : {}),
     metadata: { businessId: business.id, plan, scanRunId },
     subscription_data: payment ? undefined : { metadata: { businessId: business.id } },
-    success_url: plan === "monitor_addon" ? `${env.baseUrl}/app/abonnement?toegevoegd=1` : `${env.baseUrl}/welkom?session_id={CHECKOUT_SESSION_ID}&business=${business.id}`,
+    success_url: plan === "monitor_addon" ? page(`/app/abonnement?toegevoegd=1`) : page(`/welkom?session_id={CHECKOUT_SESSION_ID}&business=${business.id}`),
     cancel_url: `${back}?betaling=geannuleerd`,
   });
   await db.logEvent(business.id, "checkout.started", { plan, sessionId: session.id });

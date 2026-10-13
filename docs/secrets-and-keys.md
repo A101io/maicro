@@ -1,0 +1,21 @@
+# Secrets and keys (baseline A4)
+
+Every secret: where it comes from, where it is set, how to prove it landed. When a credential is "definitely set" and something still fails, **list the NAMES the job can see first** (Sitty lost 17 deploy runs to `CLOUDFLARE_API_SECRET` vs `_TOKEN`). `pnpm scan:secrets` fails CI on anything key-shaped in a tracked file.
+
+| Name | Comes from | Set in | Prove it |
+|---|---|---|---|
+| `DATABASE_URL` | Supabase → Project `bbynmqvaxpjdnkaasutd` → Connect → pooler, service role | Web + worker host env | `/api/health` returns `"db":"pg"` |
+| `SUPABASE_URL`, `SUPABASE_ANON_KEY` | Supabase → API | Web host env | Sign-in email arrives |
+| `SUPABASE_SERVICE_ROLE_KEY` | Supabase → API | Worker env only; never `NEXT_PUBLIC_` | Worker claims a job |
+| `OPENAI_API_KEY`, `GEMINI_API_KEY`, `PERPLEXITY_API_KEY`, `SERPAPI_KEY` | Each provider | Worker + web env | A scan with `MAICRO_MOCK=0` has samples from that engine |
+| `GOOGLE_PLACES_API_KEY`, `KVK_API_KEY` | Google Cloud, KvK | Web env | `/scan/kies` lists businesses |
+| `GOOGLE_OAUTH_CLIENT_ID/SECRET` | Google Cloud OAuth client | Web env | Verification sets `owner_verified_at` |
+| `STRIPE_SECRET_KEY` | Maicro's own Stripe account (not Sitty `acct_1UA8rHEGTq7D30VV`, not Sonable `acct_1TyIM8EQK4LIWEDd`) | Web env; GitHub environment secret for setup | `pnpm stripe:setup` prints the account id; pin it as `MAICRO_STRIPE_ACCOUNT` |
+| `STRIPE_WEBHOOK_SECRET` | Printed once by `pnpm stripe:setup --apply` | Web env | A test event reaches `/api/stripe/webhook` with 200 |
+| `STRIPE_PRICE_SETUP/MONITOR`, `STRIPE_TAX_RATE_ID` | `pnpm stripe:setup` output | Web env | Checkout opens with €149 + 21% btw |
+| `RESEND_API_KEY` | Resend | Worker + web env | A report mail arrives |
+| `UNSUBSCRIBE_SECRET` | `openssl rand -hex 32` | Worker + web env | Unsubscribe link works; without it follow-ups are not sent |
+| `CLOUDFLARE_API_TOKEN`, `CLOUDFLARE_ZONE_ID` | Cloudflare | Worker env | A facts host verifies |
+| `INDEXNOW_KEY` | Any random string | Worker env | `/indexnow-key.txt` on a facts host |
+
+Nothing above is set anywhere yet except in local `.env` for mock mode.

@@ -1,5 +1,5 @@
 import { redirect } from "next/navigation";
-import { copy } from "@maicro/core/copy";
+import { getI18n } from "@/lib/i18n";
 import { SiteHeader } from "@/components/SiteHeader";
 import { SiteFooter } from "@/components/SiteFooter";
 import { env } from "@/lib/env";
@@ -10,7 +10,8 @@ export const dynamic = "force-dynamic";
 
 export default async function LoginPage({ searchParams }: { searchParams: Promise<{ next?: string; business?: string; sent?: string; fout?: string }> }) {
   const sp = await searchParams;
-  if (sp.fout !== "geen" && (await getSession())) redirect(sp.next ?? "/app");
+  const { copy, href } = await getI18n();
+  if (sp.fout !== "geen" && (await getSession())) redirect(href(sp.next ?? "/app"));
   const a = copy.auth;
   return (
     <>

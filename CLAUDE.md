@@ -2,6 +2,26 @@
 
 Maicro checks what AI assistants say about a Dutch business, finds wrong facts and their sources, publishes a facts page on the owner's domain, syncs directories, and fixes errors at the source with proof. Tagline: *Je klanten vragen het aan ChatGPT. Wij zorgen dat het antwoord klopt.*
 
+## Resuming work — read this first
+- **`SETUP_STATUS.md`** is the baseline status (v3); work rows that are not `✓verified`. **`docs/go-live-checklist.md`** is the launch gate, decisions for Julian first.
+- The site is previewed (static, mock data) at https://a101io.github.io/maicro/ by `.github/workflows/site.yml` on every push to main. There is no production deploy yet.
+- NL lives at `/`, EN at `/en/...` (`apps/web/middleware.ts`, `lib/lang-paths.ts`, `lib/i18n.ts`). Copy: `packages/core/src/copy/index.ts` (Dutch, the source) and `en.ts` (same shape, enforced by `CopyShape`). Add a key to both or typecheck fails.
+
+## How to write to Julian
+Short. One action at a time. Real strings, not placeholders. End with one concrete question and a suggested answer when something needs him. Say plainly when something keeps failing. Never touch his iCloud folder.
+
+## Things that cost an hour to rediscover
+- **This cloud container cannot reach `*.supabase.co`, `a101io.github.io` or `api.stripe.com`.** Use the Supabase MCP tools (check the ref on every call) and the GitHub MCP tools; ask Julian to open the Pages site himself.
+- **A script that touches React-rendered text before hydration makes React throw the server HTML away** and rebuild the page, which also drops every Web Animations API animation `motion.js` set up (scenes freeze, elements "not attached to the DOM"). `public/ask.js` therefore waits until the node carries a `__reactFiber` key. `motion.js` only animates, it never changes markup; keep it that way.
+- **`pkill -f next-server` kills the shell running it.** Find the pid with `ps` and kill that.
+- **RLS tests on the hosted project**: run them as one `DO` block that sets role and JWT claims, then `raise exception` with the counts, so the transaction rolls back and nothing stays behind. Always include the owner as a control that must see rows.
+- **CI Postgres**: Docker Hub's anonymous pull limit broke the service container; the job uses the runner's preinstalled Postgres.
+- **GitHub Pages artifacts may not contain paths starting with `_`**: the snapshot renames `_next` to `assets`.
+- **A server action that redirects into an API route hangs**; go through a page (`/eigenaar/bevestigen`).
+- **Deleting a cookie during render is a server error** in Next 15; only route handlers and server actions may set cookies.
+- **Supabase `create_project` via MCP timed out three times**; creating it in the dashboard worked.
+- Two other Stripe accounts sit in the same company (Sitty `acct_1UA8rHEGTq7D30VV`, Sonable `acct_1TyIM8EQK4LIWEDd`); `pnpm stripe:setup` refuses both and pins Maicro's.
+
 ## Read first
 - `docs/CONTRACT.md` — module layout and rules (facts are owner-asserted; never claim "control"; no jargon).
 - `docs/ARCHITECTURE.md` — workflows A–E and the fix-path table.
@@ -40,7 +60,7 @@ Not done yet: `DATABASE_URL` / service-role key in a secret store, and a run of 
 5. Then Gemini, Perplexity, SerpAPI.
 
 ## Conventions
-- Customer-facing text: Dutch, informal "je", calm verbs, no exclamation marks, never GEO/AEO/LLM/prompt/credits/zichtbaarheid/platform/agent in UI.
+- Customer-facing text: Dutch, informal "je", calm verbs, no exclamation marks, never GEO/AEO/LLM/prompt/credits/zichtbaarheid/platform/agent in UI. One exception, asked for by Julian: the "Straks" section (`copy.landing.agents`, `components/AgentsSection.tsx`) names AI-agent, OKF, schema.org, llms.txt, MCP, A2A, each explained in plain words with who published it and when. Claims there must match what the code does (the facts page publishes HTML, schema.org JSON-LD and llms.txt; OKF is followed, not yet published).
 - Facts are versioned; a new version only via the owner's confirmation. Samples are evidence; findings are the diff.
 - **Ownership is proven, never claimed.** An e-mail address (report capture, magic link) only says who asked. `business.owner_verified_at` is set by `/api/google/callback` when the signed-in Google account holds a Business Profile location whose place id equals `google_place_id` (`packages/core/src/shared/ownership.ts`); proof replaces any earlier claim. Saving facts, the domain, on-demand scans (`requireVerifiedOwner`) and every setup/publish/sync/fix/recheck job (`apps/worker/src/jobs/paid.ts`: paying AND verified) wait for it. A business without a place id cannot be verified automatically; that goes to hallo@maicro.nl.
 - Keep `pnpm -r typecheck`, `pnpm -r test` and `pnpm e2e:mock` green before committing.

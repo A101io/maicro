@@ -1,4 +1,4 @@
-import { copy } from "@maicro/core/copy";
+import { getI18n } from "@/lib/i18n";
 import { Chip, Maicro, Scene } from "./Scene";
 
 const MISSED = 8;
@@ -16,7 +16,8 @@ function Phone() {
  * the AI gets a dead line, and the count goes up until Maicro fixes the
  * directories and the call goes through.
  */
-export function BelViz() {
+export async function BelViz() {
+  const { copy } = await getI18n();
   const S = copy.landing.scenes.bel;
   return (
     <Scene seconds={14} label={S.label} caption={S.caption}>

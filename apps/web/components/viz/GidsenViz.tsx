@@ -1,4 +1,4 @@
-import { copy } from "@maicro/core/copy";
+import { getI18n } from "@/lib/i18n";
 import { Chip, Dot, Scene } from "./Scene";
 
 const START = { r: "red", x: "grey", g: "green" } as const;
@@ -8,7 +8,8 @@ const START = { r: "red", x: "grey", g: "green" } as const;
  * live, the same facts go out to every source in a wave, and the three
  * assistants stop giving the old number.
  */
-export function GidsenViz() {
+export async function GidsenViz() {
+  const { copy } = await getI18n();
   const S = copy.landing.scenes.gidsen;
   return (
     <Scene seconds={14} label={S.label} caption={S.caption}>

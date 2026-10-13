@@ -1,4 +1,4 @@
-import { copy } from "@maicro/core/copy";
+import { getI18n } from "@/lib/i18n";
 import { Chip, Maicro, Scene, Tick, type Tone } from "./Scene";
 
 /**
@@ -6,7 +6,8 @@ import { Chip, Maicro, Scene, Tick, type Tone } from "./Scene";
  * directory calls closed (16s). Then Maicro fixes the directory and the same
  * order goes to that business.
  */
-export function RegelViz() {
+export async function RegelViz() {
+  const { copy } = await getI18n();
   const S = copy.landing.scenes.regel;
   return (
     <Scene seconds={16} label={S.label} caption={S.caption}>

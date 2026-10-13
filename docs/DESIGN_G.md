@@ -30,6 +30,8 @@ Open them in a browser (they are self-contained HTML; ignore the `support.js`/`x
 
 Font: **Manrope** 400/500/600/800 via Google Fonts (`next/font/google`). Base 17px / line-height 1.5. Headings 800 weight, tight tracking: h1 56–64px (`letter-spacing:-2px`, lh 1.02), h2 34–40px (`-1px`, lh 1.1), card titles 20px 700. Max content width 1168px, side padding 40px desktop / 16px mobile. Radii: cards 18px, panels 24px, buttons/inputs 12px, pills 999px.
 
+**Warm pass (Oct 2026, option 1, chosen by Julian: "te klinisch en saai").** The grey and white page became warmer: `--line #E7E3DC`, `--panel #F4F1EC`, `--panel-2 #FBF8F3`, and three section grounds `--cream #FBF6EE`, `--sky #EEF4FF`, `--mint #EDF7F1` (classes `ground-cream|sky|mint|warm` in `globals.css`). The hero has a soft three-colour glow (`.hero-glow`), the dark sections are deep blue `#0F172A` with blue and green light, the hero's key words sit under a yellow marker (`--sun`, `copy.landing.hero.h1Mark`), cards are rounder (22px, panels 28px) with a soft shadow. These override the "no gradients, no shadows" rule below; the rest still holds. Looping scenes (`components/viz`) explain each step and are styled in `app/scenes.css`.
+
 Rules kept from the brief: one primary (blue) button per view; no gradients, no shadows except a soft one on the floating result card; no dark mode; no emoji; no exclamation marks; status colours only in dots, pills and report rows, never as section backgrounds.
 
 ## Components

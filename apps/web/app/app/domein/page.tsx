@@ -1,4 +1,4 @@
-import { copy } from "@maicro/core/copy";
+import { getI18n } from "@/lib/i18n";
 import { requireVerifiedOwner } from "@/lib/owner";
 import { factsHostFor, cnameTarget } from "@/lib/factsPage";
 import { registerDomain } from "../actions";
@@ -6,6 +6,7 @@ import { registerDomain } from "../actions";
 export default async function DomainPage({ searchParams }: { searchParams: Promise<{ dns?: string; registreren?: string }> }) {
   const sp = await searchParams;
   const { business } = await requireVerifiedOwner("/app/domein");
+  const { copy } = await getI18n();
   const D = copy.domain;
   const host = business.domain ? factsHostFor(business) : null;
   const verified = Boolean(business.factsHostVerifiedAt) || sp.dns === "ok";

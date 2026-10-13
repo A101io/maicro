@@ -8,9 +8,14 @@
   --ink: #111827;
   --ink-2: #374151;
   --muted: #6b7280;
-  --line: #e5e7eb;
-  --panel: #f3f4f6;
-  --panel-2: #f9fafb;
+  --line: #e7e3dc;
+  --panel: #f4f1ec;
+  --panel-2: #fbf8f3;
+  /* Warm pass (Oct 2026): section grounds so the page is not white and grey only. */
+  --cream: #fbf6ee;
+  --sky: #eef4ff;
+  --mint: #edf7f1;
+  --sun: #fde68a;
   --red: #e11d48;
   --red-bg: #fdecea;
   --green: #2f855a;
@@ -416,3 +421,71 @@ a.pill:hover { background: var(--panel); }
 /* Grown from the left by public/motion.js (set here, not by the script, so
    the server's HTML and the hydrated page agree). */
 [data-motion="draw"], [data-motion="bars"] > * { transform-origin: left center; }
+
+/* ------------------------------------------------------------------------
+ * Warm pass (option 1, Oct 2026): tinted grounds, a glow behind the hero,
+ * deep-blue dark sections, a marker under the hero's key words and cards
+ * that sit on their ground with a soft shadow.
+ * --------------------------------------------------------------------- */
+.ground-cream { background: var(--cream); }
+.ground-sky { background: linear-gradient(180deg, var(--sky), #f6f9ff); }
+.ground-mint { background: linear-gradient(180deg, var(--mint), #f6fbf8); }
+.ground-warm {
+  background:
+    radial-gradient(50% 80% at 10% 0%, rgb(37 99 235 / 0.10), transparent 70%),
+    radial-gradient(45% 70% at 95% 100%, rgb(245 158 11 / 0.12), transparent 70%),
+    var(--cream);
+}
+.hero-glow { position: relative; isolation: isolate; }
+.hero-glow::before {
+  content: "";
+  position: absolute;
+  inset: -120px -10vw 0;
+  z-index: -1;
+  background:
+    radial-gradient(38% 55% at 78% 30%, rgb(37 99 235 / 0.13), transparent 70%),
+    radial-gradient(30% 45% at 12% 75%, rgb(245 158 11 / 0.13), transparent 70%),
+    radial-gradient(28% 40% at 55% 95%, rgb(47 133 90 / 0.10), transparent 70%);
+  pointer-events: none;
+}
+/* The dark sections: deep blue instead of flat grey-black, with light. */
+.bg-dark {
+  background:
+    radial-gradient(45% 60% at 85% 0%, rgb(37 99 235 / 0.35), transparent 70%),
+    radial-gradient(40% 50% at 0% 100%, rgb(47 133 90 / 0.18), transparent 70%),
+    #0f172a !important;
+}
+.marker {
+  background: linear-gradient(transparent 62%, var(--sun) 62%, var(--sun) 92%, transparent 92%);
+  padding: 0 0.06em;
+  -webkit-box-decoration-break: clone;
+  box-decoration-break: clone;
+}
+.card, .card-sm { box-shadow: 0 1px 2px rgb(17 24 39 / 0.04), 0 12px 32px -26px rgb(17 24 39 / 0.35); }
+/* The hero glow bleeds past the page edge on purpose; it must not widen the page. */
+main { overflow-x: clip; }
+
+/* NL · EN switch (components/LangSwitch.tsx). */
+.lang-switch { display: inline-flex; padding: 2px; border-radius: 999px; border: 1.5px solid var(--line); background: #fff; font-size: 13px; font-weight: 700; }
+.lang-switch a { padding: 3px 9px; border-radius: 999px; color: var(--muted); }
+.lang-switch a:hover { color: var(--ink); }
+.lang-switch a.is-current { background: var(--ink); color: #fff; }
+
+/* Mobile menu: a <details>, so it opens without script. */
+.site-menu { position: relative; }
+.site-menu-icon, .site-menu-icon::before, .site-menu-icon::after { display: block; width: 16px; height: 2px; border-radius: 2px; background: var(--ink); }
+.site-menu-icon { position: relative; }
+.site-menu-icon::before, .site-menu-icon::after { content: ""; position: absolute; left: 0; }
+.site-menu-icon::before { top: -5px; }
+.site-menu-icon::after { top: 5px; }
+.site-menu[open] .site-menu-icon { background: transparent; }
+.site-menu[open] .site-menu-icon::before { top: 0; rotate: 45deg; }
+.site-menu[open] .site-menu-icon::after { top: 0; rotate: -45deg; }
+.site-menu-panel {
+  position: fixed; left: 16px; right: 16px; top: 76px; z-index: 50;
+  display: flex; flex-direction: column; padding: 8px;
+  background: #fff; border: 1.5px solid var(--line); border-radius: 16px;
+  box-shadow: 0 20px 40px -24px rgb(17 24 39 / 0.45);
+}
+.site-menu-panel a { padding: 10px 12px; border-radius: 10px; font-weight: 700; }
+.site-menu-panel a:hover { background: var(--panel); color: var(--ink); }

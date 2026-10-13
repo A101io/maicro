@@ -1,5 +1,5 @@
 import Link from "next/link";
-import { copy } from "@maicro/core/copy";
+import { getI18n } from "@/lib/i18n";
 import { Wordmark } from "@/components/SiteHeader";
 import { requireOwner } from "@/lib/owner";
 
@@ -7,6 +7,7 @@ export const dynamic = "force-dynamic";
 
 export default async function AppLayout({ children }: { children: React.ReactNode }) {
   const { business, session } = await requireOwner();
+  const { copy, href } = await getI18n();
   const d = copy.dashboard;
   const links = [
     { href: "/app", label: d.h1 },
@@ -27,7 +28,7 @@ export default async function AppLayout({ children }: { children: React.ReactNod
           </div>
           <nav className="flex flex-wrap items-center gap-x-5 gap-y-2 text-[14px] font-semibold">
             {links.map((l) => (
-              <Link key={l.href} href={l.href}>
+              <Link key={l.href} href={href(l.href)}>
                 {l.label}
               </Link>
             ))}

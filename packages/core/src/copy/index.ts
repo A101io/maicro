@@ -7,6 +7,8 @@
  * controleren · vinden · herstellen · laten zien.
  */
 
+import { en } from "./en.js";
+
 export const PRICES = {
   setupEur: 149,
   monitorEurPerMonth: 49,
@@ -50,6 +52,8 @@ export const copy = {
   landing: {
     hero: {
       h1: "Wat zegt AI over jouw bedrijf?",
+      /** The words under the marker in the hero heading. */
+      h1Mark: "jouw bedrijf",
       sub: "In Haarlem klopt het bij 47 van de 100 bedrijven niet, of de AI kent ze niet.",
       exampleLabel: "voorbeeld",
       caption: "100 Haarlemse bedrijven · ChatGPT, Google AI en Copilot · 7 oktober 2026",
@@ -255,6 +259,163 @@ export const copy = {
         { stip: "groen", text: "“Hendriks in Breda doet warmtepompen, open ma–vr 8–17.”", meta: "dag 21" },
       ],
       footnote: "Fictief voorbeeld. Of en wanneer een AI je gaat noemen bepalen wij niet; of het je kán vinden wel.",
+    },
+    /**
+     * "Vraag het zelf": a simulated conversation with an AI assistant, one
+     * case per kind of fact. Answers are split around the wrong part so it
+     * can be marked. Fictional businesses, real patterns.
+     */
+    ask: {
+      h2: "Vraag het zelf",
+      body: "Kies een vraag die een klant stelt. Je ziet wat de AI antwoordt, wat er niet klopt, waar het vandaan komt en wat het je kost. Daarna zie je hetzelfde antwoord na herstel.",
+      pick: "Kies een vraag",
+      engine: "AI-assistent",
+      you: "Klant",
+      typing: "denkt na…",
+      before: "Nu",
+      after: "Na herstel",
+      sourcesLabel: "Gebruikte bronnen",
+      rows: { verdict: "Klopt het?", source: "Waar komt het vandaan?", cost: "Wat kost het je?", fix: "Wat wij doen" },
+      verdictWrong: "Nee",
+      verdictMissing: "De AI weet het niet",
+      verdictRight: "Ja, het klopt",
+      replay: "Opnieuw afspelen",
+      sourceAfter: "Je feitenpagina en de bijgewerkte bronnen",
+      costAfter: "Niets meer. De klant krijgt het juiste antwoord.",
+      caption: "Gesimuleerde gesprekken met fictieve bedrijven. De fouten en bronnen zijn patronen die we in echte controles zien.",
+      cases: [
+        {
+          topic: "Bestaan",
+          question: "Is Kapsalon Mirte in Haarlem nog open?",
+          tone: "red",
+          answer: ["Kapsalon Mirte is ", "permanent gesloten", " volgens recente vermeldingen. Misschien is een andere kapper in de buurt iets voor je?"],
+          sources: ["Google-profiel", "Nieuwsbericht 2024", "Cylex"],
+          wrong: "Een kapsalon met dezelfde naam in Hoofddorp ging dicht. De AI haalt de twee door elkaar.",
+          source: "Nieuwsbericht over de naamgenoot in Hoofddorp, 2024",
+          cost: "Wie dit leest, boekt meteen bij een ander. Je hoort er nooit van.",
+          fix: "Je feitenpagina zegt wie je bent, met adres en KvK. De gidsen krijgen dezelfde gegevens, zodat de AI de twee kan scheiden.",
+          fixed: "Kapsalon Mirte in Haarlem is open, van dinsdag tot zaterdag. Let op: een salon met dezelfde naam in Hoofddorp is gesloten.",
+        },
+        {
+          topic: "Werkgebied",
+          question: "Komt Loodgietersbedrijf Bakker ook in Heemstede?",
+          tone: "red",
+          answer: ["Nee, Bakker werkt ", "alleen in Haarlem-Noord", ". Voor Heemstede kun je beter een loodgieter uit de buurt bellen."],
+          sources: ["Eigen website", "Werkspot", "Telefoonboek.nl"],
+          wrong: "Bakker werkt al jaren in heel Haarlem en omgeving. De oude website noemt alleen Haarlem-Noord.",
+          source: "Eigen website, pagina ‘Werkgebied’ uit 2019",
+          cost: "Elke klus buiten Haarlem-Noord, ook spoed om de hoek, gaat naar een ander.",
+          fix: "We leggen je werkgebied vast als lijst van plaatsen, op je feitenpagina en in de gidsen, en geven je de zin die op je website moet.",
+          fixed: "Ja, Bakker komt in heel Haarlem, Heemstede en Bloemendaal, ook voor spoed.",
+        },
+        {
+          topic: "Diensten",
+          question: "Doet Installatiebedrijf Hendriks ook warmtepompen?",
+          tone: "red",
+          answer: ["Nee, Hendriks doet ", "alleen cv-ketels en sanitair", ". Voor een warmtepomp zijn er gespecialiseerde installateurs in Breda."],
+          sources: ["Eigen website", "Bedrijvenpagina.nl"],
+          wrong: "Hendriks plaatst sinds 2022 warmtepompen. De dienstenpagina is nooit bijgewerkt.",
+          source: "Eigen website, pagina ‘Diensten’ uit 2019",
+          cost: "De grootste klussen van het jaar gaan naar een concurrent, met een verwijzing van de AI erbij.",
+          fix: "Diensten die je wel én niet doet staan op je feitenpagina en in de gidsen. Na drie weken vragen we het opnieuw.",
+          fixed: "Ja, Hendriks plaatst sinds 2022 warmtepompen en helpt ook met de subsidieaanvraag.",
+        },
+        {
+          topic: "Voorwaarden",
+          question: "Kan ik zonder verwijzing naar Fysiotherapie Van Dijk?",
+          tone: "red",
+          answer: ["Nee, voor Van Dijk heb je ", "altijd een verwijzing van de huisarts", " nodig. Maak eerst een afspraak bij je huisarts."],
+          sources: ["Praktijkfolder (pdf)", "Zorgkaart"],
+          wrong: "Van Dijk is al jaren direct toegankelijk. De AI leest een oude folder.",
+          source: "Praktijkfolder als pdf op de website, 2017",
+          cost: "Patiënten gaan eerst naar de huisarts, of kiezen een praktijk waar ze meteen terechtkunnen.",
+          fix: "Toegang, verwijzing en wachttijd komen op je feitenpagina. Voor de oude pdf geven we je de vervangende tekst.",
+          fixed: "Ja, Van Dijk is direct toegankelijk. Je kunt zonder verwijzing een afspraak maken.",
+        },
+        {
+          topic: "Prijs",
+          question: "Wat kost een APK bij Garage De Wit?",
+          tone: "red",
+          answer: ["Een APK kost bij Garage De Wit ", "€89", ". Bij andere garages in de buurt kan het goedkoper."],
+          sources: ["Opendi", "Eigen website"],
+          wrong: "De Wit rekent €45. Het bedrag van €89 komt uit een oude vermelding met een APK-pakket inclusief onderhoud.",
+          source: "Opendi-vermelding uit 2021",
+          cost: "Je lijkt twee keer zo duur als je bent. De klant belt niet om het te vragen.",
+          fix: "Je vanafprijzen staan met datum op je feitenpagina. De oude vermelding passen we aan bij de gids zelf.",
+          fixed: "Een APK kost bij Garage De Wit €45. Op werkdagen kan het zonder afspraak.",
+        },
+        {
+          topic: "Betalen",
+          question: "Kan ik pinnen bij Bakkerij De Vries?",
+          tone: "red",
+          answer: ["Nee, bij Bakkerij De Vries kun je ", "alleen contant", " betalen."],
+          sources: ["Eigen website", "Tripadvisor"],
+          wrong: "De Vries neemt al jaren pin en contactloos aan.",
+          source: "Eigen website, 2019, en een review uit 2018",
+          cost: "Wie geen contant geld bij zich heeft, loopt door naar de supermarkt.",
+          fix: "Betaalmogelijkheden staan op je feitenpagina en in Google. Daar kijkt de AI het eerst.",
+          fixed: "Ja, bij Bakkerij De Vries kun je pinnen en contactloos betalen.",
+        },
+        {
+          topic: "Keurmerk",
+          question: "Is Dakdekkersbedrijf Visser erkend?",
+          tone: "grey",
+          answer: ["", "Ik kan geen keurmerk of erkenning vinden", " voor Dakdekkersbedrijf Visser. Kies bij dakwerk liefst een erkend bedrijf."],
+          sources: ["Eigen website"],
+          wrong: "Visser is wel erkend, maar dat staat nergens waar de AI het kan lezen.",
+          source: "Geen bron noemt het keurmerk",
+          cost: "Bij een klus van duizenden euro's kiest de klant het bedrijf waarvan de AI zegt dat het erkend is.",
+          fix: "Je keurmerk komt op je feitenpagina, met een link naar het openbare register, zodat de AI het kan controleren.",
+          fixed: "Ja, Dakdekkersbedrijf Visser is erkend. Het lidmaatschap staat in het openbare register van de branche.",
+        },
+        {
+          topic: "Aanbeveling",
+          question: "Welke VvE-beheerder in Utrecht neemt nog kleine VvE's aan?",
+          tone: "grey",
+          answer: ["Drie opties: Domstad Beheer, VvE Partners Utrecht en Beheer030. ", "Over Vastgoedbeheer Lindeboom vind ik niets", "."],
+          sources: ["VvE-vergelijker", "Google", "Nieuwsbericht"],
+          wrong: "Lindeboom beheert al twaalf jaar kleine VvE's, maar staat in geen enkele bron die de AI leest.",
+          source: "Geen bron noemt Lindeboom",
+          cost: "Je bent geen optie. Elke vraag zonder jou is een klant voor een ander.",
+          fix: "Een feitenpagina die de AI kan lezen, je gegevens in Google, Bing, Apple en de gidsen, en na drie weken een hercontrole.",
+          fixed: "Drie opties: Domstad Beheer, Vastgoedbeheer Lindeboom (gespecialiseerd in VvE's tot 30 appartementen) en VvE Partners Utrecht.",
+        },
+      ],
+    },
+    /**
+     * "Straks praten assistenten met elkaar": where this is going, and the
+     * terms people meet when they read about it. The one place on the site
+     * where technical terms appear; each is explained in plain words, with
+     * who made it and when, and only claims the code backs.
+     */
+    agents: {
+      h2: "Straks praten assistenten met elkaar. Wat zeggen ze over jou?",
+      body: "Vandaag vraagt een klant iets aan ChatGPT en leest het antwoord. Straks vraagt de assistent van de klant het rechtstreeks na bij andere systemen: de gidsen, de kaart, de feitenpagina van een bedrijf, of de assistent van dat bedrijf zelf. Daar worden nu open afspraken voor gemaakt. Wie leesbare feiten heeft, doet mee. Wie niets heeft, valt af zonder het te merken.",
+      scene: {
+        label: "Voorbeeld: de assistent van een klant wil croissants bestellen. Bij een bakker zonder leesbare gegevens krijgt hij geen antwoord en gaat hij door naar de volgende. Bij Bakkerij Smit leest hij de feitenpagina, ziet dat de bakker zondag open is en bestellingen aanneemt, en plaatst de bestelling.",
+        customer: "Assistent van de klant",
+        task: "Regel 12 croissants, zondag 9:00, Haarlem",
+        noFacts: { name: "Bakkerij zonder feiten", ask: "Open zondag? Bestellen mogelijk?", reply: "Geen leesbare gegevens", result: "Door naar de volgende" },
+        withFacts: { name: "Bakkerij Smit", ask: "Open zondag? Bestellen mogelijk?", reply: "zondag 8–13 · bestellen: ja · bijgewerkt 7 okt", source: "bakkerijsmit.nl/feiten", result: "Bestelling geplaatst" },
+        caption: "Voorbeeld met fictieve bakkers. Zo werkt het nog niet overal; de afspraken hiervoor worden nu gemaakt.",
+      },
+      termsTitle: "De begrippen, gewoon uitgelegd",
+      terms: [
+        { term: "AI-agent", body: "Een AI-assistent die niet alleen antwoordt, maar ook dingen doet: zoeken, vergelijken, reserveren, bestellen. Namens de klant, of namens een bedrijf." },
+        { term: "OKF (Open Knowledge Format)", body: "Een open formaat van Google, in juni 2026 gepubliceerd als versie 0.1, om kennis zo op te schrijven dat AI-assistenten het kunnen lezen: gewone tekstbestanden met een paar vaste velden bovenaan. Google noemt het zelf een begin, geen af standaard." },
+        { term: "schema.org", body: "De gedeelde woordenlijst die zoekmachines al jaren gebruiken voor bedrijfsgegevens: naam, adres, telefoon, openingstijden, diensten. AI-assistenten lezen hem ook." },
+        { term: "llms.txt", body: "Een voorstel uit 2024 voor een eenvoudig tekstbestand op je website dat AI-assistenten wijst op wat belangrijk is. Nog niet alle assistenten gebruiken het." },
+        { term: "MCP (Model Context Protocol)", body: "Een open manier, in 2024 gepubliceerd door Anthropic, waarop een AI-assistent gegevens en functies van andere systemen kan gebruiken, zoals een agenda of een voorraad." },
+        { term: "A2A (Agent2Agent)", body: "Een open protocol, in 2025 gepubliceerd door Google, waarmee AI-assistenten van verschillende bedrijven met elkaar overleggen en taken aan elkaar doorgeven." },
+        { term: "Bestellen via een assistent", body: "Afspraken waarmee een assistent namens de klant kan bestellen en betalen, zoals het Agentic Commerce Protocol van OpenAI en Stripe uit 2025." },
+      ],
+      usTitle: "Wat Maicro daarmee doet",
+      us: [
+        { title: "Nu al", body: "Je feitenpagina staat er in drie vormen: als gewone pagina, als schema.org-gegevens en als llms.txt. Dezelfde feiten, met datum, op je eigen domein." },
+        { title: "Zodra het zich zet", body: "Nieuwe formaten zoals OKF volgen we. Wordt een formaat echt gebruikt, dan zetten we je feiten er ook in. Jij hoeft daar niets voor te doen." },
+        { title: "Altijd", body: "Wat erin staat, heb jij bevestigd. Een assistent die het naleest, vindt dus jouw versie, niet die van een gids uit 2021." },
+      ],
+      footnote: "Zo staan de afspraken nu (oktober 2026). Welke het worden, bepalen wij niet; dat je feiten klaarstaan wel.",
     },
     /**
      * The looping scenes (components/viz). Each shows one thing Maicro does and
@@ -1478,4 +1639,39 @@ export const copy = {
 } as const;
 
 export type Copy = typeof copy;
+
+/** The same shape with every literal widened, so another language can fill it in (./en.ts). */
+type Widen<T> = T extends string
+  ? string
+  : T extends number
+    ? number
+    : T extends boolean
+      ? boolean
+      : T extends (...args: infer A) => infer R
+        ? (...args: A) => Widen<R>
+        : T extends readonly (infer U)[]
+          ? readonly Widen<U>[]
+          : { readonly [K in keyof T]: Widen<T[K]> };
+export type CopyShape = Widen<typeof copy>;
 export default copy;
+
+export type Lang = "nl" | "en";
+
+/**
+ * English, with one Dutch part kept on purpose: the sector pages show the
+ * questions the scanner asks, and it asks them in Dutch (prompts/sectors.ts).
+ * The words filled into those Dutch templates stay Dutch too, so an English
+ * page shows a real Dutch question rather than a half-translated one.
+ */
+const english: CopyShape = {
+  ...en,
+  sector: { ...en.sector, placeholderPlace: copy.sector.placeholderPlace },
+  sectorPages: Object.fromEntries(
+    Object.entries(en.sectorPages).map(([slug, page]) => [slug, { ...page, sample: copy.sectorPages[slug as keyof typeof copy.sectorPages].sample }]),
+  ) as unknown as CopyShape["sectorPages"], // same keys as en.sectorPages, rebuilt entry by entry
+};
+
+/** The copy in one language. */
+export function copyFor(lang: Lang): CopyShape {
+  return lang === "en" ? english : copy;
+}

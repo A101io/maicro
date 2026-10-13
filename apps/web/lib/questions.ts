@@ -1,6 +1,6 @@
 import type { FactKey, Finding } from "@maicro/core/types";
 import { describeValue } from "@maicro/core/scanner";
-import { copy } from "@maicro/core/copy";
+import type { CopyShape } from "@maicro/core/copy";
 
 const DAYS = ["maandag", "dinsdag", "woensdag", "donderdag", "vrijdag", "zaterdag", "zondag"];
 
@@ -40,7 +40,7 @@ export function questionFor(factKey: FactKey, subject: string | null, name: stri
 }
 
 /** The recommendation question ("Welk bedrijf in Haarlem doet warmtepompen?") behind a not-named finding. */
-export function recommendationQuestionFor(factKey: FactKey, subject: string | null, place: string): string {
+export function recommendationQuestionFor(factKey: FactKey, subject: string | null, place: string, copy: CopyShape): string {
   const q = copy.recommendation.question;
   switch (factKey) {
     case "service":

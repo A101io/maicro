@@ -1,7 +1,8 @@
-import { copy } from "@maicro/core/copy";
+import { getI18n } from "@/lib/i18n";
 
 /** Section 13: Vragen. Plain <details> so it works without JavaScript. */
-export function Faq() {
+export async function Faq() {
+  const { copy } = await getI18n();
   const V = copy.landing.vragen;
   return (
     <section id="vragen" className="wrap section grid grid-cols-1 gap-8 lg:grid-cols-12 lg:gap-12">

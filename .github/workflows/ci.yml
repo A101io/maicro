@@ -19,6 +19,7 @@ jobs:
           node-version: 22
           cache: pnpm
       - run: pnpm install --frozen-lockfile
+      - run: pnpm scan:secrets
       - run: pnpm -r typecheck
       - run: pnpm -r test
       - run: pnpm e2e:mock

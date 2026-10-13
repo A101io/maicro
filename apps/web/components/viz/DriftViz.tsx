@@ -1,4 +1,4 @@
-import { copy } from "@maicro/core/copy";
+import { getI18n } from "@/lib/i18n";
 import { Chip, Scene } from "./Scene";
 
 /** Month (0-based) in which each change happens. */
@@ -11,7 +11,8 @@ function eventMonths(events: readonly { month: number }[]) {
  * once: wrong from the first change on. Checked monthly: each change wrong
  * for one month.
  */
-export function DriftViz() {
+export async function DriftViz() {
+  const { copy } = await getI18n();
   const S = copy.landing.scenes.drift;
   const changes = eventMonths(S.events);
   const first = Math.min(...changes);
