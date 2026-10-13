@@ -381,6 +381,41 @@ export const copy = {
       ],
     },
     /**
+     * "Straks praten assistenten met elkaar": where this is going, and the
+     * terms people meet when they read about it. The one place on the site
+     * where technical terms appear; each is explained in plain words, with
+     * who made it and when, and only claims the code backs.
+     */
+    agents: {
+      h2: "Straks praten assistenten met elkaar. Wat zeggen ze over jou?",
+      body: "Vandaag vraagt een klant iets aan ChatGPT en leest het antwoord. Straks vraagt de assistent van de klant het rechtstreeks na bij andere systemen: de gidsen, de kaart, de feitenpagina van een bedrijf, of de assistent van dat bedrijf zelf. Daar worden nu open afspraken voor gemaakt. Wie leesbare feiten heeft, doet mee. Wie niets heeft, valt af zonder het te merken.",
+      scene: {
+        label: "Voorbeeld: de assistent van een klant wil croissants bestellen. Bij een bakker zonder leesbare gegevens krijgt hij geen antwoord en gaat hij door naar de volgende. Bij Bakkerij Smit leest hij de feitenpagina, ziet dat de bakker zondag open is en bestellingen aanneemt, en plaatst de bestelling.",
+        customer: "Assistent van de klant",
+        task: "Regel 12 croissants, zondag 9:00, Haarlem",
+        noFacts: { name: "Bakkerij zonder feiten", ask: "Open zondag? Bestellen mogelijk?", reply: "Geen leesbare gegevens", result: "Door naar de volgende" },
+        withFacts: { name: "Bakkerij Smit", ask: "Open zondag? Bestellen mogelijk?", reply: "zondag 8–13 · bestellen: ja · bijgewerkt 7 okt", source: "bakkerijsmit.nl/feiten", result: "Bestelling geplaatst" },
+        caption: "Voorbeeld met fictieve bakkers. Zo werkt het nog niet overal; de afspraken hiervoor worden nu gemaakt.",
+      },
+      termsTitle: "De begrippen, gewoon uitgelegd",
+      terms: [
+        { term: "AI-agent", body: "Een AI-assistent die niet alleen antwoordt, maar ook dingen doet: zoeken, vergelijken, reserveren, bestellen. Namens de klant, of namens een bedrijf." },
+        { term: "OKF (Open Knowledge Format)", body: "Een open formaat van Google, in juni 2026 gepubliceerd als versie 0.1, om kennis zo op te schrijven dat AI-assistenten het kunnen lezen: gewone tekstbestanden met een paar vaste velden bovenaan. Google noemt het zelf een begin, geen af standaard." },
+        { term: "schema.org", body: "De gedeelde woordenlijst die zoekmachines al jaren gebruiken voor bedrijfsgegevens: naam, adres, telefoon, openingstijden, diensten. AI-assistenten lezen hem ook." },
+        { term: "llms.txt", body: "Een voorstel uit 2024 voor een eenvoudig tekstbestand op je website dat AI-assistenten wijst op wat belangrijk is. Nog niet alle assistenten gebruiken het." },
+        { term: "MCP (Model Context Protocol)", body: "Een open manier, in 2024 gepubliceerd door Anthropic, waarop een AI-assistent gegevens en functies van andere systemen kan gebruiken, zoals een agenda of een voorraad." },
+        { term: "A2A (Agent2Agent)", body: "Een open protocol, in 2025 gepubliceerd door Google, waarmee AI-assistenten van verschillende bedrijven met elkaar overleggen en taken aan elkaar doorgeven." },
+        { term: "Bestellen via een assistent", body: "Afspraken waarmee een assistent namens de klant kan bestellen en betalen, zoals het Agentic Commerce Protocol van OpenAI en Stripe uit 2025." },
+      ],
+      usTitle: "Wat Maicro daarmee doet",
+      us: [
+        { title: "Nu al", body: "Je feitenpagina staat er in drie vormen: als gewone pagina, als schema.org-gegevens en als llms.txt. Dezelfde feiten, met datum, op je eigen domein." },
+        { title: "Zodra het zich zet", body: "Nieuwe formaten zoals OKF volgen we. Wordt een formaat echt gebruikt, dan zetten we je feiten er ook in. Jij hoeft daar niets voor te doen." },
+        { title: "Altijd", body: "Wat erin staat, heb jij bevestigd. Een assistent die het naleest, vindt dus jouw versie, niet die van een gids uit 2021." },
+      ],
+      footnote: "Zo staan de afspraken nu (oktober 2026). Welke het worden, bepalen wij niet; dat je feiten klaarstaan wel.",
+    },
+    /**
      * The looping scenes (components/viz). Each shows one thing Maicro does and
      * what it costs a business when nobody does it. Fictional businesses, real
      * patterns; every scene says so in its caption.
@@ -1602,4 +1637,18 @@ export const copy = {
 } as const;
 
 export type Copy = typeof copy;
+
+/** The same shape with every literal widened, so another language can fill it in (./en.ts). */
+type Widen<T> = T extends string
+  ? string
+  : T extends number
+    ? number
+    : T extends boolean
+      ? boolean
+      : T extends (...args: infer A) => infer R
+        ? (...args: A) => Widen<R>
+        : T extends readonly (infer U)[]
+          ? readonly Widen<U>[]
+          : { readonly [K in keyof T]: Widen<T[K]> };
+export type CopyShape = Widen<typeof copy>;
 export default copy;

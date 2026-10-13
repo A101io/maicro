@@ -14,6 +14,7 @@ import { ReportHeaderRow, ReportRow } from "@/components/ReportRow";
 import { CountUp } from "@/components/CountUp";
 import { HeroViz } from "@/components/HeroViz";
 import { AskSim } from "@/components/AskSim";
+import { AgentsSection } from "@/components/AgentsSection";
 import { SceneRow } from "@/components/viz/Scene";
 import { RegelViz } from "@/components/viz/RegelViz";
 import { BelViz } from "@/components/viz/BelViz";
@@ -391,6 +392,9 @@ export default function LandingPage() {
             <DriftViz />
           </div>
         </section>
+
+        {/* 11c Straks */}
+        <AgentsSection />
 
         {/* 12 Prijs */}
         <section id="prijs" className="bg-dark text-white">

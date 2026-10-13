@@ -40,7 +40,7 @@ Not done yet: `DATABASE_URL` / service-role key in a secret store, and a run of 
 5. Then Gemini, Perplexity, SerpAPI.
 
 ## Conventions
-- Customer-facing text: Dutch, informal "je", calm verbs, no exclamation marks, never GEO/AEO/LLM/prompt/credits/zichtbaarheid/platform/agent in UI.
+- Customer-facing text: Dutch, informal "je", calm verbs, no exclamation marks, never GEO/AEO/LLM/prompt/credits/zichtbaarheid/platform/agent in UI. One exception, asked for by Julian: the "Straks" section (`copy.landing.agents`, `components/AgentsSection.tsx`) names AI-agent, OKF, schema.org, llms.txt, MCP, A2A, each explained in plain words with who published it and when. Claims there must match what the code does (the facts page publishes HTML, schema.org JSON-LD and llms.txt; OKF is followed, not yet published).
 - Facts are versioned; a new version only via the owner's confirmation. Samples are evidence; findings are the diff.
 - **Ownership is proven, never claimed.** An e-mail address (report capture, magic link) only says who asked. `business.owner_verified_at` is set by `/api/google/callback` when the signed-in Google account holds a Business Profile location whose place id equals `google_place_id` (`packages/core/src/shared/ownership.ts`); proof replaces any earlier claim. Saving facts, the domain, on-demand scans (`requireVerifiedOwner`) and every setup/publish/sync/fix/recheck job (`apps/worker/src/jobs/paid.ts`: paying AND verified) wait for it. A business without a place id cannot be verified automatically; that goes to hallo@maicro.nl.
 - Keep `pnpm -r typecheck`, `pnpm -r test` and `pnpm e2e:mock` green before committing.
