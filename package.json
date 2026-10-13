@@ -16,7 +16,7 @@
     "scan:secrets": "node scripts/scan-secrets.mjs"
   },
   "devDependencies": {
-    "typescript": "^5.6.3",
+    "typescript": "^7.0.2",
     "tsx": "^4.19.2",
     "@maicro/core": "workspace:*",
     "@maicro/worker": "workspace:*",
