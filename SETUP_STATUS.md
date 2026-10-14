@@ -69,7 +69,7 @@ Status: `✓verified` (observed, evidence + date) · `written` (code exists, not
 ## G. Support and email
 | # | Step | Status | Evidence | Date |
 |---|---|---|---|---|
-| G1 | Support channel | blocked | hallo@vidalo.nl used everywhere; needs the domain and a real mailbox. | |
+| G1 | Support channel | blocked | hallo@vidalo.io used everywhere; needs the domain and a real mailbox. | |
 | G2 | Transactional email | blocked | Resend code + one-click unsubscribe (RFC 8058) written; DNS (SPF/DKIM/DMARC) needs the domain. | |
 
 ## H. Operations

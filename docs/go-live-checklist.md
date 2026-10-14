@@ -60,7 +60,7 @@ What the site promises a customer exists for Vidalo itself, from one record: `pa
 | W3 | Phone number, payment methods, name clashes ("niet te verwarren met"), erkenningen | blocked: Julian (the four open items in `own.test.ts`) |
 | W4 | Vidalo in the directories, Google Business Profile, Bing, Apple (the `sync` job, same as a customer) | blocked: the first production deploy and a Google Business Profile for Vidalo (gives the place id) |
 | W5 | Monthly scan of Vidalo itself: "Wat zegt AI over Vidalo?" | blocked: `OPENAI_API_KEY` (P3) and the first production deploy |
-| W6 | `feiten.vidalo.nl` as the own facts host, DNS at Cloudflare | blocked: registration of vidalo.nl (J2) |
+| W6 | `feiten.vidalo.io` as the own facts host, DNS at Cloudflare | blocked: the vidalo.io zone in A101's Cloudflare account (J2) |
 
 ## Legal
 | # | Item | Status |
