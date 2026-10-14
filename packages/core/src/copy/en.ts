@@ -702,6 +702,7 @@ export const en: CopyShape = {
               ["vidalo_consent", "Remembers that you have seen the cookie notice and which choice you made.", "12 months"],
               ["sb-…-auth-token", "Keeps you signed in to your account (Supabase, passwordless sign-in).", "Until you sign out, at most 400 days"],
               ["sb-…-code-verifier", "During sign-in: ties the sign-in link from your email to this browser.", "Removed once you are signed in, otherwise at most 400 days"],
+              ["vidalo_google_state", "While connecting your Google Business Profile: protects that step against misuse.", "10 minutes"],
               ["vidalo_preview", "Only while the site is being built: shows you the site behind the ‘Coming soon’ page.", "Until you close the browser"],
             ],
           },

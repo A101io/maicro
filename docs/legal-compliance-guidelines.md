@@ -25,11 +25,14 @@ See `docs/records-of-processing.md` and `docs/processors.md`. Cookies the app se
 
 | Name | Purpose | Lifetime |
 |---|---|---|
-| `sb-<ref>-auth-token` (Supabase) | Keeps the owner signed in | Session / refresh |
+| `sb-<ref>-auth-token` (Supabase) | Keeps the owner signed in | Up to 400 days (Supabase SSR default) |
+| `sb-<ref>-auth-token-code-verifier` (Supabase) | Ties the magic link to the browser that asked for it | Removed after sign-in, else up to 400 days |
+| `vidalo_consent` | The visitor's cookie choice (`lib/consent.ts`) | 12 months |
 | `vidalo_google_state` | CSRF state during Google sign-in | 10 minutes |
+| `vidalo_preview` | Build phase only: opens the site behind `/binnenkort` | Session |
 | `vidalo_mock_session` | Development only (mock mode) | Session |
 
-Browser storage: none. Fonts are self-hosted by Next (no Google Fonts request from the visitor). Adding any storage write or tracker means a row here and a cookie statement entry in the same change.
+The public inventory is `copy.legal.cookies` (`/cookies`); keep both in step. Browser storage: none (the assistant's conversation lives in component state). Fonts are self-hosted by Next (no Google Fonts request from the visitor). Adding any storage write or tracker means a row here and a cookie statement entry in the same change.
 
 ## DPIA screening (P3)
 Vidalo processes business facts, mostly not personal data; owner emails and Google account ids are ordinary personal data; no special categories, no location tracking of people, no profiling of individuals, not large scale. **Screening outcome: a full DPIA is not indicated.** Re-screen if Vidalo starts monitoring people (e.g. sole traders at scale) or adds analytics.
