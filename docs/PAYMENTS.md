@@ -32,10 +32,33 @@ emails → Manage failed payments** to retry (Smart Retries), email the
 customer, and then **mark the subscription as unpaid** (not cancel), so a
 late payer resumes instead of churning.
 
+## What Checkout asks, as for Sonable (playbook/STRIPE.md)
+
+- **Terms checkbox** (`consent_collection.terms_of_service: "required"`) with
+  the B2B confirmation and the links to `/voorwaarden` and `/privacy` above
+  the pay button (`copy.checkout.consentSubmit` / `consentAccept`, in the
+  visitor's language). 🔴 This needs the **Terms of Service URL and Privacy
+  Policy URL on the Stripe account** (Settings → Public details); without
+  them Stripe rejects every session and the visitor sees "Afrekenen lukt nu
+  even niet". Proof is not the settings page: the `checkout.completed` event
+  in our log carries `termsConsent: "accepted"` once a real session completed.
+- **Billing address** required, **btw-nummer** collected (`tax_id_collection`,
+  required when supported); it lands on the invoice.
+- **Return URLs follow the host the visitor is on** (`lib/origin.ts`, from
+  the Origin/Referer, our hosts only, else `PUBLIC_BASE_URL`), so a domain
+  change or the workers.dev preview never sends a customer to a dead host.
+- `managed_payments` off: it cannot be combined with the custom text above.
+- Customer portal: `return_url` explicit on every session (the subscription
+  page, same host rule), locale from the page the button was on.
+
 ## Setting it up
 
 1. A Stripe account that is Vidalo's (not Sitty's `acct_1UA8rHEGTq7D30VV`,
    not Sonable's `acct_1TyIM8EQK4LIWEDd`; the script refuses both).
+   Account settings before the first test checkout: Terms URL and Privacy URL
+   (above), VAT registered with the NL rate and the Rotterdam address,
+   statement descriptor "VIDALO", invoice branding with A101 B.V.'s KvK and
+   btw-nummer.
 2. Test mode first:
    ```bash
    STRIPE_SECRET_KEY=sk_test_... PUBLIC_BASE_URL=https://<site> pnpm stripe:setup

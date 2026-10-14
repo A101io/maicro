@@ -1490,6 +1490,8 @@ export const en: CopyShape = {
     error: "Checkout is not working right now. Nothing has been charged. Please try again later or email us at hallo@vidalo.io.",
     productSetup: "Vidalo Set it right (one-off)",
     productMonitor: "Vidalo Keep it right (per month)",
+    consentSubmit: (terms: string, privacy: string) => `Vidalo is a service for businesses, not consumers. By paying you confirm you are buying on behalf of a business and agree to Vidalo's [terms and conditions](${terms}) and [privacy policy](${privacy}).`,
+    consentAccept: (terms: string, privacy: string) => `I am authorised to enter into this agreement on behalf of my business and agree to Vidalo's [terms and conditions](${terms}) and [privacy policy](${privacy}).`,
   },
 
   pricing: {

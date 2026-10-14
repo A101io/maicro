@@ -1505,6 +1505,10 @@ export const copy = {
     error: "Afrekenen lukt nu even niet. Er is niets afgeschreven. Probeer het later opnieuw of mail ons op hallo@vidalo.io.",
     productSetup: "Vidalo Goed zetten (eenmalig)",
     productMonitor: "Vidalo Goed houden (per maand)",
+    /** Above the pay button on Stripe Checkout. Stripe renders [label](url) as a link. */
+    consentSubmit: (terms: string, privacy: string) => `Vidalo is een dienst voor bedrijven, niet voor consumenten. Door te betalen bevestig je dat je namens een bedrijf koopt en ga je akkoord met de [algemene voorwaarden](${terms}) en het [privacybeleid](${privacy}) van Vidalo.`,
+    /** Next to the checkbox the customer must tick. */
+    consentAccept: (terms: string, privacy: string) => `Ik mag deze overeenkomst namens mijn bedrijf aangaan en ga akkoord met de [algemene voorwaarden](${terms}) en het [privacybeleid](${privacy}) van Vidalo.`,
   },
 
   pricing: {

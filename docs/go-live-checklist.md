@@ -37,7 +37,7 @@ The launch gate. "continue" resumes from the first row that is not ✓. Status k
 |---|---|---|
 | B1 | Vidalo's own Stripe account, id pinned as `VIDALO_STRIPE_ACCOUNT` | blocked: Julian creates it; `api.stripe.com` must be allowed for the session |
 | B2 | `pnpm stripe:setup --apply` (prices, 21% tax rate, webhook) | blocked: B1 |
-| B3 | Terms and Privacy URLs set in Stripe settings | blocked: B1 + legal pages |
+| B3 | Terms and Privacy URLs set in Stripe settings. **Checkout now requires them** (14 Oct 2026: terms checkbox, B2B confirmation with legal links, btw-nummer, origin-derived return URLs, as for Sonable; `docs/PAYMENTS.md`). Proof: a completed session whose `checkout.completed` event reads `termsConsent: "accepted"` | blocked: B1 + legal pages |
 | B4 | One live purchase on a real card, refunded | blocked: B2 |
 
 ## Deploy
