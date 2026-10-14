@@ -612,7 +612,7 @@ export const en: CopyShape = {
         { title: "Information", links: [{ label: "What we check", href: "/hoe-het-werkt#criteria" }, { label: "Questions", href: "/#vragen" }, { label: "Facts about Vidalo", href: "/feiten" }, { label: "Contact", href: "mailto:hallo@vidalo.io" }] },
         { title: "Legal", links: [{ label: "Terms and conditions", href: "/voorwaarden" }, { label: "Privacy policy", href: "/privacy" }, { label: "Cookies", href: "/cookies" }] },
       ],
-      legal: "A101 B.V. (trading as Vidalo) · Factorij 80, 3071 AV Rotterdam, the Netherlands · KvK 42057858 · VAT NL869514192B01 · Prices excl. VAT",
+      legal: "Vidalo (part of A101 B.V.) · Factorij 80, 3071 AV Rotterdam, the Netherlands · KvK 42057858 · Prices excl. VAT",
       copyright: "© 2026 Vidalo. All rights reserved.",
       reportNote: "This report link works for 30 days.",
     },
