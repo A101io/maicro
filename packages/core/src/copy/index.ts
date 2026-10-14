@@ -621,11 +621,11 @@ export const copy = {
       resultTagline: "AI-controle voor bedrijven. Wat ChatGPT en Google AI over je zeggen, klopt.",
       lang: "NL",
       columns: [
-        { title: "Product", links: [{ label: "Hoe het werkt", href: "/hoe-het-werkt" }, { label: "Waarom", href: "/waarom" }, { label: "Straks: wat er verandert", href: "/straks" }, { label: "Voorbeeldrapport", href: "/#rapport" }, { label: "Prijs", href: "/prijzen" }, { label: "Per vak", href: "/#vak" }] },
+        { title: "Product", links: [{ label: "Hoe het werkt", href: "/hoe-het-werkt" }, { label: "Waarom", href: "/waarom" }, { label: "AI-agents en OKF", href: "/straks" }, { label: "Voorbeeldrapport", href: "/#rapport" }, { label: "Prijs", href: "/prijzen" }, { label: "Per vak", href: "/#vak" }] },
         { title: "Informatie", links: [{ label: "Wat we controleren", href: "/hoe-het-werkt#criteria" }, { label: "Vragen", href: "/#vragen" }, { label: "Feiten over Vidalo", href: "/feiten" }, { label: "Contact", href: "mailto:hallo@vidalo.io" }] },
         { title: "Juridisch", links: [{ label: "Algemene voorwaarden", href: "/voorwaarden" }, { label: "Privacybeleid", href: "/privacy" }, { label: "Cookies", href: "/cookies" }] },
       ],
-      legal: "A101 B.V. (handelend als Vidalo) · Factorij 80, 3071 AV Rotterdam · KvK 42057858 · btw NL869514192B01 · Julian de Vriend · Prijzen excl. btw",
+      legal: "A101 B.V. (handelend onder de naam Vidalo) · Factorij 80, 3071 AV Rotterdam, Nederland · KvK 42057858 · BTW NL869514192B01 · Prijzen excl. btw",
       copyright: "© 2026 Vidalo. Alle rechten voorbehouden.",
       reportNote: "Deze rapportlink werkt 30 dagen.",
     },
@@ -665,7 +665,7 @@ export const copy = {
     },
     next: {
       crumb: "Straks",
-      title: "Straks praten assistenten met elkaar: OKF, llms.txt en MCP uitgelegd",
+      title: "AI-agents, OKF, llms.txt en MCP uitgelegd voor ondernemers",
       description: "Straks overleggen AI-assistenten met elkaar en met je bedrijf. Wat betekenen OKF (Open Knowledge Format), schema.org, llms.txt, MCP en A2A, en wat moet je ermee? Gewoon uitgelegd.",
       h1: "Straks praten assistenten met elkaar",
       intro: "Wat er verandert als AI-assistenten niet alleen antwoorden maar ook regelen, en welke afspraken daarvoor nu gemaakt worden. Zonder vakjargon.",

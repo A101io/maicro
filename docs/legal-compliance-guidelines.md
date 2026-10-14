@@ -14,7 +14,7 @@ Read before writing anything a customer will read. This is a compliance aid, not
 | Fictional examples (bakkers, Van Dijk, Hendriks…) | Scenes, simulator, report | Every one is captioned as fictional. Keep the caption with the example. |
 
 ## Never use
-- Words: GEO, AEO, LLM, prompt, credits, zichtbaarheid, platform, agent (except in the "Straks" glossary, explained), garantie, gegarandeerd, controle over AI.
+- Words: GEO, AEO, LLM, prompt, credits, zichtbaarheid, platform, agent (except for "AI-agents", which stays in English and untranslated: the "Straks" glossary, the footer link "AI-agents en OKF" and the /straks page title; Julian, 14 Oct 2026), garantie, gegarandeerd, controle over AI.
 - Never claim control over what an AI says; never promise to be named or ranked.
 
 ## Prices and VAT

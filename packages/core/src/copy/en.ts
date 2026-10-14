@@ -608,11 +608,11 @@ export const en: CopyShape = {
       resultTagline: "AI check for businesses. What ChatGPT and Google AI say about you is right.",
       lang: "EN",
       columns: [
-        { title: "Product", links: [{ label: "How it works", href: "/hoe-het-werkt" }, { label: "Why", href: "/waarom" }, { label: "What's next", href: "/straks" }, { label: "Example report", href: "/#rapport" }, { label: "Pricing", href: "/prijzen" }, { label: "By trade", href: "/#vak" }] },
+        { title: "Product", links: [{ label: "How it works", href: "/hoe-het-werkt" }, { label: "Why", href: "/waarom" }, { label: "AI agents and OKF", href: "/straks" }, { label: "Example report", href: "/#rapport" }, { label: "Pricing", href: "/prijzen" }, { label: "By trade", href: "/#vak" }] },
         { title: "Information", links: [{ label: "What we check", href: "/hoe-het-werkt#criteria" }, { label: "Questions", href: "/#vragen" }, { label: "Facts about Vidalo", href: "/feiten" }, { label: "Contact", href: "mailto:hallo@vidalo.io" }] },
         { title: "Legal", links: [{ label: "Terms and conditions", href: "/voorwaarden" }, { label: "Privacy policy", href: "/privacy" }, { label: "Cookies", href: "/cookies" }] },
       ],
-      legal: "A101 B.V. (trading as Vidalo) · Factorij 80, 3071 AV Rotterdam · KvK (Dutch Chamber of Commerce) 42057858 · VAT NL869514192B01 · Julian de Vriend · Prices excl. VAT",
+      legal: "A101 B.V. (trading as Vidalo) · Factorij 80, 3071 AV Rotterdam, the Netherlands · KvK 42057858 · VAT NL869514192B01 · Prices excl. VAT",
       copyright: "© 2026 Vidalo. All rights reserved.",
       reportNote: "This report link works for 30 days.",
     },
@@ -651,7 +651,7 @@ export const en: CopyShape = {
     },
     next: {
       crumb: "What's next",
-      title: "Soon assistants will talk to each other: OKF, llms.txt and MCP explained",
+      title: "AI agents, OKF, llms.txt and MCP explained for business owners",
       description: "Soon AI assistants will talk to each other and to your business. What do OKF (Open Knowledge Format), schema.org, llms.txt, MCP and A2A mean, and what should you do? Plainly explained.",
       h1: "Soon assistants will talk to each other",
       intro: "What changes when AI assistants do not just answer but also arrange things, and which agreements are being made for it now. Without jargon.",

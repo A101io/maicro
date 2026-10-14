@@ -23,7 +23,7 @@ Landing page sections (Dutch copy):
 7 Prijzen — Gratis AI-check · Instellen €149 eenmalig (feitenpagina, synchronisatie, eerste herstelronde) · Bewaking €49 per maand (maandelijkse controle, herstel, rapport). Alle prijzen excl. btw. Geen opzegtermijn, geen verborgen kosten, maandelijks opzegbaar.
 8 FAQ — Ik heb toch een website? / Kunnen jullie ChatGPT laten zeggen wat ik wil? (Nee, niemand. Wij herstellen de bronnen.) / Werkt het altijd? (the honest limit) / Wat moet ik zelf doen? (5 minuten: gegevens bevestigen, één DNS-regel, één keer inloggen bij Google.) / Moet ik iets installeren? (Nee.) / Hoe vaak controleren jullie? (Elke maand, en na elke wijziging.)
 9 Slot — H2: Vraag het ChatGPT. Of laat ons het doen. CTA: Gratis AI-check.
-Footer: KvK, btw-id, adres, naam van een echt persoon, "Prijzen excl. btw".
+Footer: same identity line as Sonable: A101 B.V. (handelend onder de naam Vidalo), adres, KvK, BTW, "Prijzen excl. btw". No person's name (Julian, 14 Oct 2026).
 
 Scan result page: header "Dit zegt AI over [Bedrijf], gecontroleerd op [datum]"; summary "We stelden 12 vragen aan ChatGPT, Google AI en Copilot. 4 antwoorden klopten niet."; error cards: Vraag / [Engine] zei / Klopt niet: … / Waar het vandaan komt: [bron] / Wat we doen: …; correct answers collapsed ("8 antwoorden klopten. Toon"); engines row; "Een klant die dit vraagt, krijgt dit antwoord. Niet één keer: elke keer, tot de bron verandert."; CTA with price visible; secondary "Zelf oplossen? Dit zijn de bronnen…"; share link. Max 5 error cards first view; "klopt niet" label, not warning icons; no red backgrounds; no scores/percentages per business — only counts.
 
