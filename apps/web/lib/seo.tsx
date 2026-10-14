@@ -49,7 +49,6 @@ export function organizationLd(copy: CopyShape) {
     email: "hallo@vidalo.io",
     description: copy.tagline,
     identifier: { "@type": "PropertyValue", propertyID: "KvK", value: OWN_BUSINESS.kvk },
-    vatID: "NL869514192B01",
     subjectOf: OWN_FACTS_URL,
   };
 }
