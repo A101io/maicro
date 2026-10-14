@@ -25,8 +25,8 @@ export async function Logo({ size = 24, color }: { size?: number; color?: string
   const mark = Math.round(size * 0.75);
   return (
     <span role="img" aria-label={copy.brand} className="inline-flex items-end" style={{ gap: Math.round(size * 0.25) }}>
-      <Mark size={mark} color={color} className="mb-[0.125em]" />
-      <span className="font-extrabold leading-none" style={{ fontSize: size, letterSpacing: "-0.02em" }}>
+      <Mark size={mark} color={color} className="logo-mark mb-[0.125em]" />
+      <span className="logo-name font-extrabold leading-none" style={{ fontSize: size, letterSpacing: "-0.02em" }}>
         {copy.nav.wordmark}
       </span>
     </span>
