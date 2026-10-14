@@ -73,7 +73,7 @@ Written as if the three domains exist (Julian, 13 Oct 2026: "ga er even van uit"
 
 | # | Item | Status |
 |---|---|---|
-| D1 | `vidalo.io` registered (Julian, 14 Oct 2026). Still needed: the zone `vidalo.io` active in A101's Cloudflare account (`37c9615a0d7d9629154eca03d7de59a6`), nameservers at the registrar pointing to it. At 14 Oct 16:30 the domain had no nameservers yet | blocked: Julian (registrar → Cloudflare zone) |
+| D1 | `vidalo.io` ordered by Julian at one.com, 14 Oct 2026; **the registration is awaiting approval** (no nameservers yet). Then: add the zone in A101's Cloudflare account (`37c9615a0d7d9629154eca03d7de59a6`), set its two nameservers at one.com, wait for Active, leave the DNS records empty (the production deploy creates them as Custom Domains, like Sitty), SSL Full (strict) + Always Use HTTPS. The exact links are in the session of 14 Oct; step 1 is `dash.cloudflare.com/<account>/add-site` | blocked: registry approval, then Julian (registrar → Cloudflare zone) |
 | D2 | `vidalo-web` binds `vidalo.io` and `www.vidalo.io` as Custom Domains (`apps/web/wrangler.jsonc`); `www` answers 301 to the same path on `vidalo.io` (`apps/web/worker.ts`, `packages/core/src/shared/canonical.ts`) | written; the earlier six-host version was proven in workerd with a Host header; re-proven by the unit test after the rename |
 | D3 | Deploy check: production verifies `https://vidalo.io`, then `--redirects` for `www.vidalo.io` (`scripts/verify-deploy.mjs`) | written |
 | D4 | Cloudflare token gains **Zone · Workers Routes · Edit** on the zone `vidalo.io` (docs/secrets-and-keys.md) | blocked: D1 |
