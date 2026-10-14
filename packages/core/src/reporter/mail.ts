@@ -25,7 +25,7 @@ export interface MailResult {
 }
 
 export function defaultFrom(): string {
-  return process.env.EMAIL_FROM || "Vidalo <controle@vidalo.nl>";
+  return process.env.EMAIL_FROM || "Vidalo <controle@vidalo.io>";
 }
 
 function useResend(): boolean {
@@ -45,7 +45,7 @@ export function toEml(input: MailInput, id: string): string {
     input.replyTo ? `Reply-To: ${input.replyTo}` : null,
     `Subject: ${input.subject}`,
     `Date: ${date}`,
-    `Message-ID: <${id}@vidalo.nl>`,
+    `Message-ID: <${id}@vidalo.io>`,
     "MIME-Version: 1.0",
     ...Object.entries(input.headers ?? {}).map(([k, v]) => `${k}: ${v}`),
   ].filter(Boolean);

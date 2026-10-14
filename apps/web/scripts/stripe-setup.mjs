@@ -3,7 +3,7 @@
  * the webhook endpoint. Checks by default; changes nothing without --apply.
  *
  *   STRIPE_SECRET_KEY=sk_test_... VIDALO_STRIPE_ACCOUNT=acct_... \
- *   PUBLIC_BASE_URL=https://vidalo.nl pnpm stripe:setup [--apply] [--live]
+ *   PUBLIC_BASE_URL=https://vidalo.io pnpm stripe:setup [--apply] [--live]
  *
  * Guards, because a valid key for the wrong account is silent:
  * - VIDALO_STRIPE_ACCOUNT must name the account the key belongs to, or the

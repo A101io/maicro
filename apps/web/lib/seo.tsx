@@ -10,7 +10,7 @@ import { localizeHref, type Lang } from "./lang-paths";
  * description, canonical, hreflang, Open Graph) and to AI assistants
  * (JSON-LD and /llms.txt). Only what the page itself shows goes in here.
  */
-export const SITE = (process.env.PUBLIC_BASE_URL ?? "https://vidalo.nl").replace(/\/$/, "");
+export const SITE = (process.env.PUBLIC_BASE_URL ?? "https://vidalo.io").replace(/\/$/, "");
 const abs = (path: string) => SITE + (path === "/" ? "" : path);
 
 /** Title, description, canonical, both languages and the share card for one route. */
@@ -46,7 +46,7 @@ export function organizationLd(copy: CopyShape) {
     name: copy.brand,
     legalName: "A101 B.V.",
     url: SITE,
-    email: "hallo@vidalo.nl",
+    email: "hallo@vidalo.io",
     description: copy.tagline,
     identifier: { "@type": "PropertyValue", propertyID: "KvK", value: OWN_BUSINESS.kvk },
     subjectOf: OWN_FACTS_URL,

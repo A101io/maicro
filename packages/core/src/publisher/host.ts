@@ -16,7 +16,7 @@ import { defaultFactsHost } from "./render.js";
 export { defaultFactsHost };
 
 export function factsHostSuffix(): string {
-  return process.env.FACTS_HOST_SUFFIX || "vidalo.nl";
+  return process.env.FACTS_HOST_SUFFIX || "vidalo.io";
 }
 
 /** The CNAME target an owner must point `feiten.{domain}` at. */

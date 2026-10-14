@@ -622,7 +622,7 @@ export const copy = {
       lang: "NL",
       columns: [
         { title: "Product", links: [{ label: "Hoe het werkt", href: "/hoe-het-werkt" }, { label: "Waarom", href: "/waarom" }, { label: "AI-agents en OKF", href: "/straks" }, { label: "Voorbeeldrapport", href: "/#rapport" }, { label: "Prijs", href: "/prijzen" }, { label: "Per vak", href: "/#vak" }] },
-        { title: "Informatie", links: [{ label: "Wat we controleren", href: "/hoe-het-werkt#criteria" }, { label: "Vragen", href: "/#vragen" }, { label: "Feiten over Vidalo", href: "/feiten" }, { label: "Contact", href: "mailto:hallo@vidalo.nl" }] },
+        { title: "Informatie", links: [{ label: "Wat we controleren", href: "/hoe-het-werkt#criteria" }, { label: "Vragen", href: "/#vragen" }, { label: "Feiten over Vidalo", href: "/feiten" }, { label: "Contact", href: "mailto:hallo@vidalo.io" }] },
         { title: "Juridisch", links: [{ label: "Algemene voorwaarden", href: "/voorwaarden" }, { label: "Privacybeleid", href: "/privacy" }] },
       ],
       legal: "A101 B.V. (handelend als Vidalo) · Factorij 80, 3071 AV Rotterdam · KvK 42057858 · Prijzen excl. btw",
@@ -677,7 +677,7 @@ export const copy = {
     draft: true,
     draftNotice: "Concept. Deze tekst is nog niet juridisch gecontroleerd en kan veranderen.",
     updated: "Laatst bijgewerkt: 9 oktober 2026",
-    contact: "Vragen? Mail ons op hallo@vidalo.nl.",
+    contact: "Vragen? Mail ons op hallo@vidalo.io.",
     terms: {
       title: "Algemene voorwaarden",
       intro: "Deze voorwaarden gelden voor elke controle en elk abonnement van Vidalo, een handelsnaam van A101 B.V.",
@@ -710,7 +710,7 @@ export const copy = {
     button: "Afmelden",
     doneH1: "Je bent afgemeld",
     doneBody: "We sturen je hierover geen mails meer.",
-    invalid: "Deze afmeldlink klopt niet of is verlopen. Mail ons op hallo@vidalo.nl, dan regelen we het.",
+    invalid: "Deze afmeldlink klopt niet of is verlopen. Mail ons op hallo@vidalo.io, dan regelen we het.",
   },
 
   scanBusy: {
@@ -1434,7 +1434,7 @@ export const copy = {
   checkout: {
     mockNotice: "Betaling gesimuleerd (geen Stripe-sleutel ingesteld).",
     cancelled: "Je betaling is niet afgerond. Er is niets afgeschreven. Je kunt het hieronder opnieuw proberen.",
-    error: "Afrekenen lukt nu even niet. Er is niets afgeschreven. Probeer het later opnieuw of mail ons op hallo@vidalo.nl.",
+    error: "Afrekenen lukt nu even niet. Er is niets afgeschreven. Probeer het later opnieuw of mail ons op hallo@vidalo.io.",
     productSetup: "Vidalo Goed zetten (eenmalig)",
     productMonitor: "Vidalo Goed houden (per maand)",
   },
@@ -1478,7 +1478,7 @@ export const copy = {
     processingH1: "Bedankt, je betaling wordt verwerkt",
     processingBody: "Bij een incasso duurt het een paar werkdagen voor het geld binnen is. Je kunt alvast de stappen hieronder doen; we starten zodra de betaling rond is.",
     failedH1: "Je betaling is niet gelukt",
-    failedBody: "Er is niets afgeschreven. Probeer het opnieuw vanaf je rapport, of mail ons op hallo@vidalo.nl.",
+    failedBody: "Er is niets afgeschreven. Probeer het opnieuw vanaf je rapport, of mail ons op hallo@vidalo.io.",
     receipt: (amount: string, email: string | null) => `Je betaalde ${amount} incl. btw.${email ? ` De factuur staat in je mail (${email}).` : ""}`,
     steps: [
       { title: "Log één keer in bij Google", body: "Met het account van je Google-bedrijfsprofiel. Zo weten we dat jij de eigenaar bent.", href: "/app/google", cta: "Inloggen bij Google" },
@@ -1639,7 +1639,7 @@ export const copy = {
       error: "Er ging iets mis bij Google. Probeer het nog een keer.",
     },
     retry: "Opnieuw proberen",
-    contact: "Lukt het niet? Mail ons op hallo@vidalo.nl, dan koppelen we het samen.",
+    contact: "Lukt het niet? Mail ons op hallo@vidalo.io, dan koppelen we het samen.",
   },
 
   factsPage: {

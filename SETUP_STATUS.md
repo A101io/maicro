@@ -5,7 +5,7 @@ Status: `✓verified` (observed, evidence + date) · `written` (code exists, not
 
 ## Project facts
 - Product: Vidalo (name under review, see go-live J1). Company: A101 B.V. (handelend als Vidalo), Factorij 80, 3071 AV Rotterdam, KvK 42057858, VAT NL869514192B01 (not shown on the site by design: footer has no btw-nummer).
-- Domain: **none. `vidalo.nl` and `vidalo.com` are held by others, `vidalo.io` is free (whois + DNS, 14 Oct 2026; go-live J2).** Copy and config still assume `vidalo.nl`. Support: hallo@vidalo.nl (mailbox does not exist).
+- Domain: **`vidalo.io`**, registered by Julian 14 Oct 2026 (`vidalo.nl` and `vidalo.com` are held by others; go-live J2). Code, copy and config say `vidalo.io` since 14 Oct; DNS not yet on Cloudflare. Support: hallo@vidalo.io (mailbox does not exist yet).
 - Audience: B2B (Dutch businesses). Languages: NL + EN.
 - Stack: Next.js 15 (apps/web), worker (apps/worker), core (packages/core), Supabase `bbynmqvaxpjdnkaasutd` (eu-west-1). Hosting: Cloudflare Workers (decided 13 Oct 2026; account `37c9615a0d7d9629154eca03d7de59a6`).
 - Accounts: yes (magic link + Google verification). Payments: Stripe (account not created). AI: yes, as a tool to ask questions (OpenAI, Google, Perplexity, SerpAPI). Outbound email: Resend. Native app: no.
@@ -44,7 +44,7 @@ Status: `✓verified` (observed, evidence + date) · `written` (code exists, not
 | D2 | Deploy | written | Cloudflare Workers (Julian, 13 Oct): `vidalo-web` via OpenNext, `vidalo-worker` for cron, the scan queue and facts pages; `deploy.yml` manual, preview or production, never Workers Builds. Verified locally in workerd against real Postgres: every route NL+EN, a free scan through the queue to its report, both crons, a facts page; one handle per request (control without it: every second request 500). Blocked on the Cloudflare token + account id on the GitHub environments. **14 Oct: preview deployed by hand from Julian's Mac** (local `wrangler login`): https://vidalo-web-preview.julian-devriend.workers.dev, `verify-deploy.mjs` 7/7; queue `vidalo-scans` created. Production: no Hyperdrive, no secrets, no custom domains possible (D5). | 14 Oct |
 | D3 | No empty env overrides | ✓verified | Workflows set no `NEXT_PUBLIC_*`; live checkout refuses without `STRIPE_TAX_RATE_ID`; production without `DATABASE_URL`/Hyperdrive answers 503 instead of mock data (verified in workerd, and the deploy verifier fails on it). | 13 Oct |
 | D4 | Verify deployed bundle | written | `scripts/verify-deploy.mjs` as the last deploy step: health, NL and EN landing, pricing, llms.txt, sitemap, 404; prints status and bytes for each. Passes on the local preview, fails (with the reason) on a database-less production. | 13 Oct |
-| D5 | Domain | blocked | `vidalo.nl` taken (third party, since 14 Jun 2026), `vidalo.com` taken (2003, DE), `vidalo.io` free: whois + DNS 14 Oct. Decision for Julian (go-live J2); the custom domains in `wrangler.jsonc` fail a production deploy until then. | 14 Oct |
+| D5 | Domain | blocked | `vidalo.io` registered by Julian 14 Oct (`vidalo.nl` and `vidalo.com` are held by others). Repo renamed to `vidalo.io` the same day. Needs the zone in A101's Cloudflare account and nameservers at the registrar before the Custom Domain can bind. | 14 Oct |
 | D6 | Launch gate | open | Julian, 13 Oct: the GitHub Pages preview (mock data) stays public until there is a domain. The gate (coming-soon on `/`, `/legal/*` reachable, invariant test) comes with the production deploy. | 13 Oct |
 | D7 | Security headers + CSP | written | HSTS, nosniff, Referrer-Policy, X-Frame-Options, Permissions-Policy seen via `curl -I` on dev; CSP production-only (`next.config.ts`). | 13 Oct |
 | D8 | Health endpoint | ✓verified | `/api/health` → `{"ok":true,"db":"mem"}` 200 on dev; 503 path when the db throws. | 13 Oct |
@@ -118,5 +118,5 @@ Status: `✓verified` (observed, evidence + date) · `written` (code exists, not
 
 ## Needs Julian
 1. Upload the De Boer Legal masters (B2B, July 2026) so R2 can be built from them.
-2. The domain: `vidalo.nl` is not available (go-live J2). Decide `vidalo.io`, a buy-out, or another name; until then D4–D6, G1–G2 and production D2 wait.
+2. `vidalo.io` as a zone in A101's Cloudflare account, nameservers set at the registrar (go-live D1); until then D4–D6, G1–G2 and production D2 wait.
 3. The Supabase database password (for `DATABASE_URL`, go-live D3), a Cloudflare API token plus the `preview`/`production` GitHub environments (X2), Vidalo's own Stripe account (B1), a Google OAuth client (A3), and one click on "Stuur inloglink" on the local sign-in page (A1).

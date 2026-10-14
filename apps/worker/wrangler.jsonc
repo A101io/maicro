@@ -11,7 +11,7 @@
   "compatibility_flags": ["nodejs_compat"],
   "observability": { "enabled": true },
   "workers_dev": true,
-  "vars": { "VIDALO_MOCK": "0", "FACTS_HOST_SUFFIX": "vidalo.nl" },
+  "vars": { "VIDALO_MOCK": "0", "FACTS_HOST_SUFFIX": "vidalo.io" },
   "triggers": {
     // Every minute: run queued jobs. Every ten minutes: the cron tick
     // (monthly scans, rechecks, host polls, follow-ups). src/cloudflare.ts

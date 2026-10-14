@@ -6,7 +6,7 @@ The launch gate. "continue" resumes from the first row that is not ✓. Status k
 | # | Decision | Status |
 |---|---|---|
 | J1 | Product name: **Vidalo** (Julian, 13 Oct 2026; was Maicro). Web search found no Vidalo brand; nearest: Vidado (AI data extraction), Vidyo (video calls). Formal TMview check (EUIPO + BOIP) and the domains are Julian's. | decided; TMview + domains open |
-| J2 | Domain: **`vidalo.nl` is the main domain**; `vidalo.com` and `vidalo.io` redirect to it (Julian, 13 Oct 2026). `.com` and `.io` at Cloudflare Registrar, `.nl` at a Dutch registrar with DNS on Cloudflare. **Checked 14 Oct 2026 (whois + DNS from Julian's Mac): `vidalo.nl` is taken** (registered 14 Jun 2026 by a third party, registrar Internationale Domeinregistratie Nederland, DNSSEC on, A record 37.97.254.29); **`vidalo.com` is taken** (since 2003, German registrant, alfahosting DNS); `vidalo.io` is free, as are `vidalo.ai` and `vidalo.co`; `vidalo.app` is taken. | **blocked: decision.** (a) `vidalo.io` as the site and `.nl` out of code and copy; (b) try to buy `vidalo.nl` through its registrar; (c) another name. Until then the Domains rows and the custom domains in `apps/web/wrangler.jsonc` cannot be used, and a production deploy fails on them. |
+| J2 | Domain: **`vidalo.nl` is the main domain**; `vidalo.com` and `vidalo.io` redirect to it (Julian, 13 Oct 2026). `.com` and `.io` at Cloudflare Registrar, `.nl` at a Dutch registrar with DNS on Cloudflare. **Checked 14 Oct 2026 (whois + DNS from Julian's Mac): `vidalo.nl` is taken** (registered 14 Jun 2026 by a third party, registrar Internationale Domeinregistratie Nederland, DNSSEC on, A record 37.97.254.29); **`vidalo.com` is taken** (since 2003, German registrant, alfahosting DNS); `vidalo.io` is free, as are `vidalo.ai` and `vidalo.co`; `vidalo.app` is taken. **Decided 14 Oct 2026: `vidalo.io` is the site** (registered by Julian that day); only `www.vidalo.io` redirects to it; `.nl` and `.com` are out of code, copy and config. | decided. Open: which registrar holds `vidalo.io` and whether its DNS is a zone in A101's Cloudflare account (needed for the Custom Domain, D1) |
 | J3 | Hosting: **all on Cloudflare** (Julian, 13 Oct 2026): `vidalo-web` (OpenNext) and `vidalo-worker` (cron, scan queue, facts pages), A101's account. | decided |
 | J4 | Launch gate: the GitHub Pages preview (`a101io.github.io/maicro`, mock data) stays **public until there is a domain** (Julian, 13 Oct 2026). A coming-soon gate comes with the production deploy. | decided |
 
@@ -73,14 +73,14 @@ Written as if the three domains exist (Julian, 13 Oct 2026: "ga er even van uit"
 
 | # | Item | Status |
 |---|---|---|
-| D1 | Register `vidalo.com` and `vidalo.io` at Cloudflare Registrar, `vidalo.nl` at a Dutch registrar; add `vidalo.nl` to Cloudflare as a zone and set its nameservers there | blocked: `vidalo.nl` and `vidalo.com` are not available (J2, 14 Oct 2026); only `vidalo.io` can be registered as planned |
-| D2 | `vidalo-web` binds `vidalo.nl`, `www.vidalo.nl`, `vidalo.com`, `www.vidalo.com`, `vidalo.io`, `www.vidalo.io` as Custom Domains (`apps/web/wrangler.jsonc`); every host but `vidalo.nl` answers 301 to the same path on `vidalo.nl` (`apps/web/worker.ts`, `packages/core/src/shared/canonical.ts`) | written; proven in workerd with a Host header (301 for .io/.com/www, 200 for .nl and workers.dev) |
-| D3 | Deploy check: production verifies `https://vidalo.nl`, then `--redirects` for the five other hosts (`scripts/verify-deploy.mjs`) | written |
-| D4 | Cloudflare token gains **Zone · Workers Routes · Edit** on the three zones (docs/secrets-and-keys.md) | blocked: D1 |
-| D5 | Fallback facts hosts `{slug}.feiten.vidalo.nl` are two levels deep: Universal SSL covers only `*.vidalo.nl`, so they need Advanced Certificate Manager (about $10/month) or a one-level scheme such as `{slug}-feiten.vidalo.nl` | decision: Julian |
-| D6 | `feiten.vidalo.nl` as the CNAME target for customers' own domains (Cloudflare for SaaS, fallback origin on `vidalo-worker`) | open |
+| D1 | `vidalo.io` registered (Julian, 14 Oct 2026). Still needed: the zone `vidalo.io` active in A101's Cloudflare account (`37c9615a0d7d9629154eca03d7de59a6`), nameservers at the registrar pointing to it. At 14 Oct 16:30 the domain had no nameservers yet | blocked: Julian (registrar → Cloudflare zone) |
+| D2 | `vidalo-web` binds `vidalo.io` and `www.vidalo.io` as Custom Domains (`apps/web/wrangler.jsonc`); `www` answers 301 to the same path on `vidalo.io` (`apps/web/worker.ts`, `packages/core/src/shared/canonical.ts`) | written; the earlier six-host version was proven in workerd with a Host header; re-proven by the unit test after the rename |
+| D3 | Deploy check: production verifies `https://vidalo.io`, then `--redirects` for `www.vidalo.io` (`scripts/verify-deploy.mjs`) | written |
+| D4 | Cloudflare token gains **Zone · Workers Routes · Edit** on the zone `vidalo.io` (docs/secrets-and-keys.md) | blocked: D1 |
+| D5 | Fallback facts hosts `{slug}.feiten.vidalo.io` are two levels deep: Universal SSL covers only `*.vidalo.io`, so they need Advanced Certificate Manager (about $10/month) or a one-level scheme such as `{slug}-feiten.vidalo.io` | decision: Julian |
+| D6 | `feiten.vidalo.io` as the CNAME target for customers' own domains (Cloudflare for SaaS, fallback origin on `vidalo-worker`) | open |
 
-⚠ With D2 in place, the first production deploy puts the product on `vidalo.nl`. There is no coming-soon gate yet (J4). That deploy is the one-way door below, not a routine step.
+⚠ With D2 in place, the first production deploy puts the product on `vidalo.io`. There is no coming-soon gate yet (J4). That deploy is the one-way door below, not a routine step.
 
 ## The one-way door
 Pointing the real domain at production, with live Stripe prices, is the launch. It waits for Julian's explicit yes, and for every row above to be ✓ or consciously accepted.

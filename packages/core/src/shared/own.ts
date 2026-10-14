@@ -21,13 +21,13 @@ export const OWN_BUSINESS: Business = {
   slug: "vidalo",
   name: "Vidalo",
   place: "Rotterdam",
-  domain: "vidalo.nl",
+  domain: "vidalo.io",
   kvk: "42057858",
   googlePlaceId: null,
   sector: null,
   plan: "monitor",
   status: "active",
-  ownerEmail: "hallo@vidalo.nl",
+  ownerEmail: "hallo@vidalo.io",
   createdAt: "2026-10-13T00:00:00.000Z",
 };
 
@@ -44,8 +44,8 @@ export const OWN_FACTS: Facts = {
   address: "Factorij 80",
   postcode: "3071 AV",
   phone: null,
-  email: "hallo@vidalo.nl",
-  website: "https://vidalo.nl",
+  email: "hallo@vidalo.io",
+  website: "https://vidalo.io",
   openStatus: "open",
   hours: [
     { day: 0, open: "09:00", close: "17:00", closed: false },

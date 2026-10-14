@@ -19,7 +19,7 @@ Workflow D (fix) — one path per source_type:
 - owned_website: email owner exact page/text to change (WordPress plugin: patch); recheck 14d; reminders 14/28d.
 - directory_api (GBP/Bing/Apple): resync; recheck 7d; operator if rejected.
 - directory_form: browser agent submits; screenshot evidence; recheck 14d; operator queue on failure.
-- third_party / email-only: templated correction email in owner's name (from vidalo.nl, reply-to owner), follow-up 14d; recheck 30d; unfixable after 45d with note.
+- third_party / email-only: templated correction email in owner's name (from vidalo.io, reply-to owner), follow-up 14d; recheck 30d; unfixable after 45d with note.
 - other_entity: strengthen disambiguation on facts page ("niet te verwarren met"), sync place everywhere; recheck 30d.
 - none (model memory): nothing; recheck after major model release; shown honestly.
 - verdict not_found (any source type): there is no wrong source, so we make the business findable: publish facts page + sync all channels (GBP, Bing, Apple) + directory discovery; recheck after 21d; still not found → resync and follow-up recheck at 45d; never unfixable before 60d. Label: "Niet gevonden: we maken je vindbaar".
