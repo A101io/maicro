@@ -52,9 +52,13 @@ if (!/^https?:\/\//.test(base)) {
 
 const checks = [
   { path: "/api/health", want: (s, t) => s === 200 && /"ok":true/.test(t), what: "health 200 ok" },
-  { path: "/", want: (s, t) => s === 200 && /<html lang="nl"/.test(t) && /data-ask/.test(t), what: "Dutch landing with the simulator" },
+  // With the launch gate on (VIDALO_COMING_SOON=1) the root is the coming-soon page; either is a pass, and the log says which.
+  { path: "/", want: (s, t) => s === 200 && /<html lang="nl"/.test(t) && (/data-ask/.test(t) || /data-coming-soon/.test(t)), what: "Dutch landing with the simulator, or the coming-soon page" },
   { path: "/en", want: (s, t) => s === 200 && /<html lang="en"/.test(t), what: "English landing" },
   { path: "/en/pricing", want: (s, t) => s === 200 && /<html lang="en"/.test(t), what: "English pricing" },
+  // The gate must never hide these (core/shared/gate.ts, LEGAL-NL §6).
+  { path: "/privacy", want: (s, t) => s === 200 && /<html lang="nl"/.test(t), what: "privacy page reachable" },
+  { path: "/cookies", want: (s, t) => s === 200 && /vidalo_consent/.test(t), what: "cookie statement with the inventory" },
   { path: "/llms.txt", want: (s, t) => s === 200 && t.startsWith("# Vidalo"), what: "llms.txt" },
   { path: "/sitemap.xml", want: (s, t) => s === 200 && /hreflang/.test(t), what: "sitemap with hreflang" },
   { path: "/deze-pagina-bestaat-niet", want: (s) => s === 404, what: "unknown page 404" },

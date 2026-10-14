@@ -2,16 +2,17 @@ import { getI18n } from "@/lib/i18n";
 import { SiteHeader } from "@/components/SiteHeader";
 import { SiteFooter } from "@/components/SiteFooter";
 
-type Doc = { title: string; intro: string; sections: readonly { h: string; p: readonly string[] }[] };
+type Table = { head: readonly string[]; rows: readonly (readonly string[])[] };
+type Doc = { title: string; intro: string; sections: readonly { h: string; p: readonly string[]; table?: Table }[] };
 
-export async function LegalPage({ doc }: { doc: Doc }) {
+export async function LegalPage({ doc, draft = true }: { doc: Doc; draft?: boolean }) {
   const { copy } = await getI18n();
   const l = copy.legal;
   return (
     <>
       <SiteHeader variant="minimal" />
       <main className="wrap max-w-[760px] py-12 sm:py-16">
-        {l.draft && <p className="mb-6 rounded-xl border-[1.5px] border-line px-4 py-3 text-[14px] text-ink-2">{l.draftNotice}</p>}
+        {l.draft && draft && <p className="mb-6 rounded-xl border-[1.5px] border-line px-4 py-3 text-[14px] text-ink-2">{l.draftNotice}</p>}
         <h1 className="h2">{doc.title}</h1>
         <p className="mt-2 text-[14px] text-muted">{l.updated}</p>
         <p className="lead mt-6">{doc.intro}</p>
@@ -23,6 +24,32 @@ export async function LegalPage({ doc }: { doc: Doc }) {
                 {para}
               </p>
             ))}
+            {s.table && (
+              <div className="card mt-4 overflow-x-auto">
+                <table className="w-full text-[15px]">
+                  <thead>
+                    <tr className="border-b-[1.5px] border-line text-left text-[13px] text-muted">
+                      {s.table.head.map((h) => (
+                        <th key={h} className="px-4 py-3 font-semibold">
+                          {h}
+                        </th>
+                      ))}
+                    </tr>
+                  </thead>
+                  <tbody className="divide-y-[1px] divide-line">
+                    {s.table.rows.map((row) => (
+                      <tr key={row[0]} className="align-top">
+                        {row.map((cell, i) => (
+                          <td key={cell} className={`px-4 py-3 ${i === 0 ? "whitespace-nowrap font-mono text-[14px]" : "text-ink-2"}`}>
+                            {cell}
+                          </td>
+                        ))}
+                      </tr>
+                    ))}
+                  </tbody>
+                </table>
+              </div>
+            )}
           </section>
         ))}
         <p className="mt-12 text-[15px] text-ink-2">{l.contact}</p>

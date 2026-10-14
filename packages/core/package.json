@@ -15,6 +15,7 @@
     "./prompts": "./src/prompts/index.ts",
     "./copy": "./src/copy/index.ts",
     "./shared": "./src/shared/index.ts",
+    "./shared/gate": "./src/shared/gate.ts",
     "./billing": "./src/billing/index.ts"
   },
   "scripts": {

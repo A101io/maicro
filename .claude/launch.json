@@ -8,6 +8,12 @@
       "port": 3000
     },
     {
+      "name": "vidalo-dev-gate",
+      "runtimeExecutable": "env",
+      "runtimeArgs": ["VIDALO_COMING_SOON=1", "VIDALO_PREVIEW_BUTTON=1", "corepack", "pnpm", "--filter", "@vidalo/web", "dev"],
+      "port": 3000
+    },
+    {
       "name": "vidalo-worker",
       "runtimeExecutable": "corepack",
       "runtimeArgs": ["pnpm", "--filter", "@vidalo/worker", "start"],

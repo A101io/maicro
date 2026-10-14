@@ -610,7 +610,7 @@ export const en: CopyShape = {
       columns: [
         { title: "Product", links: [{ label: "How it works", href: "/hoe-het-werkt" }, { label: "Why", href: "/waarom" }, { label: "AI agents and OKF", href: "/straks" }, { label: "Example report", href: "/#rapport" }, { label: "Pricing", href: "/prijzen" }, { label: "By trade", href: "/#vak" }] },
         { title: "Information", links: [{ label: "What we check", href: "/hoe-het-werkt#criteria" }, { label: "Questions", href: "/#vragen" }, { label: "Facts about Vidalo", href: "/feiten" }, { label: "Contact", href: "mailto:hallo@vidalo.io" }] },
-        { title: "Legal", links: [{ label: "Terms and conditions", href: "/voorwaarden" }, { label: "Privacy policy", href: "/privacy" }] },
+        { title: "Legal", links: [{ label: "Terms and conditions", href: "/voorwaarden" }, { label: "Privacy policy", href: "/privacy" }, { label: "Cookies", href: "/cookies" }] },
       ],
       legal: "A101 B.V. (trading as Vidalo) · Factorij 80, 3071 AV Rotterdam · KvK (Dutch Chamber of Commerce) 42057858 · Prices excl. VAT",
       copyright: "© 2026 Vidalo. All rights reserved.",
@@ -688,6 +688,72 @@ export const en: CopyShape = {
         { h: "Your rights", p: ["You may access your data, have it corrected or deleted, and object. Email us; we respond within a month. If you disagree with us, you can file a complaint with the Autoriteit Persoonsgegevens (the Dutch Data Protection Authority)."] },
       ],
     },
+    cookies: {
+      title: "Cookies",
+      intro: "Vidalo only uses cookies the site needs to work. No tracking cookies, no advertising cookies. This page lists exactly what we store on your device.",
+      sections: [
+        { h: "What a cookie is", p: ["A cookie is a small file a website stores on your device so the site recognises you when you change pages or come back. The same applies to browser storage (local storage); we use none of it."] },
+        {
+          h: "Which cookies we set",
+          p: ["Every cookie below is necessary. No consent is needed for these; we do tell you they exist."],
+          table: {
+            head: ["Name", "What for", "How long"],
+            rows: [
+              ["vidalo_consent", "Remembers that you have seen the cookie notice and which choice you made.", "12 months"],
+              ["sb-…-auth-token", "Keeps you signed in to your account (Supabase, passwordless sign-in).", "Until you sign out, at most 400 days"],
+              ["sb-…-code-verifier", "During sign-in: ties the sign-in link from your email to this browser.", "Removed once you are signed in, otherwise at most 400 days"],
+              ["vidalo_preview", "Only while the site is being built: shows you the site behind the ‘Coming soon’ page.", "Until you close the browser"],
+            ],
+          },
+        },
+        { h: "Statistics and marketing", p: ["We measure nothing at the moment and set no third-party cookies. Should we ever keep visitor statistics, we will ask your consent first, with a refuse button the same size as the accept button. Until then there is nothing to switch off."] },
+        { h: "Other parties", p: ["When you pay you go to a Stripe page; Stripe's cookies and privacy policy apply there. When you connect your Google Business Profile you sign in with Google; Google's rules apply there. On vidalo.io itself we load no scripts, fonts or buttons from other parties."] },
+        { h: "Changing your choice", p: ["‘Cookie settings’ sits at the bottom of every page. It shows your choice and lets you change it. You can also delete cookies in your browser settings."] },
+      ],
+    },
+  },
+
+  comingSoon: {
+    lang: "en",
+    title: "Coming soon",
+    kicker: "Coming soon",
+    h1: "Vidalo is on its way.",
+    body: "Your customers ask ChatGPT. We make sure the answer is right. Soon you can check here, for free, what AI assistants say about your business, and have every error fixed at its source.",
+    contact: "Questions, or want in early? Email us at",
+    previewButton: "Have a look at the site already",
+    previewNote: "Temporary, while we build. The site is not finished.",
+    barTitle: "Preview",
+    barLinks: [
+      { label: "Home", href: "/" },
+      { label: "How it works", href: "/hoe-het-werkt" },
+      { label: "Why", href: "/waarom" },
+      { label: "Pricing", href: "/prijzen" },
+      { label: "What's next", href: "/straks" },
+      { label: "By trade", href: "/vak/loodgieters-installateurs" },
+      { label: "Example report", href: "/r/voorbeeld" },
+      { label: "Facts", href: "/feiten" },
+      { label: "Log in", href: "/inloggen" },
+    ],
+    barExit: "Back to Coming soon",
+  },
+
+  consent: {
+    title: "Cookies",
+    body: "We only use cookies the site needs to work. No tracking cookies.",
+    bodyWithChoice: "Necessary cookies are always on. For statistics we ask your consent. Refusing is as easy as accepting.",
+    link: "Cookie statement",
+    ok: "Got it",
+    refuse: "Necessary only",
+    accept: "Accept all",
+    settings: "Cookie settings",
+    close: "Close",
+    categories: {
+      necessary: { label: "Necessary", body: "Signing in and your cookie choice. Always on." },
+      analytics: { label: "Statistics", body: "Which pages are visited, without who you are." },
+    },
+    current: "Your choice",
+    on: "on",
+    off: "off",
   },
 
   unsubscribe: {

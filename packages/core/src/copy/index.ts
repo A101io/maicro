@@ -623,7 +623,7 @@ export const copy = {
       columns: [
         { title: "Product", links: [{ label: "Hoe het werkt", href: "/hoe-het-werkt" }, { label: "Waarom", href: "/waarom" }, { label: "AI-agents en OKF", href: "/straks" }, { label: "Voorbeeldrapport", href: "/#rapport" }, { label: "Prijs", href: "/prijzen" }, { label: "Per vak", href: "/#vak" }] },
         { title: "Informatie", links: [{ label: "Wat we controleren", href: "/hoe-het-werkt#criteria" }, { label: "Vragen", href: "/#vragen" }, { label: "Feiten over Vidalo", href: "/feiten" }, { label: "Contact", href: "mailto:hallo@vidalo.io" }] },
-        { title: "Juridisch", links: [{ label: "Algemene voorwaarden", href: "/voorwaarden" }, { label: "Privacybeleid", href: "/privacy" }] },
+        { title: "Juridisch", links: [{ label: "Algemene voorwaarden", href: "/voorwaarden" }, { label: "Privacybeleid", href: "/privacy" }, { label: "Cookies", href: "/cookies" }] },
       ],
       legal: "A101 B.V. (handelend als Vidalo) · Factorij 80, 3071 AV Rotterdam · KvK 42057858 · Prijzen excl. btw",
       copyright: "© 2026 Vidalo. Alle rechten voorbehouden.",
@@ -702,6 +702,74 @@ export const copy = {
         { h: "Jouw rechten", p: ["Je mag je gegevens inzien, laten verbeteren of laten verwijderen, en bezwaar maken. Mail ons; we reageren binnen een maand. Ben je het niet met ons eens, dan kun je een klacht indienen bij de Autoriteit Persoonsgegevens."] },
       ],
     },
+    cookies: {
+      title: "Cookies",
+      intro: "Vidalo gebruikt alleen cookies die nodig zijn om de site te laten werken. Geen volgcookies, geen advertentiecookies. Hier staat precies wat we op je apparaat zetten.",
+      sections: [
+        { h: "Wat een cookie is", p: ["Een cookie is een klein bestand dat een website op je apparaat zet, zodat de site je herkent als je van pagina wisselt of terugkomt. Hetzelfde geldt voor opslag in je browser (local storage); daar gebruiken we niets van."] },
+        {
+          h: "Welke cookies we zetten",
+          p: ["Alle cookies hieronder zijn noodzakelijk. Daar is geen toestemming voor nodig; we vertellen je wel dat ze er zijn."],
+          table: {
+            head: ["Naam", "Waarvoor", "Hoe lang"],
+            rows: [
+              ["vidalo_consent", "Onthoudt dat je de cookiemelding hebt gezien en welke keuze je maakte.", "12 maanden"],
+              ["sb-…-auth-token", "Houdt je ingelogd in je account (Supabase, inloggen zonder wachtwoord).", "Tot je uitlogt, hoogstens 400 dagen"],
+              ["sb-…-code-verifier", "Tijdens het inloggen: koppelt de inloglink uit je mail aan deze browser.", "Verwijderd zodra je bent ingelogd, anders hoogstens 400 dagen"],
+              ["vidalo_preview", "Alleen tijdens de bouwfase: laat je de site zien achter de pagina ‘Binnenkort’.", "Tot je de browser sluit"],
+            ],
+          },
+        },
+        { h: "Statistieken en marketing", p: ["We meten op dit moment niets en zetten geen cookies van andere partijen. Gaan we ooit bezoekersstatistieken bijhouden, dan vragen we daar eerst je toestemming voor, met een knop om te weigeren die even groot is als de knop om te accepteren. Tot die tijd staat er niets uit te zetten."] },
+        { h: "Andere partijen", p: ["Betaal je, dan ga je naar een pagina van Stripe; daar gelden de cookies en het privacybeleid van Stripe. Koppel je je Google-bedrijfsprofiel, dan log je in bij Google; daar gelden de regels van Google. Op vidalo.io zelf laden we geen scripts, lettertypen of knoppen van andere partijen."] },
+        { h: "Jouw keuze aanpassen", p: ["Onderaan elke pagina staat ‘Cookie-instellingen’. Daar zie je je keuze en pas je die aan. Cookies verwijderen kan ook via de instellingen van je browser."] },
+      ],
+    },
+  },
+
+  /** /binnenkort, the page behind the launch gate (core/shared/gate.ts), and the temporary preview bar. */
+  comingSoon: {
+    lang: "nl",
+    title: "Binnenkort",
+    kicker: "Binnenkort",
+    h1: "Vidalo komt eraan.",
+    body: "Je klanten vragen het aan ChatGPT. Wij zorgen dat het antwoord klopt. Binnenkort controleer je hier gratis wat AI-assistenten over je bedrijf zeggen, en laat je elke fout bij de bron herstellen.",
+    contact: "Vragen, of alvast meedoen? Mail ons op",
+    previewButton: "Bekijk de site alvast",
+    previewNote: "Tijdelijk, zolang we bouwen. De site is nog niet af.",
+    barTitle: "Voorvertoning",
+    barLinks: [
+      { label: "Home", href: "/" },
+      { label: "Zo werkt het", href: "/hoe-het-werkt" },
+      { label: "Waarom", href: "/waarom" },
+      { label: "Prijs", href: "/prijzen" },
+      { label: "Straks", href: "/straks" },
+      { label: "Per vak", href: "/vak/loodgieters-installateurs" },
+      { label: "Voorbeeldrapport", href: "/r/voorbeeld" },
+      { label: "Feiten", href: "/feiten" },
+      { label: "Inloggen", href: "/inloggen" },
+    ],
+    barExit: "Terug naar Binnenkort",
+  },
+
+  /** The cookie notice (components/CookieConsent.tsx) and the footer button that reopens it. */
+  consent: {
+    title: "Cookies",
+    body: "We gebruiken alleen cookies die nodig zijn om de site te laten werken. Geen volgcookies.",
+    bodyWithChoice: "Noodzakelijke cookies staan altijd aan. Voor statistieken vragen we je toestemming. Weigeren is net zo makkelijk als accepteren.",
+    link: "Cookiebeleid",
+    ok: "Begrepen",
+    refuse: "Alleen noodzakelijk",
+    accept: "Alles accepteren",
+    settings: "Cookie-instellingen",
+    close: "Sluiten",
+    categories: {
+      necessary: { label: "Noodzakelijk", body: "Inloggen en je cookiekeuze. Altijd aan." },
+      analytics: { label: "Statistieken", body: "Welke pagina’s bezocht worden, zonder wie je bent." },
+    },
+    current: "Je keuze",
+    on: "aan",
+    off: "uit",
   },
 
   unsubscribe: {
