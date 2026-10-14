@@ -6,7 +6,7 @@ The launch gate. "continue" resumes from the first row that is not ✓. Status k
 | # | Decision | Status |
 |---|---|---|
 | J1 | Product name: **Vidalo** (Julian, 13 Oct 2026; was Maicro). Web search found no Vidalo brand; nearest: Vidado (AI data extraction), Vidyo (video calls). Formal TMview check (EUIPO + BOIP) and the domains are Julian's. | decided; TMview + domains open |
-| J2 | Domain: **`vidalo.nl` is the main domain**; `vidalo.com` and `vidalo.io` redirect to it (Julian, 13 Oct 2026). `.com` and `.io` at Cloudflare Registrar, `.nl` at a Dutch registrar with DNS on Cloudflare. | decided; registration: Julian |
+| J2 | Domain: **`vidalo.nl` is the main domain**; `vidalo.com` and `vidalo.io` redirect to it (Julian, 13 Oct 2026). `.com` and `.io` at Cloudflare Registrar, `.nl` at a Dutch registrar with DNS on Cloudflare. **Checked 14 Oct 2026 (whois + DNS from Julian's Mac): `vidalo.nl` is taken** (registered 14 Jun 2026 by a third party, registrar Internationale Domeinregistratie Nederland, DNSSEC on, A record 37.97.254.29); **`vidalo.com` is taken** (since 2003, German registrant, alfahosting DNS); `vidalo.io` is free, as are `vidalo.ai` and `vidalo.co`; `vidalo.app` is taken. | **blocked: decision.** (a) `vidalo.io` as the site and `.nl` out of code and copy; (b) try to buy `vidalo.nl` through its registrar; (c) another name. Until then the Domains rows and the custom domains in `apps/web/wrangler.jsonc` cannot be used, and a production deploy fails on them. |
 | J3 | Hosting: **all on Cloudflare** (Julian, 13 Oct 2026): `vidalo-web` (OpenNext) and `vidalo-worker` (cron, scan queue, facts pages), A101's account. | decided |
 | J4 | Launch gate: the GitHub Pages preview (`a101io.github.io/maicro`, mock data) stays **public until there is a domain** (Julian, 13 Oct 2026). A coming-soon gate comes with the production deploy. | decided |
 
@@ -22,8 +22,15 @@ The launch gate. "continue" resumes from the first row that is not ✓. Status k
 |---|---|---|
 | D1 | Supabase `bbynmqvaxpjdnkaasutd`, migrations 0001–0005, RLS on all 11 tables | ✓verified 13 Oct 2026: anon 0, stranger 0, owner 1 (control), rolled back |
 | D2 | Paid plan, daily backups, one restore drill | blocked: Julian (billing) |
-| D3 | `DATABASE_URL` as a secret on `vidalo-web` and `vidalo-worker`, `/api/health` says `"db":"pg"` | blocked: Julian (Supabase pooler URL) |
+| D3 | `DATABASE_URL` as a secret on `vidalo-web` and `vidalo-worker`, `/api/health` says `"db":"pg"` | blocked: Julian: the pooler URL from Supabase → Connect, which carries the database password (set at project creation; Project Settings → Database → Reset if lost). Nothing else is missing: URL and anon key are known and in the local `.env` |
 | D4 | Merge Dependabot #11 (`@supabase/ssr` 0.5 → 0.12, breaking for a 0.x package) after trying the magic-link sign-in on its branch against the real project | blocked: D3 |
+
+## Accounts (sign-in)
+| # | Item | Status |
+|---|---|---|
+| A1 | Magic-link sign-in with Supabase Auth, from the local dev server | written, partly observed 14 Oct 2026: with `SUPABASE_URL` + `SUPABASE_ANON_KEY` in the root `.env` the sign-in page drops the mock hint and `/api/health` keeps `"db":"mem"`; scan → mock checkout → `/welkom` → `/inloggen?business=…` now links the business to the e-mail before the link is sent (`apps/web/app/inloggen/actions.ts`; before this the real-auth path dropped the business and the first sign-in after paying landed on "geen bedrijf"). **Not observed:** the link itself (sending it mails Julian; the browser pane was left on that page), `/auth/callback`, `/app` |
+| A2 | Supabase Auth settings: Site URL and Redirect URLs for the real host, custom SMTP (Resend), rate limits | blocked: domain (J2). Local sign-in works on the default `http://localhost:3000` |
+| A3 | Google sign-in for ownership (`GOOGLE_OAUTH_CLIENT_ID/SECRET`), redirect URI `<site>/api/google/callback` | blocked: Julian creates the OAuth client in Google Cloud (as Vidalo), with the Business Profile API scope |
 
 ## Billing
 | # | Item | Status |
@@ -37,7 +44,7 @@ The launch gate. "continue" resumes from the first row that is not ✓. Status k
 | # | Item | Status |
 |---|---|---|
 | X1 | CI on every PR: secret scan, typecheck, tests, mock pipeline, Postgres | ✓verified (GitHub Actions green on PR #8) |
-| X2 | Deploy workflow, manual (`workflow_dispatch`, `preview` or `production`), `.github/workflows/deploy.yml`, ends with `scripts/verify-deploy.mjs` | written: verified locally in workerd (preview passes; a production without database fails with the reason). Needs `CLOUDFLARE_API_TOKEN` + `CLOUDFLARE_ACCOUNT_ID` on the GitHub environments |
+| X2 | Deploy workflow, manual (`workflow_dispatch`, `preview` or `production`), `.github/workflows/deploy.yml`, ends with `scripts/verify-deploy.mjs` | written: verified locally in workerd (preview passes; a production without database fails with the reason). **Preview is live** (14 Oct 2026): deployed by hand from Julian's Mac (`wrangler login`, `pnpm cf:build`, `wrangler deploy --env preview`) to https://vidalo-web-preview.julian-devriend.workers.dev; `verify-deploy.mjs` passed all 7 checks against it. Queue `vidalo-scans` created (id `63360eff236a4a29baaeb59d272916c3`), account `37c9615a0d7d9629154eca03d7de59a6`. The workflow itself still needs the `preview` and `production` GitHub environments with `CLOUDFLARE_API_TOKEN` + `CLOUDFLARE_ACCOUNT_ID` (Julian: environments do not exist yet; the token is created in the dashboard) |
 | X2b | Hyperdrive for Supabase (`wrangler hyperdrive create vidalo-db`), id into both wrangler.jsonc files | blocked: D3 (`DATABASE_URL`) |
 | X3 | Security headers + CSP | written: headers seen on the dev server 13 Oct; CSP only in production builds |
 | X4 | Error monitoring (EU), uptime checks on `/`, `/privacy`, `/api/health` | open |
@@ -66,7 +73,7 @@ Written as if the three domains exist (Julian, 13 Oct 2026: "ga er even van uit"
 
 | # | Item | Status |
 |---|---|---|
-| D1 | Register `vidalo.com` and `vidalo.io` at Cloudflare Registrar, `vidalo.nl` at a Dutch registrar; add `vidalo.nl` to Cloudflare as a zone and set its nameservers there | blocked: Julian |
+| D1 | Register `vidalo.com` and `vidalo.io` at Cloudflare Registrar, `vidalo.nl` at a Dutch registrar; add `vidalo.nl` to Cloudflare as a zone and set its nameservers there | blocked: `vidalo.nl` and `vidalo.com` are not available (J2, 14 Oct 2026); only `vidalo.io` can be registered as planned |
 | D2 | `vidalo-web` binds `vidalo.nl`, `www.vidalo.nl`, `vidalo.com`, `www.vidalo.com`, `vidalo.io`, `www.vidalo.io` as Custom Domains (`apps/web/wrangler.jsonc`); every host but `vidalo.nl` answers 301 to the same path on `vidalo.nl` (`apps/web/worker.ts`, `packages/core/src/shared/canonical.ts`) | written; proven in workerd with a Host header (301 for .io/.com/www, 200 for .nl and workers.dev) |
 | D3 | Deploy check: production verifies `https://vidalo.nl`, then `--redirects` for the five other hosts (`scripts/verify-deploy.mjs`) | written |
 | D4 | Cloudflare token gains **Zone · Workers Routes · Edit** on the three zones (docs/secrets-and-keys.md) | blocked: D1 |

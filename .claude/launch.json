@@ -1,0 +1,17 @@
+{
+  "version": "0.0.1",
+  "configurations": [
+    {
+      "name": "vidalo-dev",
+      "runtimeExecutable": "corepack",
+      "runtimeArgs": ["pnpm", "--filter", "@vidalo/web", "dev"],
+      "port": 3000
+    },
+    {
+      "name": "vidalo-worker",
+      "runtimeExecutable": "corepack",
+      "runtimeArgs": ["pnpm", "--filter", "@vidalo/worker", "start"],
+      "port": 8787
+    }
+  ]
+}
