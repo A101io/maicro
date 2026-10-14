@@ -44,6 +44,12 @@ Short. One action at a time. Real strings, not placeholders. End with one concre
 - **Supabase `create_project` via MCP timed out three times**; creating it in the dashboard worked.
 - Two other Stripe accounts sit in the same company (Sitty `acct_1UA8rHEGTq7D30VV`, Sonable `acct_1TyIM8EQK4LIWEDd`); `pnpm stripe:setup` refuses both and pins Vidalo's.
 
+## Added 14 Oct 2026 (local session)
+- **Launch gate**: `core/shared/gate.ts` + `apps/web/middleware.ts`; env `VIDALO_COMING_SOON`, `VIDALO_PREVIEW_BUTTON`, `VIDALO_PREVIEW_KEY`; page `/binnenkort` (EN `/coming-soon`), `/api/preview`, `components/PreviewBar.tsx`. `.claude/launch.json` has `vidalo-dev` (real auth), `vidalo-dev-gate` and `vidalo-dev-mock` (no Supabase keys → mock sign-in as `eigenaar@bakkerijdevries.nl`, gate on).
+- **Cookies**: `/cookies` statement (inventory in `copy.legal.cookies`), `lib/consent.ts`, `components/CookieConsent.tsx`; add a category to `OPTIONAL_CATEGORIES` and the statement's table in the same change.
+- **Account**: `/app/account`. **Checkout**: terms consent, B2B custom text, btw-nummer, return URLs from `lib/origin.ts` (`core/shared/origin.ts`); needs the Terms and Privacy URLs on the Stripe account. **Assistant**: `core/chat` (knowledge from the copy, rules, FAQ fallback, `modelAnswer`), `/api/chat`, `components/ChatWidget.tsx`.
+- **Content**: `docs/content-check.md` is the fact-check; every number on the site carries a verified source as of 14 Oct. Free reports expire after 30 days (`app/r/[id]/page.tsx`). Copilot is a stub (`scanner/engines/copilot.ts`): keep it out of free-check copy until the adapter ships.
+
 ## Read first
 - `docs/CONTRACT.md` — module layout and rules (facts are owner-asserted; never claim "control"; no jargon).
 - `docs/ARCHITECTURE.md` — workflows A–E and the fix-path table.

@@ -20,7 +20,7 @@ Twaalf feitcategorieën, gerangschikt op ernst. De eerste vijf zijn *afhakers*: 
 
 | # | Criterium | Vraag die een klant stelt | Klopt niet als | Drempel | Ernst | Waarom dit erin zit |
 |---|---|---|---|---|---|---|
-| 1 | **Bestaan** | Bestaat X in Y nog? Is X open? | AI zegt gesloten, failliet, verhuisd of "bestaat niet" terwijl je open bent | 1 van N samples | Afhaker | De duurste fout die er is: een boekwinkel in Ohio verloor een maand omzet na "permanent gesloten" in Google AI. Komt vooral uit oude gidsen en naamgenoten. |
+| 1 | **Bestaan** | Bestaat X in Y nog? Is X open? | AI zegt gesloten, failliet, verhuisd of "bestaat niet" terwijl je open bent | 1 van N samples | Afhaker | De duurste fout die er is: een boekwinkel in Ohio verloor wekenlang omzet na "permanent gesloten" in Google AI. Komt vooral uit oude gidsen en naamgenoten. |
 | 2 | **Telefoonnummer** | Wat is het nummer van X? | Ander nummer dan jouw opgave (genormaliseerd naar +31) | 1 van N | Afhaker | Bij 30 tot 39% van de bedrijven geeft ChatGPT of Perplexity een verkeerd nummer (Insites, 10.000 bedrijven). De klant belt een ander of niemand. |
 | 3 | **Openingstijden** | Is X op zondag open? Tot hoe laat op zaterdag? | Dag/tijd wijkt af van opgave; "gesloten" terwijl open of andersom | ≥ 30% van samples | Afhaker | De meest gestelde praktische vraag. Gidsen uit 2022 en een ongeclaimd Google-profiel zijn de gebruikelijke bron. |
 | 4 | **Werkgebied** | Komt X ook in Z? Werkt X in regio Y? | AI zegt nee voor een plaats binnen je werkgebied, of ja voor een plaats erbuiten | ≥ 30% | Afhaker | Voor vakmensen en dienstverleners is dit hét selectiecriterium: "welke loodgieter komt in Heemstede" sluit je uit als de AI je werkgebied niet kent. Staat bijna nooit in gidsen. |
@@ -54,7 +54,7 @@ Waarom niet een score van 0 tot 100: een score suggereert dat 78 beter is dan 71
 
 ## Meetmethode
 
-**Welke AI-systemen.** ChatGPT (83% van het Nederlandse chatbotverkeer), Google AI Overviews en AI Mode (verschijnt boven Google-zoekresultaten, dus bij vrijwel elke lokale zoekopdracht), Copilot (standaard in Windows en Edge), Gemini en Perplexity. De gratis scan doet de eerste drie; de maandcontrole alle vijf. Claude kan als zesde worden ingeschakeld voor zakelijke dienstverleners, waar het gebruik hoger ligt.
+**Welke AI-systemen.** ChatGPT (ruim 75% van het Nederlandse chatbotverkeer, StatCounter, juni 2026), Google AI Overviews en AI Mode (verschijnt boven Google-zoekresultaten, dus bij vrijwel elke lokale zoekopdracht), Copilot (standaard in Windows en Edge), Gemini en Perplexity. De gratis scan doet de eerste drie; de maandcontrole alle vijf. Claude kan als zesde worden ingeschakeld voor zakelijke dienstverleners, waar het gebruik hoger ligt.
 
 **Hoe vaak.** Gratis scan: 6 vragen × 3 systemen × 3 keer = 54 antwoorden. Maandcontrole: 20 tot 30 vragen × 5 systemen × 10 keer, rond de 1.000 tot 1.500 antwoorden. Tien herhalingen is het minimum om een frequentie van 30% betrouwbaar te onderscheiden van ruis.
 

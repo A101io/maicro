@@ -7,8 +7,8 @@ Read before writing anything a customer will read. This is a compliance aid, not
 | Claim | Where | Backed by |
 |---|---|---|
 | "Wij zorgen dat het antwoord klopt" (tagline) | Everywhere | Softened everywhere it matters: "Niemand bepaalt wat een AI-assistent antwoordt" (FAQ, terms). Counsel to confirm the tagline reads as an aim, not a guarantee. |
-| Statistics (45% CBS, 1 op 5 SearchLab, 37% KPMG, 61/22/17% sources, Insites 10.000) | Landing | Each carries its source on the page. Keep the source line with the number. |
-| "Herstel bij bronnen van derden kan tot 14 dagen duren" | Pricing | Typical, not promised: the terms say it depends on the third party. |
+| Statistics (45% Eurostat 2025, 1 op 4 Adyen 2025, 33% KPMG/Melbourne 2025, BrightLocal source mix 2026, Insites 10.000 US businesses 2026) | Landing, /waarom, /vak | Each carries its source on the page; verified 14 Oct 2026 in docs/content-check.md. Keep the source line with the number. |
+| "Herstel bij bronnen van derden duurt meestal twee tot vier weken, soms langer" | Pricing, result page, terms | Matches `FIX_PATHS` (third_party recheck 30 days, unfixable after 45); typical, not promised: the terms say it depends on the third party. |
 | Facts page in HTML, schema.org and llms.txt | Landing "Straks" | `packages/core/src/publisher/render.ts` |
 | OKF "volgen we" | Landing "Straks" | A statement of intent only; nothing is published in OKF yet. Do not say "OKF-compatible" until it is. |
 | Fictional examples (bakkers, Van Dijk, Hendriks…) | Scenes, simulator, report | Every one is captioned as fictional. Keep the caption with the example. |

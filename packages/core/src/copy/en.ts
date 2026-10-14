@@ -40,9 +40,9 @@ export const en: CopyShape = {
   landing: {
     hero: {
       h1: "What does AI say about your business?",
-      sub: "In Haarlem, for 47 out of 100 businesses the answer is wrong, or the AI does not know them.",
+      sub: "For about half of businesses at least one answer is wrong, or the AI does not know them.",
       exampleLabel: "example",
-      caption: "100 businesses in Haarlem · ChatGPT, Google AI and Copilot · 7 October 2026",
+      caption: "Fictional example: what a check of 100 businesses with ChatGPT and Google AI looks like",
       legend: { rood: "at least one error", grijs: "not found", groen: "everything is right" },
       /** 100 dots, row by row (r = red, g = green, x = grey). */
       grid: "rggrrxrggrxrrggrxrggrxrrggrxrggrxrrggrxrrggrxrggrxgrrgrxrggrrxgrgrxrgrgrxgrrgrxgrrgrxgrgrxgrgrxrggrx",
@@ -65,21 +65,21 @@ export const en: CopyShape = {
     },
     veranderd: {
       h2: "Your customers no longer google. They ask.",
-      body: "45% of Dutch people use AI. One in five starts a purchase with a question to ChatGPT. They get one answer, not ten links. And soon the customer will let the AI choose, book and order too.",
+      body: "45% of Dutch people use AI. One in four uses ChatGPT when shopping. They get one answer, not ten links. And soon the customer will let the AI choose, book and order too.",
       panels: [
         { year: "2015", title: "Searching", body: "Ten links. The customer chooses, and sees your website." },
         { year: "2026", title: "Asking", body: "One answer, put together from what the AI found online. Is it right? Nobody checks." },
         { year: "2027", title: "The AI arranges it", body: "The customer says “find me a bakery for Sunday”. The AI chooses from the businesses it knows, with the details it has. If it thinks you are closed, it does not call." },
       ],
       stats: [
-        { n: "45%", body: "of Dutch people used AI in the past three months.", source: "CBS, 2025" },
-        { n: "1 in 5", body: "starts a purchase with a question to an AI assistant.", source: "SearchLab, 2026" },
-        { n: "37%", body: "expect the AI's answer to be right. The rest do not check, or go elsewhere.", source: "KPMG, 2026" },
+        { n: "45%", body: "of Dutch people (aged 16 to 74) used generative AI in the past three months.", source: "Eurostat, 2025" },
+        { n: "1 in 4", body: "Dutch people used ChatGPT or another AI assistant while shopping in the past year.", source: "Adyen, 2025" },
+        { n: "33%", body: "of Dutch people are willing to trust what AI tells them. Yet almost half ask it anyway.", source: "KPMG and University of Melbourne, 2025" },
       ],
     },
     leest: {
       h2: "How AI reads about your business",
-      body: "An AI assistant does not know you. For every question it gathers, in a few seconds, everything online about you, weighs it up and gives one answer. What appears most often wins. Not what is true.",
+      body: "An AI assistant does not know you. For every question it gathers, in a few seconds, everything online about you, weighs it up and gives one answer. Whatever appears in more sources weighs more. Whether it is true, the AI cannot tell.",
       step1: "1. What the AI gathers",
       sources: [
         { label: "Your website", stip: "groen" },
@@ -101,9 +101,9 @@ export const en: CopyShape = {
       takeaways: [
         { title: "The majority wins", body: "An old directory listing counts as much as your own website. Often more, because there are more of them." },
         { title: "No second chance", body: "When searching, the customer sees ten links and can still choose you. When asking, they get one answer, and when the AI arranges it, one choice." },
-        { title: "Different every month", body: "Which sources the AI uses changes constantly; with ChatGPT up to 60% of sources change each month. Setting it right once is not enough." },
+        { title: "Different every month", body: "Which sources the AI uses changes constantly; with ChatGPT a large share of sources changes every month. Setting it right once is not enough." },
       ],
-      footnote: "Source distribution: Profound, 680 million citations; monthly change: Profound, 2026.",
+      footnote: "Source distribution: BrightLocal, 60,970 checks across 1,355 businesses, 2026.",
     },
     snippers: {
       h2: "The answer is built from scraps. Half of them are wrong.",
@@ -115,16 +115,16 @@ export const en: CopyShape = {
         { where: "Hair salon, Zuid", wrong: "“permanently closed”", right: "open", source: "ChatGPT · source: business with the same name in Hoofddorp" },
       ],
       shares: [
-        { n: "61%", body: "from business directories nobody keeps up to date." },
-        { n: "22%", body: "from the business's own website, with text that was never updated." },
-        { n: "17%", body: "from businesses with the same name and news about another business." },
+        { n: "415", body: "different directories were used by AI as a source across 1,355 businesses." },
+        { n: "28%", body: "of all sources were a Google Business Profile, often not kept up to date." },
+        { n: "1st", body: "source for ChatGPT is your own website; the rest comes from directories, maps and news." },
       ],
       story: {
         title: "A bookshop in Ohio",
-        body: "was called “permanently closed” by Google AI based on an old directory listing. A month with almost no revenue. The owner heard it from customers.",
-        source: "Hoodline, July 2026",
+        body: "was called “permanently closed” by Google AI, at the wrong address. Sales fell for weeks. The owner heard it from a customer.",
+        source: "News 5 Cleveland, July 2026",
       },
-      footnote: "Fictional Haarlem examples, real patterns. Nationwide: Insites, 10,000 businesses, 2026.",
+      footnote: "Fictional Haarlem examples, real patterns. The figures: Insites, 10,000 US businesses, ChatGPT and Perplexity, 2026.",
     },
     loket: {
       h2: "You cannot change the answer. You can change the sources.",
@@ -141,9 +141,9 @@ export const en: CopyShape = {
       sub: "You do five minutes of work at the start. The rest runs by itself, every month.",
       steps: [
         { n: "1", tone: "ink", title: "Record", body: "Your details right, once: address, phone, opening hours, what you do and do not do. We fill them in beforehand, you confirm.", meta: "You: 5 minutes" },
-        { n: "2", tone: "blue", title: "Publish", body: "A facts page on your own domain, with a date. The same details to Google, Bing, Apple and the Dutch directories.", meta: "Live within 48 hours" },
-        { n: "3", tone: "rood", title: "Check", body: "Every month we ask ChatGPT, Google AI and Copilot, in Dutch, the questions your customers ask. Several times, because AI never answers the same way twice.", meta: "Every month, 1,000 answers" },
-        { n: "4", tone: "groen", title: "Fix", body: "Every error with its source. Fixed where we can reach it, written to where needed, on your behalf. Then we ask again and you see before and after.", meta: "Proof for every error" },
+        { n: "2", tone: "blue", title: "Publish", body: "A facts page on your own domain, with a date. The same details to Google, Bing, Apple and the business directories.", meta: "Live as soon as your DNS record is in place" },
+        { n: "3", tone: "rood", title: "Check", body: "Every month we ask ChatGPT, Google AI, Gemini and Perplexity, in Dutch, the questions your customers ask. Several times, because AI rarely answers the same way twice.", meta: "Every month, 1,000 answers" },
+        { n: "4", tone: "groen", title: "Fix", body: "Every error with its source. Fixed where we can reach the source, requested in writing where we cannot, on your behalf. Then we ask again and you see before and after.", meta: "Proof for every error" },
       ],
       note: "Asking several times is necessary: AI rarely gives exactly the same answer twice. That is why we count how often an error comes back.",
       engines: ["ChatGPT", "Google AI", "Gemini", "Copilot", "Perplexity"],
@@ -176,7 +176,7 @@ export const en: CopyShape = {
         2: "“What is the number?”",
         3: "“Open on Sunday?”",
         4: "“Does X also come to Z?”",
-        5: "“Still today?”",
+        5: "“Can they come today?”",
         6: "“Heat pumps too?”",
         7: "“Private customers too?”",
         8: "“Where is X?”",
@@ -244,7 +244,7 @@ export const en: CopyShape = {
         { stip: "oranje", text: "Facts page live, Google and directories filled in", meta: "day 2" },
         { stip: "groen", text: "“Hendriks in Breda does heat pumps, open Mon–Fri 8–17.”", meta: "day 21" },
       ],
-      footnote: "Fictional example. Whether and when an AI names you is not up to us; whether it can find you is.",
+      footnote: "Fictional example. Whether and when an AI names you is not up to us. Whether it can find you is.",
     },
     /**
      * "Ask it yourself": a simulated conversation with an AI assistant, one
@@ -267,7 +267,7 @@ export const en: CopyShape = {
       verdictRight: "Yes, it is right",
       replay: "Play again",
       sourceAfter: "Your facts page and the updated sources",
-      costAfter: "Nothing any more. The customer gets the right answer.",
+      costAfter: "Nothing anymore. The customer gets the right answer.",
       caption: "Simulated conversations with fictional businesses. The errors and sources are patterns we see in real checks.",
       cases: [
         {
@@ -390,7 +390,7 @@ export const en: CopyShape = {
         { term: "AI agent", body: "An AI assistant that does not only answer, but also does things: search, compare, book, order. On behalf of the customer, or on behalf of a business." },
         { term: "OKF (Open Knowledge Format)", body: "An open format from Google, published in June 2026 as version 0.1, for writing down knowledge so that AI assistants can read it: plain text files with a few fixed fields at the top. Google itself calls it a start, not a finished standard." },
         { term: "schema.org", body: "The shared vocabulary search engines have used for years for business details: name, address, phone, opening hours, services. AI assistants read it too." },
-        { term: "llms.txt", body: "A proposal from 2024 for a simple text file on your website that points AI assistants to what matters. Not all assistants use it yet." },
+        { term: "llms.txt", body: "A proposal by Jeremy Howard (Answer.AI) from September 2024 for a simple text file on your website that points AI assistants to what matters. None of the major assistants has confirmed reading it; having it ready costs nothing." },
         { term: "MCP (Model Context Protocol)", body: "An open way, published by Anthropic in 2024, for an AI assistant to use data and functions from other systems, such as a calendar or a stock list." },
         { term: "A2A (Agent2Agent)", body: "An open protocol, published by Google in 2025, through which AI assistants from different companies consult each other and hand tasks to each other." },
         { term: "Ordering through an assistant", body: "Agreements that let an assistant order and pay on the customer's behalf, such as the Agentic Commerce Protocol from OpenAI and Stripe, from 2025." },
@@ -433,7 +433,7 @@ export const en: CopyShape = {
         caption: "Example with fictional bakeries. The customer sees no list, only the order.",
       },
       bel: {
-        h3: "One old number in three directories. Whoever calls reaches nobody.",
+        h3: "One old number in three directories. Whoever calls gets no one.",
         body: "The AI gives the number that appears most often. If your old number is still in three directories, that is the one the customer calls. They hear “not in service” and call the next one.",
         label: "Example: a customer asks Copilot for the number of Fysiotherapie Van Dijk and gets the old number, which is still in three directories. The customer hears that the number is not in service, and so it goes with every caller. Vidalo corrects the three directories; after that Copilot gives the right number and the customer gets through.",
         ask: "What is the number of Fysiotherapie Van Dijk?",
@@ -458,7 +458,7 @@ export const en: CopyShape = {
       },
       gidsen: {
         h3: "Record it once, the same everywhere",
-        body: "As long as sixteen sources give three different numbers, the AI picks one itself. We put your facts page live and send the same details to Google, Bing, Apple and thirteen Dutch directories. Then there is nothing left to choose.",
+        body: "As long as sixteen sources give three different numbers, the AI picks one itself. We put your facts page live and send the same details to Google, Bing, Apple and thirteen business directories. Then there is nothing left to choose.",
         label: "Example: sixteen sources give three different phone numbers and ChatGPT, Google AI and Copilot give an old number. Vidalo publishes a facts page and puts the same details in all sixteen sources. After that the answer is right with all three.",
         before: "16 sources · 3 different numbers",
         after: "16 sources · one version of the facts",
@@ -487,19 +487,19 @@ export const en: CopyShape = {
         engines: ["ChatGPT", "Google AI", "Copilot"],
         engineWrong: "old number",
         engineRight: "correct",
-        caption: "Example with a fictional practice. The sources are the real sixteen where we put your details.",
+        caption: "Example with a fictional practice. The sources are the real sixteen we send your details to.",
       },
       controle: {
         h3: "Asking once tells you nothing",
-        body: "AI never gives the same answer twice. Whoever looks once sees “everything is right” and misses the error every third customer gets. That is why we ask every question twenty times to every assistant, and count.",
-        label: "Example: the same question asked twenty times to ChatGPT, Google AI and Copilot. The first time everything is right. Over twenty times, Copilot gives an old number seven times, ChatGPT once. Asking once would have missed that error.",
+        body: "AI rarely gives the same answer twice. Whoever looks once sees “everything is right” and misses the error every third customer gets. That is why we ask every question ten times to every assistant, and count.",
+        label: "Example: the same question asked ten times to ChatGPT, Google AI and Copilot. The first time everything is right. Over ten times, Copilot gives an old number three times, ChatGPT once. Asking once would have missed that error.",
         ask: "What is the number of Fysiotherapie Van Dijk?",
         once: "Asked once: everything is right",
-        many: "Asked twenty times",
+        many: "Asked ten times",
         rows: [
-          { engine: "ChatGPT", wrong: [11], result: "1 of 20 wrong · unstable", tone: "amber" },
-          { engine: "Google AI", wrong: [], result: "0 of 20 wrong · correct", tone: "green" },
-          { engine: "Copilot", wrong: [2, 5, 8, 9, 13, 16, 18], result: "7 of 20 wrong · source: Telefoonboek.nl", tone: "red" },
+          { engine: "ChatGPT", wrong: [6], result: "1 of 10 wrong · unstable", tone: "amber" },
+          { engine: "Google AI", wrong: [], result: "0 of 10 wrong · correct", tone: "green" },
+          { engine: "Copilot", wrong: [2, 5, 8], result: "3 of 10 wrong · source: Telefoonboek.nl", tone: "red" },
         ],
         verdict: "Asking once would have missed this error.",
         caption: "Example. An error that rarely shows up we call unstable; if it comes back often, we fix the source.",
@@ -521,7 +521,7 @@ export const en: CopyShape = {
           { day: "day 2", text: "facts page and directories" },
           { day: "day 21", text: "recheck" },
         ],
-        caption: "Fictional example. Whether the AI names you is not up to us; whether it can find you is.",
+        caption: "Fictional example. Whether the AI names you is not up to us. Whether it can find you is.",
       },
       drift: {
         h2: "Right once is not enough",
@@ -540,7 +540,7 @@ export const en: CopyShape = {
     },
     prijs: {
       h2: "Pricing",
-      sub: "No notice period. No hidden costs. Cancel monthly.",
+      sub: "No notice period. No hidden costs. Cancel any month.",
       exclVat: "All prices excl. VAT",
       setup: {
         name: "Set it right",
@@ -550,7 +550,7 @@ export const en: CopyShape = {
         unit: "one-off",
         includes: [
           "A facts page on your own domain, with a date.",
-          "Sync with Google, Bing, Apple and the Dutch directories.",
+          "Sync with Google, Bing, Apple and the business directories.",
           "A first round of fixes for every error found.¹",
         ],
         limit: "1 location · one-off payment",
@@ -563,14 +563,14 @@ export const en: CopyShape = {
         price: "€49",
         unit: "per month",
         includes: [
-          "A new check with ChatGPT, Google AI and Copilot every month.",
+          "A new check with ChatGPT, Google AI, Gemini and Perplexity every month.",
           "A fix at the source for every new error.¹",
           "A monthly report with proof of what was fixed.",
         ],
-        limit: "1 location · cancel monthly · Set it right €149 one-off",
+        limit: "1 location · cancel any month · Set it right €149 one-off",
         button: "Start with the free check",
       },
-      footnote: "¹ Fixes at third-party sources can take up to 14 days.",
+      footnote: "¹ Fixes at third-party sources usually take two to four weeks, sometimes longer. Your report shows where each one stands.",
       multi: "More than 10 locations? Get in touch.",
     },
     /** The check band between sections, and the links to the explainer pages. */
@@ -588,13 +588,13 @@ export const en: CopyShape = {
     vragen: {
       h2: "Questions",
       items: [
-        { q: "But I have a website?", a: "AI reads it as one source out of twenty. The bookshop that was called “permanently closed” had a website too." },
+        { q: "But I have a website?", a: "AI reads it as one source among many. The bookshop that was called “permanently closed” had a website too." },
         { q: "Can you make ChatGPT say what I want?", a: "No, nobody can. We fix the sources AI draws on, so they all say the same thing." },
         { q: "Does it always work?", a: "Answers that use search we usually fix within weeks. Answers from the model's memory only change with a new model version. We say so honestly in your report." },
         { q: "What do I have to do myself?", a: "Five minutes: confirm your details, add one DNS record and log in to Google once. No domain? Then we arrange one." },
         { q: "Do I need to install anything?", a: "No." },
         { q: "How often do you check?", a: "Every month, and again after every change to your details and after every fixed error." },
-        { q: "AI finds nothing at all about my business. Can you do something about that?", a: "Yes, that is exactly what we are for. We make a facts page AI can read, put you in Google, Bing, Apple and the Dutch directories, and then check whether you are named. Nobody can guarantee that an AI names you; making sure it can find you, we can." },
+        { q: "AI finds nothing at all about my business. Can you do something about that?", a: "Yes, that is exactly what we are for. We make a facts page AI can read, put you in Google, Bing, Apple and the business directories, and then check whether you are named. Nobody can guarantee that an AI will name you, but we can make sure it is able to find you." },
         { q: "What if AI names my competitor?", a: "We cannot prevent that. What we do make sure of is that the AI has the right facts about you, so you do not drop out because it thinks you are closed or do not do something." },
       ],
     },
@@ -605,14 +605,14 @@ export const en: CopyShape = {
     },
     footer: {
       tagline: "Your customers ask ChatGPT. We make sure the answer is right.",
-      resultTagline: "AI check for businesses. What ChatGPT, Google AI and Copilot say about you is right.",
+      resultTagline: "AI check for businesses. What ChatGPT and Google AI say about you is right.",
       lang: "EN",
       columns: [
-        { title: "Product", links: [{ label: "How it works", href: "/hoe-het-werkt" }, { label: "Why", href: "/waarom" }, { label: "AI agents and OKF", href: "/straks" }, { label: "Example report", href: "/#rapport" }, { label: "Pricing", href: "/prijzen" }, { label: "By trade", href: "/#vak" }] },
+        { title: "Product", links: [{ label: "How it works", href: "/hoe-het-werkt" }, { label: "Why", href: "/waarom" }, { label: "What's next", href: "/straks" }, { label: "Example report", href: "/#rapport" }, { label: "Pricing", href: "/prijzen" }, { label: "By trade", href: "/#vak" }] },
         { title: "Information", links: [{ label: "What we check", href: "/hoe-het-werkt#criteria" }, { label: "Questions", href: "/#vragen" }, { label: "Facts about Vidalo", href: "/feiten" }, { label: "Contact", href: "mailto:hallo@vidalo.io" }] },
         { title: "Legal", links: [{ label: "Terms and conditions", href: "/voorwaarden" }, { label: "Privacy policy", href: "/privacy" }, { label: "Cookies", href: "/cookies" }] },
       ],
-      legal: "A101 B.V. (trading as Vidalo) · Factorij 80, 3071 AV Rotterdam · KvK (Dutch Chamber of Commerce) 42057858 · Prices excl. VAT",
+      legal: "A101 B.V. (trading as Vidalo) · Factorij 80, 3071 AV Rotterdam · KvK (Dutch Chamber of Commerce) 42057858 · VAT NL869514192B01 · Julian de Vriend · Prices excl. VAT",
       copyright: "© 2026 Vidalo. All rights reserved.",
       reportNote: "This report link works for 30 days.",
     },
@@ -633,7 +633,7 @@ export const en: CopyShape = {
     },
     home: {
       title: "Is what ChatGPT says about your business right? Free AI check",
-      description: "Free check: what do ChatGPT, Google AI and Copilot say about your business? We find every error and its source, and fix that source. Set it right €149 once, keep it right €49 a month, excl. VAT.",
+      description: "Free check: what do ChatGPT and Google AI say about your business? We find every error and its source, and fix that source. Set it right €149 once, keep it right €49 a month, excl. VAT.",
     },
     why: {
       crumb: "Why",
@@ -645,15 +645,15 @@ export const en: CopyShape = {
     how: {
       crumb: "How it works",
       title: "How Vidalo works: record, publish, check, fix",
-      description: "Record your details once, publish them the same everywhere, check every question twenty times a month with ChatGPT, Google AI and Copilot, and fix errors at the source with proof.",
+      description: "Record your details once, publish them the same everywhere, check every question ten times a month with ChatGPT, Google AI, Gemini and Perplexity, and fix errors at the source with proof.",
       h1: "How Vidalo works",
       intro: "Five minutes of work for you at the start. After that we check every month what AI assistants say about you, and fix every error at its source.",
     },
     next: {
       crumb: "What's next",
-      title: "AI agents, OKF, llms.txt and MCP explained for business owners",
+      title: "Soon assistants will talk to each other: OKF, llms.txt and MCP explained",
       description: "Soon AI assistants will talk to each other and to your business. What do OKF (Open Knowledge Format), schema.org, llms.txt, MCP and A2A mean, and what should you do? Plainly explained.",
-      h1: "Soon, assistants talk to each other",
+      h1: "Soon assistants will talk to each other",
       intro: "What changes when AI assistants do not just answer but also arrange things, and which agreements are being made for it now. Without jargon.",
     },
     home_crumb: "Vidalo",
@@ -666,23 +666,23 @@ export const en: CopyShape = {
     contact: "Questions? Email us at hallo@vidalo.io.",
     terms: {
       title: "Terms and conditions",
-      intro: "These terms apply to every check and every subscription from Vidalo, a trade name of A101 B.V.",
+      intro: "These terms apply to every check and every subscription from Vidalo, a trade name of A101 B.V. This is a translation; the Dutch text is the binding version.",
       sections: [
         { h: "What we do", p: ["We ask AI assistants such as ChatGPT, Google AI and Copilot what they say about your business, compare that with the details you confirm, and show where an error comes from.", "With a paid plan we publish a facts page, put your details in Google, Bing, Apple and Dutch directories, and ask sources with an error to fix it."] },
-        { h: "What we do not promise", p: ["Nobody decides what an AI assistant answers. We fix the sources those answers come from. Answers from a model's memory only change with a new model version.", "A fix at another website or directory depends on that party and can take up to 14 days or longer."] },
+        { h: "What we do not promise", p: ["Nobody decides what an AI assistant answers. We fix the sources those answers come from. Answers from a model's memory only change with a new model version.", "A fix at another website or directory depends on that party and usually takes two to four weeks, sometimes longer."] },
         { h: "Your details, your responsibility", p: ["You confirm your business's details yourself. We only publish and send what you have confirmed.", "You give us permission to send correction requests to websites and directories on behalf of your business, and to update your Google Business Profile if you connect it."] },
         { h: "Price and payment", p: ["Set it right costs €149 one-off. Keep it right costs €49 per month. All prices are exclusive of VAT.", "You pay through Stripe with iDEAL, card or SEPA direct debit. You receive an invoice for each payment."] },
-        { h: "Cancelling", p: ["There is no notice period. You cancel monthly under ‘Subscription’ in your account; the current month runs out.", "When your subscription ends, we stop checking and updating, and your facts page redirects to your own website."] },
+        { h: "Cancelling", p: ["There is no notice period. You cancel any month under ‘Subscription’ in your account; the current month runs out.", "When your subscription ends, we stop checking and updating, and your facts page redirects to your own website."] },
         { h: "Liability", p: ["We do our work carefully, but are not liable for what AI assistants or other parties say about your business. Our liability is limited to the amount you paid us in the last twelve months."] },
         { h: "Applicable law", p: ["Dutch law applies to these terms."] },
       ],
     },
     privacy: {
       title: "Privacy policy",
-      intro: "Vidalo is a trade name of A101 B.V. This page sets out which data we use, why, and with whom we share it.",
+      intro: "Vidalo is a trade name of A101 B.V. This page sets out which data we use, why, and with whom we share it. This is a translation; the Dutch text is the binding version.",
       sections: [
         { h: "Which data", p: ["About your business: name, town, address, phone number, website, opening hours, services and other details you confirm. These are usually not personal data, unless your business carries your own name.", "About you: your email address, to log in and to send your reports. When you pay, Stripe processes your payment details; we do not see them.", "About the check: the questions we ask, the answers of AI assistants and the sources they mention."] },
-        { h: "Why", p: ["To carry out the check, fix errors, email you about your report and invoice your subscription. After a free check we send you a reminder after 7 and after 21 days; if you do not want that, email us. The legal basis is the agreement with you, and for a free check our legitimate interest in being able to give you a report."] },
+        { h: "Why", p: ["To carry out the check, fix errors, email you about your report and invoice your subscription. After a free check we send you a reminder after 7 and after 21 days. Every email has an unsubscribe link; after that we send nothing more. The legal basis is the agreement with you, and for a free check our legitimate interest in being able to give you a report."] },
         { h: "With whom we share data", p: ["Supabase (database and login, storage in the EU). OpenAI, Google, Perplexity and SerpAPI to ask the questions; we only send business details, no email addresses. Google and the KvK to find your business. Stripe for payments. Resend for email. Cloudflare for your facts page.", "Some of these parties process data outside the EU. That happens on the basis of the European Commission's standard contractual clauses or the EU-US Data Privacy Framework."] },
         { h: "How long", p: ["A report from a free check can be seen through the link for 30 days. We keep the data of a paid plan for as long as you are a customer. 90 days after your subscription ends we do one more free check; after that we only keep what the law requires for invoices."] },
         { h: "Your rights", p: ["You may access your data, have it corrected or deleted, and object. Email us; we respond within a month. If you disagree with us, you can file a complaint with the Autoriteit Persoonsgegevens (the Dutch Data Protection Authority)."] },
@@ -735,6 +735,22 @@ export const en: CopyShape = {
       { label: "Log in", href: "/inloggen" },
     ],
     barExit: "Back to Coming soon",
+  },
+
+  chat: {
+    button: "Ask us",
+    close: "Close",
+    title: "Ask Vidalo",
+    aiNotice: "This is an AI assistant. Prefer a person? Email",
+    welcome: "Ask what Vidalo does, what it costs or how it works.",
+    starters: ["What exactly does Vidalo do?", "What does it cost?", "How do I cancel?"],
+    placeholder: "Type your question",
+    send: "Send",
+    thinking: "One moment.",
+    faqNote: "Answer from our frequently asked questions.",
+    fallback: "I am not sure about that. Email us at hallo@vidalo.io and a person will answer.",
+    error: "Answering is not working right now. Email us at hallo@vidalo.io.",
+    rateLimited: "You are asking many questions in a short time. Try again in a few minutes, or email hallo@vidalo.io.",
   },
 
   consent: {
@@ -896,7 +912,7 @@ export const en: CopyShape = {
       setup: "Only set it right · €149",
       monitorGrey: "Make it findable and keep it that way · €149 + €49/month",
       setupGrey: "Only make it findable · €149",
-      exclVat: "Excl. VAT · no notice period · fixes at third parties can take up to 14 days",
+      exclVat: "Excl. VAT · no notice period · fixes at third parties usually take 2 to 4 weeks",
       exclVatGrey: "Excl. VAT · no notice period",
     },
     email: {
@@ -935,8 +951,8 @@ export const en: CopyShape = {
       h2: "Why you do not notice this on your phone",
       body: "A customer who does not get to see you through AI does not call. There is no missed call, no rejected quote, no review. Just a phone that is a little quieter than last year. The only thing you can do is ask yourself what the AI says about you, and that is exactly what we do every month.",
       stats: [
-        { n: "1 in 2", body: "businesses have at least one AI answer that is wrong", source: "Insites, 10,000 businesses, 2026" },
-        { n: "1 in 5", body: "Dutch people start a purchase with a question to AI", source: "SearchLab, 2026" },
+        { n: "1 in 2", body: "businesses have at least one AI answer that is wrong", source: "Insites, 10,000 businesses (US), 2026" },
+        { n: "1 in 4", body: "Dutch people used ChatGPT or another AI assistant while shopping", source: "Adyen, 2025" },
       ],
       recheck: { n: "21 days", body: "until we ask again whether the AI now does name you" },
     },
@@ -946,7 +962,7 @@ export const en: CopyShape = {
       after: (date: string) => `${date} · after`,
       sources: "Sources:",
       fixed: "Fixed:",
-      footnote: "Fictional business, real layout. Whether and when an AI names you is not up to us; whether it can find you is.",
+      footnote: "Fictional business, real layout. Whether and when an AI names you is not up to us. Whether it can find you is.",
     },
     ctaH2: (nounYour: string) => `What does AI say about your ${nounYour}?`,
     placeholderPlace: "[town]",
@@ -973,7 +989,7 @@ export const en: CopyShape = {
         { title: "Emergency service", body: "With a leak or breakdown, only whoever can come “today” counts. If your emergency number and weekend availability are nowhere to be found, you do not exist for that question.", question: "“Does X have a weekend emergency service?”" },
         { title: "Accreditations and new services", body: "“Accredited heat pump installer” is on your van, not in the sources AI reads. Your website from 2019 still says “boilers”. So the AI does not name you for heat pumps.", question: "“Is X accredited for heat pumps?”" },
       ],
-      whyStat: { n: "0", body: "directories that record your service area and emergency service as standard", source: "our own survey, 12 Dutch directories" },
+      whyStat: { n: "0", body: "directories that record your service area and emergency service as standard", source: "our own survey, 13 directories, 2026" },
       example: {
         name: "Installatiebedrijf Hendriks",
         beforeDate: "7 October",
@@ -1109,7 +1125,7 @@ export const en: CopyShape = {
         { title: "Reservations and card payment", body: "Can I book for six, can I pay by card, is there a terrace. Practical questions that decide for the customer. If they are nowhere to be found, the AI guesses.", question: "“Can I book at X for 6 people?”" },
         { title: "Same name", body: "A place with the same name in another town that has closed, and the AI reports that you are permanently closed.", question: "“Is X the same as X in Z?”" },
       ],
-      whyStat: { n: "“closed”", body: "is the most common error in hospitality: a place that is open, according to a directory from 2022", source: "Insites, 10,000 businesses, 2026" },
+      whyStat: { n: "1 in 3", body: "businesses get a wrong phone number from ChatGPT; for hospitality, “closed” from an old directory comes on top", source: "Insites, 10,000 businesses (US), 2026" },
       example: {
         name: "Eetcafé De Brug",
         beforeDate: "7 October",
@@ -1143,7 +1159,7 @@ export const en: CopyShape = {
         { title: "Your address, also after a move", body: "After a move, your old address stays in directories and on maps for years. The customer walks to an empty shop window.", question: "“Is X still at the same address?”" },
         { title: "What you sell", body: "The customer asks about a brand, a size or a product. If that is nowhere next to your name, the AI sends them to the chain down the road.", question: "“Does X also sell gluten-free bread?”" },
       ],
-      whyStat: { n: "1 in 3", body: "shops get a wrong phone number or address from AI", source: "Insites, 10,000 businesses, 2026" },
+      whyStat: { n: "1 in 3", body: "businesses get a wrong phone number from ChatGPT", source: "Insites, 10,000 businesses (US), 2026" },
       example: {
         name: "Bakkerij De Vries",
         beforeDate: "7 October",
@@ -1521,7 +1537,7 @@ export const en: CopyShape = {
     portal: "Invoices and payment details",
     portalNote: "View and download your invoices, change your payment method or cancel. This opens a Stripe page.",
     addonTitle: "Add monitoring",
-    addonBody: "The same questions again every month, new errors dealt with straight away and a monthly report. €49 per month excl. VAT, cancel monthly.",
+    addonBody: "The same questions again every month, new errors dealt with straight away and a monthly report. €49 per month excl. VAT, cancel any month.",
     addonButton: "Add Keep it right",
     addonDone: "Monitoring added. From now on we check your business every month.",
     processing: "Your payment is still being processed. With a direct debit that takes a few working days; after that we start automatically.",
@@ -1529,7 +1545,7 @@ export const en: CopyShape = {
 
   welcome: {
     h1: "Welcome to Vidalo",
-    body: "Your payment went through. Four things, and we are live within 48 hours.",
+    body: "Your payment went through. Four things, and your first check is ready within 48 hours.",
     processingH1: "Thank you, your payment is being processed",
     processingBody: "With a direct debit it takes a few working days for the money to arrive. You can already do the steps below; we start as soon as the payment is complete.",
     failedH1: "Your payment did not go through",
@@ -1691,7 +1707,7 @@ export const en: CopyShape = {
     recordValue: "Value",
     checkButton: "Check DNS",
     verified: (host: string) => `${host} points to Vidalo. Your facts page is live.`,
-    notYet: "We do not see the DNS record yet. DNS changes can take up to an hour. We check again every 10 minutes.",
+    notYet: "We do not see the DNS record yet. Usually it is there within an hour, sometimes it takes a day. We check again every 10 minutes.",
     optionB: "Let Vidalo register a domain",
     optionBHint: (name: string) => `We register ${name} and set everything up. You do not need to do anything.`,
     optionBButton: "Register it for me",

@@ -5,6 +5,7 @@ import "./scenes.css";
 import { getCopy, getLang, getRoute, localizeHref } from "@/lib/i18n";
 import { CookieConsent } from "@/components/CookieConsent";
 import { PreviewBar } from "@/components/PreviewBar";
+import { ChatWidget } from "@/components/ChatWidget";
 
 const jakarta = Plus_Jakarta_Sans({ subsets: ["latin"], weight: ["400", "500", "600", "700", "800"], variable: "--font-jakarta", display: "swap" });
 
@@ -30,6 +31,7 @@ export default async function RootLayout({ children }: { children: React.ReactNo
         <CookieConsent copy={copy.consent} cookiesHref={localizeHref("/cookies", lang)} />
         {/* Temporary, only while the launch gate is on and this browser previews the site. */}
         <PreviewBar copy={copy.comingSoon} lang={lang} />
+        <ChatWidget copy={copy.chat} lang={lang} />
         {/* Scroll motion; hides nothing on its own, so the page is whole without it. */}
         <script src="/motion.js" defer />
         <script src="/ask.js" defer />
