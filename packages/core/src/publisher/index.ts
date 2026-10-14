@@ -54,7 +54,7 @@ export async function ensureFactsHost(businessId: string, choice: "domain" | "fa
   const host = choice === "domain" ? preferredFactsHost(business) : defaultFactsHost(business);
   const verifiedAt = isFallbackHost(host) ? new Date().toISOString() : null;
   const updated = await setFactsHost(business.id, host, verifiedAt);
-  await db.logEvent(business.id, "facts_host.set", { host, verified: verifiedAt !== null, cnameTarget: isFallbackHost(host) ? null : `feiten.${process.env.FACTS_HOST_SUFFIX || "vidalo.nl"}` });
+  await db.logEvent(business.id, "facts_host.set", { host, verified: verifiedAt !== null, cnameTarget: isFallbackHost(host) ? null : `feiten.${process.env.FACTS_HOST_SUFFIX || "vidalo.io"}` });
   return updated;
 }
 

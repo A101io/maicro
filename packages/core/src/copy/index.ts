@@ -53,9 +53,9 @@ export const copy = {
   landing: {
     hero: {
       h1: "Wat zegt AI over jouw bedrijf?",
-      sub: "In Haarlem klopt het bij 47 van de 100 bedrijven niet, of de AI kent ze niet.",
+      sub: "Bij ongeveer de helft van de bedrijven klopt minstens één antwoord niet, of de AI kent ze niet.",
       exampleLabel: "voorbeeld",
-      caption: "100 Haarlemse bedrijven · ChatGPT, Google AI en Copilot · 7 oktober 2026",
+      caption: "Fictief voorbeeld: zo ziet een controle van 100 bedrijven bij ChatGPT en Google AI eruit",
       legend: { rood: "minstens één fout", grijs: "niet gevonden", groen: "alles klopt" },
       /** 100 dots, row by row (r = rood, g = groen, x = grijs). */
       grid: "rggrrxrggrxrrggrxrggrxrrggrxrggrxrrggrxrrggrxrggrxgrrgrxrggrrxgrgrxrgrgrxgrrgrxgrrgrxgrgrxgrgrxrggrx",
@@ -78,21 +78,21 @@ export const copy = {
     },
     veranderd: {
       h2: "Je klanten googelen niet meer. Ze vragen.",
-      body: "45% van de Nederlanders gebruikt AI. Eén op de vijf begint een aankoop met een vraag aan ChatGPT. Ze krijgen één antwoord, geen tien links. En binnenkort laat de klant de AI ook kiezen, reserveren en bestellen.",
+      body: "45% van de Nederlanders gebruikt AI. Eén op de vier gebruikt ChatGPT bij het winkelen. Ze krijgen één antwoord, geen tien links. En binnenkort laat de klant de AI ook kiezen, reserveren en bestellen.",
       panels: [
         { year: "2015", title: "Zoeken", body: "Tien links. De klant kiest, en ziet jouw website." },
         { year: "2026", title: "Vragen", body: "Eén antwoord, in elkaar gezet uit wat de AI online vond. Klopt het? Niemand kijkt het na." },
         { year: "2027", title: "De AI regelt het", body: "De klant zegt “regel een bakker voor zondag”. De AI kiest uit de bedrijven die het kent, met de gegevens die het heeft. Denkt het dat je dicht bent, dan belt het niet." },
       ],
       stats: [
-        { n: "45%", body: "van de Nederlanders gebruikte AI in de afgelopen drie maanden.", source: "CBS, 2025" },
-        { n: "1 op 5", body: "begint een aankoop met een vraag aan een AI-assistent.", source: "SearchLab, 2026" },
-        { n: "37%", body: "verwacht dat het antwoord van AI klopt. De rest controleert niet, of gaat ergens anders heen.", source: "KPMG, 2026" },
+        { n: "45%", body: "van de Nederlanders (16 tot 74 jaar) gebruikte generatieve AI in de afgelopen drie maanden.", source: "Eurostat, 2025" },
+        { n: "1 op 4", body: "Nederlanders gebruikte het afgelopen jaar ChatGPT of een andere AI-assistent bij het winkelen.", source: "Adyen, 2025" },
+        { n: "33%", body: "van de Nederlanders is bereid de uitkomsten van AI te vertrouwen. Toch vraagt bijna de helft het.", source: "KPMG en Universiteit van Melbourne, 2025" },
       ],
     },
     leest: {
       h2: "Zo leest AI over je bedrijf",
-      body: "Een AI-assistent kent jou niet. Bij elke vraag haalt het in een paar seconden alles op wat er online over je staat, weegt het tegen elkaar af en geeft één antwoord. Wat het vaakst voorkomt, wint. Niet wat waar is.",
+      body: "Een AI-assistent kent jou niet. Bij elke vraag haalt hij in een paar seconden alles op wat er online over je staat, weegt het tegen elkaar af en geeft één antwoord. Komt iets in meer bronnen voor, dan weegt het zwaarder. Of het waar is, kan de AI niet zien.",
       step1: "1. Wat de AI ophaalt",
       sources: [
         { label: "Je website", stip: "groen" },
@@ -114,9 +114,9 @@ export const copy = {
       takeaways: [
         { title: "Meerderheid wint", body: "Een oude gidsvermelding telt even zwaar als je eigen website. Vaak zwaarder, omdat er meer van zijn." },
         { title: "Geen tweede kans", body: "Bij zoeken ziet de klant tien links en kan hij jou alsnog kiezen. Bij vragen krijgt hij één antwoord en bij regelen één keuze." },
-        { title: "Elke maand anders", body: "Welke bronnen de AI gebruikt verandert voortdurend; bij ChatGPT wisselt tot 60% van de bronnen per maand. Eén keer goed zetten is niet genoeg." },
+        { title: "Elke maand anders", body: "Welke bronnen de AI gebruikt verandert voortdurend; bij ChatGPT wisselt een groot deel van de bronnen elke maand. Eén keer goed zetten is niet genoeg." },
       ],
-      footnote: "Bronverdeling: Profound, 680 miljoen citaties; wisseling per maand: Profound, 2026.",
+      footnote: "Bronverdeling: BrightLocal, 60.970 controles bij 1.355 bedrijven, 2026.",
     },
     snippers: {
       h2: "Het antwoord is uit snippers gebouwd. De helft klopt niet.",
@@ -128,16 +128,16 @@ export const copy = {
         { where: "Kapsalon, Zuid", wrong: "“permanent gesloten”", right: "open", source: "ChatGPT · bron: naamgenoot in Hoofddorp" },
       ],
       shares: [
-        { n: "61%", body: "uit bedrijvengidsen die niemand meer bijhoudt." },
-        { n: "22%", body: "uit de eigen website, met teksten die nooit zijn aangepast." },
-        { n: "17%", body: "uit naamgenoten en nieuws over een ander bedrijf." },
+        { n: "415", body: "verschillende gidsen gebruikte AI als bron bij 1.355 bedrijven." },
+        { n: "28%", body: "van alle bronnen was een Google-bedrijfsprofiel, vaak niet bijgewerkt." },
+        { n: "1e", body: "bron voor ChatGPT is je eigen website; de rest komt uit gidsen, kaarten en nieuws." },
       ],
       story: {
         title: "Een boekwinkel in Ohio",
-        body: "werd door Google AI “permanent gesloten” genoemd op basis van een oude gidsvermelding. Een maand bijna geen omzet. De eigenaar hoorde het van klanten.",
-        source: "Hoodline, juli 2026",
+        body: "werd door Google AI “permanent gesloten” genoemd, op een verkeerd adres. Wekenlang liep de omzet terug. De eigenaar hoorde het van een klant.",
+        source: "News 5 Cleveland, juli 2026",
       },
-      footnote: "Fictieve Haarlemse voorbeelden, echte patronen. Landelijk: Insites, 10.000 bedrijven, 2026.",
+      footnote: "Fictieve Haarlemse voorbeelden, echte patronen. De cijfers: Insites, 10.000 Amerikaanse bedrijven, ChatGPT en Perplexity, 2026.",
     },
     loket: {
       h2: "Je kunt het antwoord niet aanpassen. Wel de bronnen.",
@@ -154,8 +154,8 @@ export const copy = {
       sub: "Jij doet vijf minuten werk bij de start. De rest loopt vanzelf, elke maand.",
       steps: [
         { n: "1", tone: "ink", title: "Vastleggen", body: "Je gegevens één keer goed: adres, telefoon, openingstijden, wat je wel en niet doet. Wij vullen vooraf in, jij bevestigt.", meta: "Jij: 5 minuten" },
-        { n: "2", tone: "blue", title: "Publiceren", body: "Een feitenpagina op je eigen domein, met datum. Dezelfde gegevens naar Google, Bing, Apple en de Nederlandse gidsen.", meta: "Live binnen 48 uur" },
-        { n: "3", tone: "rood", title: "Controleren", body: "Elke maand stellen we ChatGPT, Google AI en Copilot in het Nederlands de vragen die je klanten stellen. Meerdere keren, want AI antwoordt niet twee keer hetzelfde.", meta: "Elke maand, 1.000 antwoorden" },
+        { n: "2", tone: "blue", title: "Publiceren", body: "Een feitenpagina op je eigen domein, met datum. Dezelfde gegevens naar Google, Bing, Apple en de bedrijvengidsen.", meta: "Live zodra je DNS-regel staat" },
+        { n: "3", tone: "rood", title: "Controleren", body: "Elke maand stellen we ChatGPT, Google AI, Gemini en Perplexity in het Nederlands de vragen die je klanten stellen. Meerdere keren, want AI antwoordt zelden twee keer hetzelfde.", meta: "Elke maand, 1.000 antwoorden" },
         { n: "4", tone: "groen", title: "Herstellen", body: "Elke fout met bron. Hersteld waar wij bij kunnen, aangeschreven waar het moet, namens jou. Daarna vragen we het opnieuw en zie je voor en na.", meta: "Bewijs bij elke fout" },
       ],
       note: "Meerdere keren vragen is nodig: AI geeft zelden twee keer precies hetzelfde antwoord. Daarom tellen we hoe vaak een fout terugkomt.",
@@ -403,7 +403,7 @@ export const copy = {
         { term: "AI-agent", body: "Een AI-assistent die niet alleen antwoordt, maar ook dingen doet: zoeken, vergelijken, reserveren, bestellen. Namens de klant, of namens een bedrijf." },
         { term: "OKF (Open Knowledge Format)", body: "Een open formaat van Google, in juni 2026 gepubliceerd als versie 0.1, om kennis zo op te schrijven dat AI-assistenten het kunnen lezen: gewone tekstbestanden met een paar vaste velden bovenaan. Google noemt het zelf een begin, geen af standaard." },
         { term: "schema.org", body: "De gedeelde woordenlijst die zoekmachines al jaren gebruiken voor bedrijfsgegevens: naam, adres, telefoon, openingstijden, diensten. AI-assistenten lezen hem ook." },
-        { term: "llms.txt", body: "Een voorstel uit 2024 voor een eenvoudig tekstbestand op je website dat AI-assistenten wijst op wat belangrijk is. Nog niet alle assistenten gebruiken het." },
+        { term: "llms.txt", body: "Een voorstel van Jeremy Howard (Answer.AI) uit september 2024 voor een eenvoudig tekstbestand op je website dat AI-assistenten wijst op wat belangrijk is. Geen van de grote assistenten heeft bevestigd het te lezen; het kost niets om het klaar te hebben." },
         { term: "MCP (Model Context Protocol)", body: "Een open manier, in 2024 gepubliceerd door Anthropic, waarop een AI-assistent gegevens en functies van andere systemen kan gebruiken, zoals een agenda of een voorraad." },
         { term: "A2A (Agent2Agent)", body: "Een open protocol, in 2025 gepubliceerd door Google, waarmee AI-assistenten van verschillende bedrijven met elkaar overleggen en taken aan elkaar doorgeven." },
         { term: "Bestellen via een assistent", body: "Afspraken waarmee een assistent namens de klant kan bestellen en betalen, zoals het Agentic Commerce Protocol van OpenAI en Stripe uit 2025." },
@@ -471,7 +471,7 @@ export const copy = {
       },
       gidsen: {
         h3: "Eén keer vastleggen, overal hetzelfde",
-        body: "Zolang zestien bronnen drie verschillende nummers noemen, kiest de AI er zelf een. Wij zetten je feitenpagina live en sturen dezelfde gegevens naar Google, Bing, Apple en dertien Nederlandse gidsen. Dan valt er niets meer te kiezen.",
+        body: "Zolang zestien bronnen drie verschillende nummers noemen, kiest de AI er zelf een. Wij zetten je feitenpagina live en sturen dezelfde gegevens naar Google, Bing, Apple en dertien bedrijvengidsen. Dan valt er niets meer te kiezen.",
         label: "Voorbeeld: zestien bronnen noemen drie verschillende telefoonnummers en ChatGPT, Google AI en Copilot geven een oud nummer. Vidalo publiceert een feitenpagina en zet dezelfde gegevens in alle zestien bronnen. Daarna klopt het antwoord bij alle drie.",
         before: "16 bronnen · 3 verschillende nummers",
         after: "16 bronnen · één versie van de feiten",
@@ -500,19 +500,19 @@ export const copy = {
         engines: ["ChatGPT", "Google AI", "Copilot"],
         engineWrong: "oud nummer",
         engineRight: "klopt",
-        caption: "Voorbeeld met een fictieve praktijk. De bronnen zijn de echte zestien waar wij je gegevens zetten.",
+        caption: "Voorbeeld met een fictieve praktijk. De bronnen zijn de echte zestien waar wij je gegevens naartoe sturen.",
       },
       controle: {
         h3: "Eén keer vragen zegt niets",
-        body: "AI geeft niet twee keer hetzelfde antwoord. Wie één keer kijkt, ziet “alles klopt” en mist de fout die elke derde klant krijgt. Daarom stellen we elke vraag twintig keer aan elke assistent, en tellen we.",
-        label: "Voorbeeld: dezelfde vraag twintig keer gesteld aan ChatGPT, Google AI en Copilot. De eerste keer klopt alles. Over twintig keer geeft Copilot zeven keer een oud nummer, ChatGPT één keer. Eén keer vragen had die fout gemist.",
+        body: "AI geeft zelden twee keer hetzelfde antwoord. Wie één keer kijkt, ziet “alles klopt” en mist de fout die elke derde klant krijgt. Daarom stellen we elke vraag tien keer aan elke assistent, en tellen we.",
+        label: "Voorbeeld: dezelfde vraag tien keer gesteld aan ChatGPT, Google AI en Copilot. De eerste keer klopt alles. Over tien keer geeft Copilot drie keer een oud nummer, ChatGPT één keer. Eén keer vragen had die fout gemist.",
         ask: "Wat is het nummer van Fysiotherapie Van Dijk?",
         once: "Eén keer gevraagd: alles klopt",
-        many: "Twintig keer gevraagd",
+        many: "Tien keer gevraagd",
         rows: [
-          { engine: "ChatGPT", wrong: [11], result: "1 van 20 fout · instabiel", tone: "amber" },
-          { engine: "Google AI", wrong: [], result: "0 van 20 fout · klopt", tone: "green" },
-          { engine: "Copilot", wrong: [2, 5, 8, 9, 13, 16, 18], result: "7 van 20 fout · bron: Telefoonboek.nl", tone: "red" },
+          { engine: "ChatGPT", wrong: [6], result: "1 van 10 fout · instabiel", tone: "amber" },
+          { engine: "Google AI", wrong: [], result: "0 van 10 fout · klopt", tone: "green" },
+          { engine: "Copilot", wrong: [2, 5, 8], result: "3 van 10 fout · bron: Telefoonboek.nl", tone: "red" },
         ],
         verdict: "Eén keer vragen had deze fout gemist.",
         caption: "Voorbeeld. Een fout die zelden opduikt noemen we instabiel; komt hij vaak terug, dan herstellen we de bron.",
@@ -563,7 +563,7 @@ export const copy = {
         unit: "eenmalig",
         includes: [
           "Een feitenpagina op je eigen domein, met datum.",
-          "Synchronisatie met Google, Bing, Apple en de Nederlandse gidsen.",
+          "Synchronisatie met Google, Bing, Apple en de bedrijvengidsen.",
           "Een eerste herstelronde van alle gevonden fouten.¹",
         ],
         limit: "1 vestiging · eenmalige betaling",
@@ -576,14 +576,14 @@ export const copy = {
         price: "€49",
         unit: "per maand",
         includes: [
-          "Elke maand een nieuwe controle bij ChatGPT, Google AI en Copilot.",
+          "Elke maand een nieuwe controle bij ChatGPT, Google AI, Gemini en Perplexity.",
           "Herstel aan de bron bij elke nieuwe fout.¹",
           "Een maandelijks rapport met bewijs van wat er is hersteld.",
         ],
         limit: "1 vestiging · maandelijks opzegbaar · goed zetten €149 eenmalig",
         button: "Begin met de gratis check",
       },
-      footnote: "¹ Herstel bij bronnen van derden kan tot 14 dagen duren.",
+      footnote: "¹ Herstel bij bronnen van derden duurt meestal twee tot vier weken, soms langer. Je ziet in je rapport waar het staat.",
       multi: "Meer dan 10 vestigingen? Neem contact op.",
     },
     /** The check band between sections, and the links to the explainer pages. */
@@ -601,7 +601,7 @@ export const copy = {
     vragen: {
       h2: "Vragen",
       items: [
-        { q: "Ik heb toch een website?", a: "AI leest die als één bron van twintig. De boekwinkel die “permanent gesloten” werd genoemd had ook een website." },
+        { q: "Ik heb toch een website?", a: "AI leest die als één bron van vele. De boekwinkel die “permanent gesloten” werd genoemd had ook een website." },
         { q: "Kunnen jullie ChatGPT laten zeggen wat ik wil?", a: "Nee, niemand kan dat. Wij herstellen de bronnen waar AI uit put, zodat ze allemaal hetzelfde zeggen." },
         { q: "Werkt het altijd?", a: "Antwoorden mét zoekfunctie herstellen we meestal binnen weken. Antwoorden uit het geheugen van het model veranderen pas bij een nieuwe modelversie. Dat zeggen we eerlijk in je rapport." },
         { q: "Wat moet ik zelf doen?", a: "Vijf minuten: je gegevens bevestigen, één DNS-regel toevoegen en één keer inloggen bij Google. Geen domein? Dan regelen wij er een." },
@@ -618,14 +618,14 @@ export const copy = {
     },
     footer: {
       tagline: "Je klanten vragen het aan ChatGPT. Wij zorgen dat het antwoord klopt.",
-      resultTagline: "AI-controle voor bedrijven. Wat ChatGPT, Google AI en Copilot over je zeggen, klopt.",
+      resultTagline: "AI-controle voor bedrijven. Wat ChatGPT en Google AI over je zeggen, klopt.",
       lang: "NL",
       columns: [
         { title: "Product", links: [{ label: "Hoe het werkt", href: "/hoe-het-werkt" }, { label: "Waarom", href: "/waarom" }, { label: "AI-agents en OKF", href: "/straks" }, { label: "Voorbeeldrapport", href: "/#rapport" }, { label: "Prijs", href: "/prijzen" }, { label: "Per vak", href: "/#vak" }] },
-        { title: "Informatie", links: [{ label: "Wat we controleren", href: "/hoe-het-werkt#criteria" }, { label: "Vragen", href: "/#vragen" }, { label: "Contact", href: "mailto:hallo@vidalo.nl" }] },
-        { title: "Juridisch", links: [{ label: "Algemene voorwaarden", href: "/voorwaarden" }, { label: "Privacybeleid", href: "/privacy" }] },
+        { title: "Informatie", links: [{ label: "Wat we controleren", href: "/hoe-het-werkt#criteria" }, { label: "Vragen", href: "/#vragen" }, { label: "Feiten over Vidalo", href: "/feiten" }, { label: "Contact", href: "mailto:hallo@vidalo.io" }] },
+        { title: "Juridisch", links: [{ label: "Algemene voorwaarden", href: "/voorwaarden" }, { label: "Privacybeleid", href: "/privacy" }, { label: "Cookies", href: "/cookies" }] },
       ],
-      legal: "A101 B.V. (handelend als Vidalo) · Factorij 80, 3071 AV Rotterdam · KvK 42057858 · Prijzen excl. btw",
+      legal: "Vidalo (onderdeel van A101 B.V.) · Factorij 80, 3071 AV Rotterdam, Nederland · KvK 42057858 · Prijzen excl. btw",
       copyright: "© 2026 Vidalo. Alle rechten voorbehouden.",
       reportNote: "Deze rapportlink werkt 30 dagen.",
     },
@@ -637,9 +637,17 @@ export const copy = {
    */
   /** Titles and descriptions for search engines and AI assistants, per page. */
   pages: {
+    /** /feiten: Vidalo's own facts page, the same page a customer gets, on our own site. */
+    ownFacts: {
+      crumb: "Feiten",
+      title: "Feiten over Vidalo: adres, openingstijden, diensten en prijzen",
+      description: "De feitenpagina van Vidalo zelf, gemaakt met dezelfde opzet als voor onze klanten: adres, openingstijden, wat we wel en niet doen, prijzen, met datum. Ook als schema.org en llms.txt.",
+      intro: "Wat we voor klanten maken, hebben we ook voor onszelf. Dit is onze eigen feitenpagina, met dezelfde opzet, dezelfde datum en dezelfde tekstversie voor AI-assistenten.",
+      textVersion: "Tekstversie voor AI-assistenten",
+    },
     home: {
       title: "Klopt wat ChatGPT over je bedrijf zegt? Gratis AI-controle",
-      description: "Gratis controle: wat zeggen ChatGPT, Google AI en Copilot over je bedrijf? We vinden elke fout en de bron, en herstellen die bron. Goed zetten €149 eenmalig, goed houden €49 per maand, excl. btw.",
+      description: "Gratis controle: wat zeggen ChatGPT en Google AI over je bedrijf? We vinden elke fout en de bron, en herstellen die bron. Goed zetten €149 eenmalig, goed houden €49 per maand, excl. btw.",
     },
     why: {
       crumb: "Waarom",
@@ -651,7 +659,7 @@ export const copy = {
     how: {
       crumb: "Zo werkt het",
       title: "Zo werkt Vidalo: vastleggen, publiceren, controleren, herstellen",
-      description: "Je gegevens één keer vastleggen, overal hetzelfde publiceren, elke maand twintig keer per vraag controleren bij ChatGPT, Google AI en Copilot, en fouten aan de bron herstellen met bewijs.",
+      description: "Je gegevens één keer vastleggen, overal hetzelfde publiceren, elke maand tien keer per vraag controleren bij ChatGPT, Google AI, Gemini en Perplexity, en fouten aan de bron herstellen met bewijs.",
       h1: "Zo werkt Vidalo",
       intro: "Vijf minuten werk voor jou bij de start. Daarna controleren we elke maand wat AI-assistenten over je zeggen, en herstellen we elke fout bij de bron.",
     },
@@ -669,13 +677,13 @@ export const copy = {
     draft: true,
     draftNotice: "Concept. Deze tekst is nog niet juridisch gecontroleerd en kan veranderen.",
     updated: "Laatst bijgewerkt: 9 oktober 2026",
-    contact: "Vragen? Mail ons op hallo@vidalo.nl.",
+    contact: "Vragen? Mail ons op hallo@vidalo.io.",
     terms: {
       title: "Algemene voorwaarden",
       intro: "Deze voorwaarden gelden voor elke controle en elk abonnement van Vidalo, een handelsnaam van A101 B.V.",
       sections: [
         { h: "Wat we doen", p: ["We vragen AI-assistenten zoals ChatGPT, Google AI en Copilot wat ze over je bedrijf zeggen, vergelijken dat met de gegevens die jij bevestigt en laten zien waar een fout vandaan komt.", "Met een betaald plan publiceren we een feitenpagina, zetten we je gegevens in Google, Bing, Apple en Nederlandse gidsen, en vragen we bronnen met een fout om die te herstellen."] },
-        { h: "Wat we niet beloven", p: ["Niemand bepaalt wat een AI-assistent antwoordt. We herstellen de bronnen waar die antwoorden uit komen. Antwoorden uit het geheugen van een model veranderen pas bij een nieuwe modelversie.", "Herstel bij een andere website of gids hangt af van die partij en kan tot 14 dagen of langer duren."] },
+        { h: "Wat we niet beloven", p: ["Niemand bepaalt wat een AI-assistent antwoordt. We herstellen de bronnen waar die antwoorden uit komen. Antwoorden uit het geheugen van een model veranderen pas bij een nieuwe modelversie.", "Herstel bij een andere website of gids hangt af van die partij en duurt meestal twee tot vier weken, soms langer."] },
         { h: "Jouw gegevens, jouw verantwoordelijkheid", p: ["Je bevestigt zelf de gegevens van je bedrijf. Wij publiceren en versturen alleen wat jij bevestigd hebt.", "Je geeft ons toestemming om namens je bedrijf correctieverzoeken te sturen naar websites en gidsen, en om je Google-bedrijfsprofiel bij te werken als je dat koppelt."] },
         { h: "Prijs en betalen", p: ["Goed zetten kost eenmalig €149. Goed houden kost €49 per maand. Alle prijzen zijn exclusief btw.", "Je betaalt via Stripe met iDEAL, kaart of SEPA-incasso. Je ontvangt een factuur per betaling."] },
         { h: "Opzeggen", p: ["Er is geen opzegtermijn. Je zegt maandelijks op onder ‘Abonnement’ in je account; de lopende maand loopt af.", "Als je abonnement afloopt, stoppen we met controleren en bijwerken, en verwijst je feitenpagina door naar je eigen website."] },
@@ -688,12 +696,98 @@ export const copy = {
       intro: "Vidalo is een handelsnaam van A101 B.V. Hier staat welke gegevens we gebruiken, waarom, en met wie we ze delen.",
       sections: [
         { h: "Welke gegevens", p: ["Over je bedrijf: naam, plaats, adres, telefoonnummer, website, openingstijden, diensten en andere gegevens die je bevestigt. Dit zijn meestal geen persoonsgegevens, behalve als je bedrijf je eigen naam draagt.", "Over jou: je e-mailadres, om in te loggen en je rapporten te sturen. Bij betalen verwerkt Stripe je betaalgegevens; wij zien die niet.", "Over de controle: de vragen die we stellen, de antwoorden van AI-assistenten en de bronnen die ze noemen."] },
-        { h: "Waarom", p: ["Om de controle uit te voeren, fouten te herstellen, je te mailen over je rapport en je abonnement te factureren. Na een gratis controle sturen we je na 7 en na 21 dagen nog een herinnering; wil je die niet, mail ons dan. De grondslag is de overeenkomst met jou, en voor een gratis controle ons gerechtvaardigd belang om je een rapport te kunnen geven."] },
+        { h: "Waarom", p: ["Om de controle uit te voeren, fouten te herstellen, je te mailen over je rapport en je abonnement te factureren. Na een gratis controle sturen we je na 7 en na 21 dagen nog een herinnering. Elke mail heeft een afmeldlink; na afmelden sturen we niets meer. De grondslag is de overeenkomst met jou, en voor een gratis controle ons gerechtvaardigd belang om je een rapport te kunnen geven."] },
         { h: "Met wie we gegevens delen", p: ["Supabase (database en inloggen, opslag in de EU). OpenAI, Google, Perplexity en SerpAPI om de vragen te stellen; we sturen alleen bedrijfsgegevens, geen e-mailadressen. Google en de KvK om je bedrijf te vinden. Stripe voor betalingen. Resend voor e-mail. Cloudflare voor je feitenpagina.", "Sommige van deze partijen verwerken gegevens buiten de EU. Dat gebeurt op basis van de standaardcontractbepalingen van de Europese Commissie of het EU-VS-gegevensprivacykader."] },
         { h: "Hoe lang", p: ["Een rapport van een gratis controle is 30 dagen via de link te zien. Gegevens van een betaald plan bewaren we zolang je klant bent. 90 dagen na het einde van je abonnement doen we nog één gratis controle; daarna bewaren we alleen wat de wet voor facturen vraagt."] },
         { h: "Jouw rechten", p: ["Je mag je gegevens inzien, laten verbeteren of laten verwijderen, en bezwaar maken. Mail ons; we reageren binnen een maand. Ben je het niet met ons eens, dan kun je een klacht indienen bij de Autoriteit Persoonsgegevens."] },
       ],
     },
+    cookies: {
+      title: "Cookies",
+      intro: "Vidalo gebruikt alleen cookies die nodig zijn om de site te laten werken. Geen volgcookies, geen advertentiecookies. Hier staat precies wat we op je apparaat zetten.",
+      sections: [
+        { h: "Wat een cookie is", p: ["Een cookie is een klein bestand dat een website op je apparaat zet, zodat de site je herkent als je van pagina wisselt of terugkomt. Hetzelfde geldt voor opslag in je browser (local storage); daar gebruiken we niets van."] },
+        {
+          h: "Welke cookies we zetten",
+          p: ["Alle cookies hieronder zijn noodzakelijk. Daar is geen toestemming voor nodig; we vertellen je wel dat ze er zijn."],
+          table: {
+            head: ["Naam", "Waarvoor", "Hoe lang"],
+            rows: [
+              ["vidalo_consent", "Onthoudt dat je de cookiemelding hebt gezien en welke keuze je maakte.", "12 maanden"],
+              ["sb-…-auth-token", "Houdt je ingelogd in je account (Supabase, inloggen zonder wachtwoord).", "Tot je uitlogt, hoogstens 400 dagen"],
+              ["sb-…-code-verifier", "Tijdens het inloggen: koppelt de inloglink uit je mail aan deze browser.", "Verwijderd zodra je bent ingelogd, anders hoogstens 400 dagen"],
+              ["vidalo_google_state", "Tijdens het koppelen van je Google-bedrijfsprofiel: beschermt die stap tegen misbruik.", "10 minuten"],
+              ["vidalo_preview", "Alleen tijdens de bouwfase: laat je de site zien achter de pagina ‘Binnenkort’.", "Tot je de browser sluit"],
+            ],
+          },
+        },
+        { h: "Statistieken en marketing", p: ["We meten op dit moment niets en zetten geen cookies van andere partijen. Gaan we ooit bezoekersstatistieken bijhouden, dan vragen we daar eerst je toestemming voor, met een knop om te weigeren die even groot is als de knop om te accepteren. Tot die tijd staat er niets uit te zetten."] },
+        { h: "Andere partijen", p: ["Betaal je, dan ga je naar een pagina van Stripe; daar gelden de cookies en het privacybeleid van Stripe. Koppel je je Google-bedrijfsprofiel, dan log je in bij Google; daar gelden de regels van Google. Op vidalo.io zelf laden we geen scripts, lettertypen of knoppen van andere partijen."] },
+        { h: "Jouw keuze aanpassen", p: ["Onderaan elke pagina staat ‘Cookie-instellingen’. Daar zie je je keuze en pas je die aan. Cookies verwijderen kan ook via de instellingen van je browser."] },
+      ],
+    },
+  },
+
+  /** /binnenkort, the page behind the launch gate (core/shared/gate.ts), and the temporary preview bar. */
+  comingSoon: {
+    lang: "nl",
+    title: "Binnenkort",
+    kicker: "Binnenkort",
+    h1: "Vidalo komt eraan.",
+    body: "Je klanten vragen het aan ChatGPT. Wij zorgen dat het antwoord klopt. Binnenkort controleer je hier gratis wat AI-assistenten over je bedrijf zeggen, en laat je elke fout bij de bron herstellen.",
+    contact: "Vragen, of alvast meedoen? Mail ons op",
+    previewButton: "Bekijk de site alvast",
+    previewNote: "Tijdelijk, zolang we bouwen. De site is nog niet af.",
+    barTitle: "Voorvertoning",
+    barLinks: [
+      { label: "Home", href: "/" },
+      { label: "Zo werkt het", href: "/hoe-het-werkt" },
+      { label: "Waarom", href: "/waarom" },
+      { label: "Prijs", href: "/prijzen" },
+      { label: "Straks", href: "/straks" },
+      { label: "Per vak", href: "/vak/loodgieters-installateurs" },
+      { label: "Voorbeeldrapport", href: "/r/voorbeeld" },
+      { label: "Feiten", href: "/feiten" },
+      { label: "Inloggen", href: "/inloggen" },
+    ],
+    barExit: "Terug naar Binnenkort",
+  },
+
+  /** The website assistant (components/ChatWidget.tsx, /api/chat, core/chat). */
+  chat: {
+    button: "Vraag het ons",
+    close: "Sluiten",
+    title: "Vraag het Vidalo",
+    aiNotice: "Dit is een AI-assistent. Liever een mens? Mail",
+    welcome: "Stel je vraag over wat Vidalo doet, wat het kost of hoe het werkt.",
+    starters: ["Wat doet Vidalo precies?", "Wat kost het?", "Hoe zeg ik op?"],
+    placeholder: "Typ je vraag",
+    send: "Stuur",
+    thinking: "Even kijken.",
+    faqNote: "Antwoord uit onze veelgestelde vragen.",
+    fallback: "Dat weet ik niet zeker. Mail ons op hallo@vidalo.io, dan krijg je antwoord van een mens.",
+    error: "Antwoorden lukt nu even niet. Mail ons op hallo@vidalo.io.",
+    rateLimited: "Je stelt veel vragen in korte tijd. Probeer het over een paar minuten opnieuw, of mail hallo@vidalo.io.",
+  },
+
+  /** The cookie notice (components/CookieConsent.tsx) and the footer button that reopens it. */
+  consent: {
+    title: "Cookies",
+    body: "We gebruiken alleen cookies die nodig zijn om de site te laten werken. Geen volgcookies.",
+    bodyWithChoice: "Noodzakelijke cookies staan altijd aan. Voor statistieken vragen we je toestemming. Weigeren is net zo makkelijk als accepteren.",
+    link: "Cookiebeleid",
+    ok: "Begrepen",
+    refuse: "Alleen noodzakelijk",
+    accept: "Alles accepteren",
+    settings: "Cookie-instellingen",
+    close: "Sluiten",
+    categories: {
+      necessary: { label: "Noodzakelijk", body: "Inloggen en je cookiekeuze. Altijd aan." },
+      analytics: { label: "Statistieken", body: "Welke pagina’s bezocht worden, zonder wie je bent." },
+    },
+    current: "Je keuze",
+    on: "aan",
+    off: "uit",
   },
 
   unsubscribe: {
@@ -702,7 +796,7 @@ export const copy = {
     button: "Afmelden",
     doneH1: "Je bent afgemeld",
     doneBody: "We sturen je hierover geen mails meer.",
-    invalid: "Deze afmeldlink klopt niet of is verlopen. Mail ons op hallo@vidalo.nl, dan regelen we het.",
+    invalid: "Deze afmeldlink klopt niet of is verlopen. Mail ons op hallo@vidalo.io, dan regelen we het.",
   },
 
   scanBusy: {
@@ -835,7 +929,7 @@ export const copy = {
       setup: "Alleen goed zetten · €149",
       monitorGrey: "Vindbaar maken en houden · €149 + €49/mnd",
       setupGrey: "Alleen vindbaar maken · €149",
-      exclVat: "Excl. btw · geen opzegtermijn · herstel bij derden kan tot 14 dagen duren",
+      exclVat: "Excl. btw · geen opzegtermijn · herstel bij derden duurt meestal 2 tot 4 weken",
       exclVatGrey: "Excl. btw · geen opzegtermijn",
     },
     email: {
@@ -874,8 +968,8 @@ export const copy = {
       h2: "Waarom je dit niet ziet aan je telefoon",
       body: "Een klant die jou via AI niet te zien krijgt, belt niet. Er is geen gemiste oproep, geen afgewezen offerte, geen review. Alleen een telefoon die iets stiller is dan vorig jaar. Het enige wat je kunt doen is zelf vragen wat de AI over je zegt, en dat is precies wat wij elke maand doen.",
       stats: [
-        { n: "1 op 2", body: "bedrijven heeft minstens één AI-antwoord dat niet klopt", source: "Insites, 10.000 bedrijven, 2026" },
-        { n: "1 op 5", body: "Nederlanders begint een aankoop met een vraag aan AI", source: "SearchLab, 2026" },
+        { n: "1 op 2", body: "bedrijven heeft minstens één AI-antwoord dat niet klopt", source: "Insites, 10.000 bedrijven (VS), 2026" },
+        { n: "1 op 4", body: "Nederlanders gebruikte ChatGPT of een andere AI-assistent bij het winkelen", source: "Adyen, 2025" },
       ],
       recheck: { n: "21 dagen", body: "tot we opnieuw vragen of de AI je nu wél noemt" },
     },
@@ -912,7 +1006,7 @@ export const copy = {
         { title: "Spoeddienst", body: "Bij lekkage of storing telt alleen wie “vandaag” kan. Staat je storingsnummer en je bereikbaarheid in het weekend nergens, dan besta je niet voor die vraag.", question: "“Heeft X een storingsdienst in het weekend?”" },
         { title: "Erkenningen en nieuwe diensten", body: "“Erkend installateur warmtepompen” staat op je busje, niet in de bronnen die AI leest. Je website uit 2019 zegt nog “cv-ketels”. Dus noemt de AI je niet voor warmtepompen.", question: "“Is X erkend voor warmtepompen?”" },
       ],
-      whyStat: { n: "0", body: "gidsen die je werkgebied en spoeddienst standaard vastleggen", source: "eigen inventarisatie, 12 NL-gidsen" },
+      whyStat: { n: "0", body: "gidsen die je werkgebied en spoeddienst standaard vastleggen", source: "eigen inventarisatie, 13 gidsen, 2026" },
       example: {
         name: "Installatiebedrijf Hendriks",
         beforeDate: "7 oktober",
@@ -1048,7 +1142,7 @@ export const copy = {
         { title: "Reserveren en pinnen", body: "Kan ik reserveren voor zes, kan ik pinnen, is er een terras. Praktische vragen die de klant beslissen. Staan ze nergens, dan raadt de AI.", question: "“Kan ik bij X reserveren voor 6 personen?”" },
         { title: "Naamgenoot", body: "Een zaak met dezelfde naam in een andere stad die gesloten is, en de AI meldt dat jij permanent dicht bent.", question: "“Is X hetzelfde als X in Z?”" },
       ],
-      whyStat: { n: "“gesloten”", body: "is de meest voorkomende fout bij horeca: een zaak die open is, volgens een gids uit 2022", source: "Insites, 10.000 bedrijven, 2026" },
+      whyStat: { n: "1 op 3", body: "bedrijven krijgt van ChatGPT een verkeerd telefoonnummer; bij horeca komt daar “gesloten” uit een oude gids bij", source: "Insites, 10.000 bedrijven (VS), 2026" },
       example: {
         name: "Eetcafé De Brug",
         beforeDate: "7 oktober",
@@ -1082,7 +1176,7 @@ export const copy = {
         { title: "Je adres, ook na een verhuizing", body: "Na een verhuizing staat je oude adres nog jaren in gidsen en op kaarten. De klant loopt naar een lege etalage.", question: "“Zit X nog op hetzelfde adres?”" },
         { title: "Wat je verkoopt", body: "De klant vraagt naar een merk, een maat of een product. Staat dat nergens bij je naam, dan stuurt de AI hem naar de keten verderop.", question: "“Verkoopt X ook glutenvrij brood?”" },
       ],
-      whyStat: { n: "1 op 3", body: "winkels krijgt van AI een verkeerd telefoonnummer of adres", source: "Insites, 10.000 bedrijven, 2026" },
+      whyStat: { n: "1 op 3", body: "bedrijven krijgt van ChatGPT een verkeerd telefoonnummer", source: "Insites, 10.000 bedrijven (VS), 2026" },
       example: {
         name: "Bakkerij De Vries",
         beforeDate: "7 oktober",
@@ -1426,9 +1520,13 @@ export const copy = {
   checkout: {
     mockNotice: "Betaling gesimuleerd (geen Stripe-sleutel ingesteld).",
     cancelled: "Je betaling is niet afgerond. Er is niets afgeschreven. Je kunt het hieronder opnieuw proberen.",
-    error: "Afrekenen lukt nu even niet. Er is niets afgeschreven. Probeer het later opnieuw of mail ons op hallo@vidalo.nl.",
+    error: "Afrekenen lukt nu even niet. Er is niets afgeschreven. Probeer het later opnieuw of mail ons op hallo@vidalo.io.",
     productSetup: "Vidalo Goed zetten (eenmalig)",
     productMonitor: "Vidalo Goed houden (per maand)",
+    /** Above the pay button on Stripe Checkout. Stripe renders [label](url) as a link. */
+    consentSubmit: (terms: string, privacy: string) => `Vidalo is een dienst voor bedrijven, niet voor consumenten. Door te betalen bevestig je dat je namens een bedrijf koopt en ga je akkoord met de [algemene voorwaarden](${terms}) en het [privacybeleid](${privacy}) van Vidalo.`,
+    /** Next to the checkbox the customer must tick. */
+    consentAccept: (terms: string, privacy: string) => `Ik mag deze overeenkomst namens mijn bedrijf aangaan en ga akkoord met de [algemene voorwaarden](${terms}) en het [privacybeleid](${privacy}) van Vidalo.`,
   },
 
   pricing: {
@@ -1466,11 +1564,11 @@ export const copy = {
 
   welcome: {
     h1: "Welkom bij Vidalo",
-    body: "Je betaling is gelukt. Vier dingen, dan zijn we binnen 48 uur live.",
+    body: "Je betaling is gelukt. Vier dingen, dan staat binnen 48 uur je eerste controle klaar.",
     processingH1: "Bedankt, je betaling wordt verwerkt",
     processingBody: "Bij een incasso duurt het een paar werkdagen voor het geld binnen is. Je kunt alvast de stappen hieronder doen; we starten zodra de betaling rond is.",
     failedH1: "Je betaling is niet gelukt",
-    failedBody: "Er is niets afgeschreven. Probeer het opnieuw vanaf je rapport, of mail ons op hallo@vidalo.nl.",
+    failedBody: "Er is niets afgeschreven. Probeer het opnieuw vanaf je rapport, of mail ons op hallo@vidalo.io.",
     receipt: (amount: string, email: string | null) => `Je betaalde ${amount} incl. btw.${email ? ` De factuur staat in je mail (${email}).` : ""}`,
     steps: [
       { title: "Log één keer in bij Google", body: "Met het account van je Google-bedrijfsprofiel. Zo weten we dat jij de eigenaar bent.", href: "/app/google", cta: "Inloggen bij Google" },
@@ -1523,6 +1621,38 @@ export const copy = {
     noScan: "Nog geen controle uitgevoerd.",
     viewReport: "Rapport bekijken",
     factsPage: "Feitenpagina bekijken",
+  },
+
+  /** /app/account: who is signed in, the business as we know it, the latest report, the plan. */
+  account: {
+    nav: "Account",
+    h1: "Account",
+    intro: "Wie je bent, wat we van je bedrijf weten, en hoe je laatste controle ging.",
+    sections: { login: "Ingelogd", business: "Je bedrijf", report: "Laatste rapport", runs: "Controles", plan: "Abonnement" },
+    loginEmail: "E-mailadres",
+    ownerLabel: "Eigenaar",
+    ownerVerified: (date: string) => `Bevestigd met Google op ${date}`,
+    ownerNotVerified: "Nog niet bevestigd met Google",
+    verifyNow: "Bevestig met Google",
+    logout: "Uitloggen",
+    fields: { name: "Naam", place: "Plaats", address: "Adres", phone: "Telefoon", email: "E-mail", website: "Website", kvk: "KvK", factsHost: "Feitenpagina", factsVersion: "Gegevens" },
+    empty: "nog niet ingevuld",
+    noFactsHost: "nog geen domein",
+    factsConfirmed: (version: number, date: string) => `versie ${version}, bevestigd op ${date}`,
+    factsProvisional: "nog niet door jou bevestigd",
+    editFacts: "Gegevens bewerken",
+    setDomain: "Domein instellen",
+    reportLine: (ok: number, total: number) => `${ok} van ${total} antwoorden kloppen`,
+    reportDate: (date: string) => `Gecontroleerd op ${date}`,
+    openFindings: (n: number) => `${n} ${n === 1 ? "fout" : "fouten"} open`,
+    resolvedFindings: (n: number) => `${n} hersteld`,
+    noReport: "Nog geen controle afgerond. De eerste controle start zodra je gegevens bevestigd zijn.",
+    viewReport: "Rapport bekijken",
+    checkNow: "Controleer nu",
+    runKind: { free: "Gratis controle", baseline: "Eerste controle", monthly: "Maandelijkse controle", recheck: "Hercontrole", ondemand: "Op verzoek" },
+    runStatus: { queued: "Ingepland", running: "Bezig", done: "Klaar", failed: "Mislukt" },
+    noRuns: "Nog geen controles.",
+    planLink: "Abonnement en facturen",
   },
 
   facts: {
@@ -1597,7 +1727,7 @@ export const copy = {
     recordValue: "Waarde",
     checkButton: "Controleer DNS",
     verified: (host: string) => `${host} wijst naar Vidalo. Je feitenpagina is live.`,
-    notYet: "We zien de DNS-regel nog niet. DNS-wijzigingen kunnen tot een uur duren. We controleren elke 10 minuten opnieuw.",
+    notYet: "We zien de DNS-regel nog niet. Meestal staat hij binnen een uur, soms duurt het een dag. We controleren elke 10 minuten opnieuw.",
     optionB: "Laat Vidalo een domein registreren",
     optionBHint: (name: string) => `We registreren ${name} en richten alles in. Je hoeft niets te doen.`,
     optionBButton: "Registreer voor mij",
@@ -1631,7 +1761,7 @@ export const copy = {
       error: "Er ging iets mis bij Google. Probeer het nog een keer.",
     },
     retry: "Opnieuw proberen",
-    contact: "Lukt het niet? Mail ons op hallo@vidalo.nl, dan koppelen we het samen.",
+    contact: "Lukt het niet? Mail ons op hallo@vidalo.io, dan koppelen we het samen.",
   },
 
   factsPage: {

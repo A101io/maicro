@@ -1,0 +1,29 @@
+{
+  "version": "0.0.1",
+  "configurations": [
+    {
+      "name": "vidalo-dev",
+      "runtimeExecutable": "corepack",
+      "runtimeArgs": ["pnpm", "--filter", "@vidalo/web", "dev"],
+      "port": 3000
+    },
+    {
+      "name": "vidalo-dev-gate",
+      "runtimeExecutable": "env",
+      "runtimeArgs": ["VIDALO_COMING_SOON=1", "VIDALO_PREVIEW_BUTTON=1", "corepack", "pnpm", "--filter", "@vidalo/web", "dev"],
+      "port": 3000
+    },
+    {
+      "name": "vidalo-dev-mock",
+      "runtimeExecutable": "env",
+      "runtimeArgs": ["SUPABASE_URL=", "SUPABASE_ANON_KEY=", "VIDALO_COMING_SOON=1", "VIDALO_PREVIEW_BUTTON=1", "corepack", "pnpm", "--filter", "@vidalo/web", "dev"],
+      "port": 3000
+    },
+    {
+      "name": "vidalo-worker",
+      "runtimeExecutable": "corepack",
+      "runtimeArgs": ["pnpm", "--filter", "@vidalo/worker", "start"],
+      "port": 8787
+    }
+  ]
+}

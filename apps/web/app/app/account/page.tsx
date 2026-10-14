@@ -1,0 +1,191 @@
+import Link from "next/link";
+import { getI18n } from "@/lib/i18n";
+import { isVerifiedOwner } from "@vidalo/core/shared";
+import { Stip } from "@/components/Stip";
+import { requireOwner } from "@/lib/owner";
+import { loadDashboard } from "@/lib/reads";
+import { getScanReport } from "@/lib/core";
+import { dateShort, dateTime } from "@/lib/format";
+import { checkNow } from "../actions";
+
+export const dynamic = "force-dynamic";
+
+function Row({ label, children }: { label: string; children: React.ReactNode }) {
+  return (
+    <div className="grid gap-1 px-5 py-3.5 sm:grid-cols-[160px_1fr] sm:gap-6">
+      <span className="text-[14px] text-muted">{label}</span>
+      <span className="text-[15px]">{children}</span>
+    </div>
+  );
+}
+
+/**
+ * The account page: who is signed in, the business as Vidalo knows it (from
+ * the confirmed facts, falling back to what the scan found), the latest
+ * finished report with its colour, the recent checks, and the plan. Reading
+ * only; every change has its own page (gegevens, domein, google, abonnement).
+ */
+export default async function AccountPage() {
+  const { business, session } = await requireOwner("/app/account");
+  const data = await loadDashboard(business.id);
+  const { copy, href } = await getI18n();
+  const A = copy.account;
+  const B = copy.billing;
+  const facts = data.facts;
+  const verified = isVerifiedOwner(business, session.userId);
+  const lastRun = data.scanRuns.find((r) => r.status === "done");
+  const report = lastRun ? await getScanReport(lastRun.id) : null;
+  const open = data.findings.filter((f) => f.status !== "resolved").length;
+  const resolved = data.findings.length - open;
+  const planTone = business.status === "paused" ? "rood" : business.status === "trial" || business.status === "active" ? "groen" : "grijs";
+  const value = (v: string | null | undefined) => (v && v.trim() ? v : <span className="text-muted">{A.empty}</span>);
+
+  return (
+    <div className="space-y-10">
+      <header>
+        <h1 className="h2">{A.h1}</h1>
+        <p className="mt-2 text-[17px] text-ink-2">{A.intro}</p>
+      </header>
+
+      {/* Signed in */}
+      <section>
+        <h2 className="h3">{A.sections.login}</h2>
+        <div className="card mt-3 divide-y-[1px] divide-line">
+          <Row label={A.loginEmail}>{session.email}</Row>
+          <Row label={A.ownerLabel}>
+            <span className="inline-flex flex-wrap items-center gap-x-3 gap-y-1">
+              <span className="inline-flex items-center gap-2">
+                <Stip tone={verified ? "groen" : "grijs"} /> {verified && business.ownerVerifiedAt ? A.ownerVerified(dateShort(business.ownerVerifiedAt)) : A.ownerNotVerified}
+              </span>
+              {!verified && (
+                <Link href={href("/app/google")} className="btn-link">
+                  {A.verifyNow}
+                </Link>
+              )}
+            </span>
+          </Row>
+        </div>
+      </section>
+
+      {/* The business */}
+      <section>
+        <div className="flex items-baseline justify-between gap-4">
+          <h2 className="h3">{A.sections.business}</h2>
+          <Link href={href("/app/gegevens")} className="btn-link">
+            {A.editFacts}
+          </Link>
+        </div>
+        <div className="card mt-3 divide-y-[1px] divide-line">
+          <Row label={A.fields.name}>{facts?.name ?? business.name}</Row>
+          <Row label={A.fields.place}>{facts?.place ?? business.place}</Row>
+          <Row label={A.fields.address}>{value([facts?.address, facts?.postcode].filter(Boolean).join(", "))}</Row>
+          <Row label={A.fields.phone}>{value(facts?.phone)}</Row>
+          <Row label={A.fields.email}>{value(facts?.email)}</Row>
+          <Row label={A.fields.website}>
+            {facts?.website ? (
+              <a href={facts.website} target="_blank" rel="noopener" className="underline-offset-2 hover:underline">
+                {facts.website}
+              </a>
+            ) : (
+              value(business.domain)
+            )}
+          </Row>
+          <Row label={A.fields.kvk}>{value(business.kvk)}</Row>
+          <Row label={A.fields.factsHost}>
+            {business.factsHost ? (
+              <span className="inline-flex items-center gap-2">
+                <Stip tone={business.factsHostVerifiedAt ? "groen" : "oranje"} /> {business.factsHost}
+              </span>
+            ) : (
+              <span className="inline-flex flex-wrap items-center gap-x-3">
+                <span className="text-muted">{A.noFactsHost}</span>
+                <Link href={href("/app/domein")} className="btn-link">
+                  {A.setDomain}
+                </Link>
+              </span>
+            )}
+          </Row>
+          <Row label={A.fields.factsVersion}>{facts && !facts.provisional ? A.factsConfirmed(facts.version, dateShort(facts.verifiedAt ?? new Date())) : <span className="text-muted">{A.factsProvisional}</span>}</Row>
+        </div>
+      </section>
+
+      {/* Latest report */}
+      <section>
+        <div className="flex items-baseline justify-between gap-4">
+          <h2 className="h3">{A.sections.report}</h2>
+          {lastRun && (
+            <Link href={href(`/r/${lastRun.id}`)} className="btn-link">
+              {A.viewReport}
+            </Link>
+          )}
+        </div>
+        <div className="card mt-3 flex flex-col gap-4 p-5 sm:flex-row sm:items-center sm:justify-between">
+          {lastRun && report ? (
+            <div className="flex items-start gap-4">
+              <Stip tone={report.stip} size={22} className="mt-1" />
+              <div>
+                <p className="text-[17px] font-bold">{A.reportLine(report.totalAnswers - report.wrongAnswers - (report.notFoundAnswers ?? 0), report.totalAnswers)}</p>
+                <p className="mt-1 text-[15px] text-ink-2">{copy.stipLine[report.stip]}</p>
+                <p className="mt-1 text-[14px] text-muted">
+                  {A.reportDate(dateShort(lastRun.finishedAt ?? lastRun.startedAt))} · {A.openFindings(open)} · {A.resolvedFindings(resolved)}
+                </p>
+              </div>
+            </div>
+          ) : (
+            <p className="text-[15px] text-muted">{A.noReport}</p>
+          )}
+          <form action={checkNow}>
+            <button type="submit" className="btn-primary h-[52px]">
+              {A.checkNow}
+            </button>
+          </form>
+        </div>
+      </section>
+
+      {/* Recent checks */}
+      <section>
+        <h2 className="h3">{A.sections.runs}</h2>
+        {data.scanRuns.length === 0 ? (
+          <p className="mt-3 text-[15px] text-muted">{A.noRuns}</p>
+        ) : (
+          <ol className="card mt-3 divide-y-[1px] divide-line">
+            {data.scanRuns.slice(0, 6).map((r) => (
+              <li key={r.id} className="flex flex-wrap items-center justify-between gap-x-4 gap-y-1 px-5 py-3 text-[15px]">
+                <span>
+                  {A.runKind[r.kind]} <span className="text-muted">· {dateTime(r.finishedAt ?? r.startedAt)}</span>
+                </span>
+                <span className="inline-flex items-center gap-2 text-[14px]">
+                  <Stip tone={r.status === "done" ? "groen" : r.status === "failed" ? "rood" : "oranje"} /> {A.runStatus[r.status]}
+                </span>
+              </li>
+            ))}
+          </ol>
+        )}
+      </section>
+
+      {/* Plan */}
+      <section>
+        <div className="flex items-baseline justify-between gap-4">
+          <h2 className="h3">{A.sections.plan}</h2>
+          <Link href={href("/app/abonnement")} className="btn-link">
+            {A.planLink}
+          </Link>
+        </div>
+        <div className="card mt-3 divide-y-[1px] divide-line">
+          <Row label={B.planLabel}>{B.plans[business.plan]}</Row>
+          <Row label={B.statusLabel}>
+            <span className="inline-flex items-center gap-2">
+              <Stip tone={planTone} /> {B.statuses[business.status]}
+            </span>
+          </Row>
+        </div>
+      </section>
+
+      <form action="/auth/uitloggen" method="post">
+        <button type="submit" className="btn-sm">
+          {A.logout}
+        </button>
+      </form>
+    </div>
+  );
+}

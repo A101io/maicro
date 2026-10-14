@@ -1,4 +1,25 @@
 import type { NextConfig } from "next";
+import { existsSync, readFileSync } from "node:fs";
+import { join } from "node:path";
+
+/**
+ * The README says `cp .env.example .env` at the repo root, but Next only reads
+ * env files from this folder, so a root .env was silently ignored and every
+ * sign-in fell back to the mock session. Load the root file first; a value
+ * already in the environment (CI, a Worker, apps/web/.env) always wins.
+ */
+for (const file of [".env", ".env.local"]) {
+  const p = join(__dirname, "..", "..", file);
+  if (!existsSync(p)) continue;
+  for (const line of readFileSync(p, "utf8").split("\n")) {
+    const m = /^\s*(?:export\s+)?([A-Za-z_][A-Za-z0-9_]*)\s*=\s*(.*?)\s*$/.exec(line);
+    const key = m?.[1];
+    const raw = m?.[2];
+    if (!key || raw === undefined || line.trimStart().startsWith("#")) continue;
+    const value = raw.replace(/^(['"])(.*)\1$/, "$2").replace(/\s+#.*$/, "");
+    if (process.env[key] === undefined) process.env[key] = value;
+  }
+}
 
 /**
  * Security headers on every response (baseline D7). The CSP is production

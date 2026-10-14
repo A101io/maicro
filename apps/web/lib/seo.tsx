@@ -1,5 +1,7 @@
 import type { Metadata } from "next";
 import { PRICES, type CopyShape } from "@vidalo/core/copy";
+import { buildJsonLd } from "@vidalo/core/publisher";
+import { OWN_BUSINESS, OWN_FACTS, OWN_FACTS_PATH } from "@vidalo/core/shared";
 import { localizeHref, type Lang } from "./lang-paths";
 
 /**
@@ -8,7 +10,7 @@ import { localizeHref, type Lang } from "./lang-paths";
  * description, canonical, hreflang, Open Graph) and to AI assistants
  * (JSON-LD and /llms.txt). Only what the page itself shows goes in here.
  */
-export const SITE = (process.env.PUBLIC_BASE_URL ?? "https://vidalo.nl").replace(/\/$/, "");
+export const SITE = (process.env.PUBLIC_BASE_URL ?? "https://vidalo.io").replace(/\/$/, "");
 const abs = (path: string) => SITE + (path === "/" ? "" : path);
 
 /** Title, description, canonical, both languages and the share card for one route. */
@@ -26,19 +28,28 @@ export function pageMetadata({ title, description, route, lang, absoluteTitle = 
   };
 }
 
+/** The own facts page's address on this site. */
+export const OWN_FACTS_URL = abs(OWN_FACTS_PATH);
+
+/**
+ * Vidalo's own structured data: the very LocalBusiness block the facts page
+ * renders for a customer, built from `OWN_FACTS`, plus what an Organization
+ * says about itself. Practise what we preach: our data comes from the same
+ * record and the same renderer as a customer's.
+ */
 export function organizationLd(copy: CopyShape) {
+  const facts = buildJsonLd(OWN_FACTS, OWN_BUSINESS, OWN_FACTS_URL);
   return {
-    "@context": "https://schema.org",
-    "@type": "Organization",
+    ...facts,
+    "@type": ["Organization", "LocalBusiness"],
     "@id": `${SITE}/#organization`,
     name: copy.brand,
     legalName: "A101 B.V.",
     url: SITE,
-    email: "hallo@vidalo.nl",
+    email: "hallo@vidalo.io",
     description: copy.tagline,
-    address: { "@type": "PostalAddress", streetAddress: "Factorij 80", postalCode: "3071 AV", addressLocality: "Rotterdam", addressCountry: "NL" },
-    identifier: { "@type": "PropertyValue", propertyID: "KvK", value: "42057858" },
-    areaServed: "NL",
+    identifier: { "@type": "PropertyValue", propertyID: "KvK", value: OWN_BUSINESS.kvk },
+    subjectOf: OWN_FACTS_URL,
   };
 }
 

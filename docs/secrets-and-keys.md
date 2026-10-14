@@ -8,7 +8,7 @@ Set on **both** GitHub environments of `A101io/maicro` (Settings → Environment
 
 | Name | Comes from | Prove it |
 |---|---|---|
-| `CLOUDFLARE_API_TOKEN` | Cloudflare → My Profile → API Tokens → Create Token → Custom. Account resources: A101's account only. Permissions: **Account · Workers Scripts · Edit**, **Account · Queues · Edit**, **Account · Hyperdrive · Edit**, **Account · Account Settings · Read**. Add **Zone · Workers Routes · Edit** once the domain is on Cloudflare. | The deploy workflow's "Require the Cloudflare credentials" step passes; on a miss it prints the secret names it can see |
+| `CLOUDFLARE_API_TOKEN` | Cloudflare → My Profile → API Tokens → Create Token → Custom. Account resources: A101's account only. Permissions: **Account · Workers Scripts · Edit**, **Account · Queues · Edit**, **Account · Hyperdrive · Edit**, **Account · Account Settings · Read**. Plus **Zone · Workers Routes · Edit** for the zone `vidalo.io` (the production deploy binds `vidalo.io` and `www.vidalo.io` as Custom Domains; without it the deploy fails naming the zone). | The deploy workflow's "Require the Cloudflare credentials" step passes; on a miss it prints the secret names it can see |
 | `CLOUDFLARE_ACCOUNT_ID` | Cloudflare dashboard → Workers & Pages → Account ID in the right column (the same account as Sitty and Sonable) | `wrangler deploy` names the account it deployed to |
 
 ## On the Workers (`wrangler secret put NAME --name vidalo-web` / `--name vidalo-worker`)

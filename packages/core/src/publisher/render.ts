@@ -14,6 +14,8 @@ export interface RenderOptions {
   verifiedAt?: string;
   /** Protocol for canonical links; https in production. */
   protocol?: "https" | "http";
+  /** Full canonical URL when the page does not live at the root of `host` (Vidalo's own page at /feiten). */
+  canonicalUrl?: string;
 }
 
 export interface RenderedFactsPage {
@@ -76,7 +78,7 @@ export function safeWebUrl(raw: string | null | undefined): string | null {
 }
 
 export function defaultFactsHost(business: Pick<Business, "slug">): string {
-  const suffix = process.env.FACTS_HOST_SUFFIX || "vidalo.nl";
+  const suffix = process.env.FACTS_HOST_SUFFIX || "vidalo.io";
   return `${business.slug}.feiten.${suffix}`;
 }
 
@@ -300,7 +302,7 @@ function list(items: string[], prefix = ""): string {
 export function renderFactsPage(facts: Facts, business: Business, opts: RenderOptions = {}): RenderedFactsPage {
   const host = opts.host ?? defaultFactsHost(business);
   const protocol = opts.protocol ?? (host.startsWith("localhost") || host.startsWith("127.") ? "http" : "https");
-  const canonicalUrl = `${protocol}://${host}/`;
+  const canonicalUrl = opts.canonicalUrl ?? `${protocol}://${host}/`;
   const checkedAt = opts.verifiedAt ?? new Date().toISOString();
   const lastmod = facts.verifiedAt && new Date(facts.verifiedAt) > new Date(checkedAt) ? facts.verifiedAt : checkedAt;
 
@@ -355,7 +357,7 @@ ${facts.servicesNo.length ? `<p>Niet:</p>${list(facts.servicesNo, "Niet: ")}` : 
 ${facts.prices.map((p) => `<tr><th scope="row">${escapeHtml(p.label)}</th><td>${escapeHtml(formatPrice(p))}</td></tr>`).join("\n")}
 </tbody>
 </table>
-<p class="meta">Prijzen inclusief btw, tenzij anders vermeld.</p>
+${facts.prices.every((p) => /btw/i.test(p.unit ?? "")) ? "" : `<p class="meta">Prijzen inclusief btw, tenzij anders vermeld.</p>`}
 </section>`);
   }
 

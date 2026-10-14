@@ -21,6 +21,7 @@ const EN_SLUGS: Record<string, string> = {
   welkom: "welcome",
   eigenaar: "owner",
   feiten: "facts",
+  binnenkort: "coming-soon",
 };
 const NL_SLUGS = Object.fromEntries(Object.entries(EN_SLUGS).map(([nl, en]) => [en, nl]));
 

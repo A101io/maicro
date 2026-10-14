@@ -98,7 +98,11 @@ async function activate(business: BusinessRecord, session: Record<string, unknow
   // Setup waits for proven ownership (apps/worker/src/jobs/paid.ts) and is
   // enqueued again by the Google callback once it is proven.
   await db.enqueueJob("setup", { businessId: business.id });
-  await db.logEvent(business.id, "checkout.completed", { plan, sessionId: session.id });
+  // The terms consent is recorded with the sale: a completed session reading
+  // "accepted" is the proof the account-level Terms URL is set and the box
+  // was ticked (playbook/STRIPE.md), not a settings page.
+  const consent = (session.consent as { terms_of_service?: string } | null | undefined)?.terms_of_service ?? null;
+  await db.logEvent(business.id, "checkout.completed", { plan, sessionId: session.id, termsConsent: consent, email });
 }
 
 export async function handleStripeEvent(event: StripeEventLike): Promise<BillingOutcome> {

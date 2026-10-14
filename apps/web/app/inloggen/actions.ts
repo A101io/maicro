@@ -19,6 +19,15 @@ export async function sendMagicLink(form: FormData) {
   const { href } = await getI18n();
   if (!isEmail(email)) redirect(href(`/inloggen?fout=1&${q}`));
 
+  // Coming from /welkom after checkout: remember who asked for this business,
+  // so the first sign-in finds it. A claim, not proof: ownership is proven by
+  // Google later (shared/ownership.ts), and a verified owner replaces any claim.
+  const db = await ready();
+  if (businessId) {
+    const b = await db.getBusiness(businessId);
+    if (b && !b.ownerEmail) await db.upsertBusiness({ id: b.id, slug: b.slug, name: b.name, place: b.place, ownerEmail: email });
+  }
+
   const supabase = await createServerSupabase();
   if (supabase) {
     const { error } = await supabase.auth.signInWithOtp({
@@ -29,17 +38,12 @@ export async function sendMagicLink(form: FormData) {
     redirect(href(`/inloggen?sent=1`));
   }
 
-  // Mock auth: sign in immediately as this e-mail, linking the business that was just bought if it has no owner yet.
-  const db = await ready();
+  // Mock auth: sign in immediately as this e-mail.
   const store = await cookies();
   if (next.startsWith("/eigenaar/bevestigen")) {
     // Claiming a business: ownership is proven by Google next, not by owning one already.
     store.set(MOCK_SESSION_COOKIE, JSON.stringify({ userId: `mock-${email}`, email }), { httpOnly: true, sameSite: "lax", path: "/", maxAge: 60 * 60 * 24 * 30 });
     redirect(href(next));
-  }
-  if (businessId) {
-    const b = await db.getBusiness(businessId);
-    if (b && !b.ownerEmail) await db.upsertBusiness({ id: b.id, slug: b.slug, name: b.name, place: b.place, ownerEmail: email });
   }
   const owned = await db.getBusinessByOwner({ email });
   if (!owned) {

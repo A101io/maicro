@@ -22,6 +22,17 @@ export const env = {
     const n = Number(read("FREE_SCANS_PER_DAY") ?? 25);
     return Number.isFinite(n) && n >= 0 ? Math.floor(n) : 25;
   },
+  /** Launch gate (go-live J4): the marketing pages show /binnenkort (core/shared/gate.ts). */
+  get comingSoon(): boolean {
+    return read("VIDALO_COMING_SOON") === "1";
+  },
+  /** Temporary: the button on /binnenkort that lets anyone walk the site. Off = only the key opens it. */
+  get previewButton(): boolean {
+    return read("VIDALO_PREVIEW_BUTTON") === "1";
+  },
+  get previewKey() {
+    return read("VIDALO_PREVIEW_KEY");
+  },
   get baseUrl(): string {
     return read("PUBLIC_BASE_URL") ?? "http://localhost:3000";
   },

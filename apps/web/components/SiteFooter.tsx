@@ -2,6 +2,7 @@ import Link from "next/link";
 import { getI18n } from "@/lib/i18n";
 import { LangSwitch } from "@/components/LangSwitch";
 import { Logo } from "@/components/Logo";
+import { CookieSettingsButton } from "@/components/CookieConsent";
 
 /**
  * Footer. `variant="full"`: four columns + legal line (landing, result).
@@ -15,7 +16,13 @@ export async function SiteFooter({ variant = "full", note, tagline }: { variant?
       <footer className="border-t-[1.5px] border-line ground-cream">
         <div className="wrap flex flex-wrap justify-between gap-x-6 gap-y-2 py-10 text-[13px] text-muted">
           <span>{f.legal}</span>
-          <span>{note ?? f.copyright}</span>
+          <span className="flex flex-wrap gap-x-4">
+            <Link href={href("/cookies")} className="nav-link">
+              {copy.legal.cookies.title}
+            </Link>
+            <CookieSettingsButton label={copy.consent.settings} />
+            <span>{note ?? f.copyright}</span>
+          </span>
         </div>
       </footer>
     );
@@ -37,6 +44,8 @@ export async function SiteFooter({ variant = "full", note, tagline }: { variant?
                   {l.label}
                 </Link>
               ))}
+              {/* The cookie choice must be changeable from a named button; it sits under the legal links. */}
+              {c.links.some((l) => l.href === "/cookies") && <CookieSettingsButton label={copy.consent.settings} />}
             </div>
           ))}
         </div>

@@ -28,12 +28,12 @@ jobs:
       name: ${{ inputs.target }}
       # Literals, not a repository variable: a variable outside the repo can
       # name a dead host for weeks (Sitty's DEPLOY_URL did).
-      url: ${{ inputs.target == 'production' && 'https://vidalo-web.julian-devriend.workers.dev' || 'https://vidalo-web-preview.julian-devriend.workers.dev' }}
+      url: ${{ inputs.target == 'production' && 'https://vidalo.io' || 'https://vidalo-web-preview.julian-devriend.workers.dev' }}
     permissions:
       contents: read
       deployments: write
     env:
-      SITE: ${{ inputs.target == 'production' && 'https://vidalo-web.julian-devriend.workers.dev' || 'https://vidalo-web-preview.julian-devriend.workers.dev' }}
+      SITE: ${{ inputs.target == 'production' && 'https://vidalo.io' || 'https://vidalo-web-preview.julian-devriend.workers.dev' }}
       WRANGLER_ENV: ${{ inputs.target == 'production' && '' || 'preview' }}
     steps:
       - uses: actions/checkout@v4
@@ -111,3 +111,9 @@ jobs:
       # SAW (status, bytes, language), not just what it wanted.
       - name: Verify what is live
         run: node scripts/verify-deploy.mjs "$SITE"
+
+      # Production only: www must send visitors to vidalo.io, same path,
+      # permanently.
+      - name: Verify the redirect to vidalo.io
+        if: inputs.target == 'production'
+        run: node scripts/verify-deploy.mjs --redirects https://vidalo.io www.vidalo.io

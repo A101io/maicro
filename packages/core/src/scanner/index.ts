@@ -128,7 +128,7 @@ async function sampleAll(
 }
 
 function attributionContext(business: { domain: string | null; slug: string; name: string; factsHost?: string | null }, facts: Facts): AttributionContext {
-  const suffix = process.env.FACTS_HOST_SUFFIX ?? "vidalo.nl";
+  const suffix = process.env.FACTS_HOST_SUFFIX ?? "vidalo.io";
   return {
     business,
     factsHost: business.factsHost ?? `${business.slug}.feiten.${suffix}`,

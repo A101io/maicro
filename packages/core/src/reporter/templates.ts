@@ -216,7 +216,7 @@ ${dns}
    ${d.links.googleConnectUrl}
 
 4. Wij doen de rest
-   Binnen 48 uur staat je feitenpagina live, zijn Google, Bing en Apple gelijkgezet en draait de eerste volledige controle. Het resultaat krijg je per mail.
+   Zodra je DNS-regel staat, is je feitenpagina live. Je Google-profiel werken we direct bij; bij Bing en Apple dienen we de wijziging in en bewaken we de verwerking. De eerste volledige controle draait binnen 48 uur na je bevestiging; het resultaat krijg je per mail.
 
 Je overzicht: ${d.links.dashboardUrl}
 

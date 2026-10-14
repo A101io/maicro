@@ -17,11 +17,18 @@ import { EmailCapture } from "./EmailCapture";
 
 export const dynamic = "force-dynamic";
 
+/** copy.landing.footer.reportNote and the privacy text promise this number. */
+const FREE_REPORT_DAYS = 30;
+
 async function load(id: string): Promise<{ report: ScanReport; opts: BuildViewOptions; demo: boolean } | null> {
   if (id === DEMO_IDS.red) return { report: demoReport(), opts: { domain: DEMO_DOMAIN }, demo: true };
   if (id === DEMO_IDS.grey) return { report: demoGreyReport(), opts: { domain: DEMO_GREY_DOMAIN, sources: demoGreySources }, demo: true };
   const report = (await getScanReport(id)) ?? (await latestScanReport(id));
   if (!report) return null;
+  // A free report is reachable for 30 days, as the footer and the privacy
+  // text say (docs/content-check.md). Paid customers' reports stay with the
+  // account. Expired: the same "niet gevonden" page as an unknown link.
+  if (report.kind === "free" && Date.now() - new Date(report.checkedAt).getTime() > FREE_REPORT_DAYS * 86_400_000) return null;
   const db = await ready();
   const business = await db.getBusiness(report.business.id);
   const facts = await db.latestFacts(report.business.id);

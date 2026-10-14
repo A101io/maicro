@@ -1,10 +1,11 @@
 import { getI18n } from "@/lib/i18n";
 import { Chip, Dot, Scene, type Tone } from "./Scene";
 
-const ASKS = 20;
+/** One dot per sample: SCAN_DEFAULTS.monthly asks each question 10 times (docs/CRITERIA.md, Meetmethode). */
+const ASKS = 10;
 
 /**
- * The same question asked twenty times of each assistant (14s). The first
+ * The same question asked ten times of each assistant (14s). The first
  * round says all is well; only the count shows the error that keeps coming
  * back.
  */
