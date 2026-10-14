@@ -15,6 +15,7 @@ export default async function AppLayout({ children }: { children: React.ReactNod
     { href: "/app/domein", label: d.setupSteps.domain },
     { href: "/app/google", label: d.setupSteps.google },
     { href: "/app/abonnement", label: d.billingNav },
+    { href: "/app/account", label: copy.account.nav },
   ];
   return (
     <>
