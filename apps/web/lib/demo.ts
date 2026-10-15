@@ -13,6 +13,7 @@ import type { CriteriumId, Engine, EngineStip, Finding, ScanReport } from "@vida
 import { ABSENT_LABEL, NOT_FOUND_LABEL } from "@vidalo/core/types";
 import { prepareBusiness, runScan, groupBySeverity } from "@vidalo/core/scanner";
 import type { SourceRowData } from "./report";
+import type { CopyShape } from "@vidalo/core/copy";
 
 export const DEMO_OWNER_EMAIL = "eigenaar@bakkerijdevries.nl";
 export const DEMO_SLUG = "bakkerij-de-vries-haarlem";
@@ -37,20 +38,20 @@ export const demoEngineStips: EngineStip[] = [
 ];
 
 export const demoCorrect: ScanReport["correct"] = [
-  { prompt: "Is Bakkerij De Vries in Haarlem op zondag open?", engine: "google_ai", value: "zondag gesloten", factKey: "hours", subject: "6" },
-  { prompt: "Is Bakkerij De Vries in Haarlem op zondag open?", engine: "copilot", value: "zondag gesloten", factKey: "hours", subject: "6" },
+  { prompt: "Is Bakkerij De Vries in Haarlem op zondag open?", engine: "google_ai", value: "zondag gesloten", raw: "closed", factKey: "hours", subject: "6" },
+  { prompt: "Is Bakkerij De Vries in Haarlem op zondag open?", engine: "copilot", value: "zondag gesloten", raw: "closed", factKey: "hours", subject: "6" },
   { prompt: "Wat is het telefoonnummer van Bakkerij De Vries in Haarlem?", engine: "chatgpt", value: "023 535 22 18", factKey: "phone", subject: null },
   { prompt: "Wat is het telefoonnummer van Bakkerij De Vries in Haarlem?", engine: "google_ai", value: "023 535 22 18", factKey: "phone", subject: null },
-  { prompt: "Kan ik pinnen bij Bakkerij De Vries in Haarlem?", engine: "chatgpt", value: "ja", factKey: "payment", subject: "pin" },
-  { prompt: "Kan ik pinnen bij Bakkerij De Vries in Haarlem?", engine: "copilot", value: "ja", factKey: "payment", subject: "pin" },
-  { prompt: "Bestaat Bakkerij De Vries in Haarlem nog?", engine: "google_ai", value: "open", factKey: "existence", subject: null },
-  { prompt: "Bestaat Bakkerij De Vries in Haarlem nog?", engine: "copilot", value: "open", factKey: "existence", subject: null },
+  { prompt: "Kan ik pinnen bij Bakkerij De Vries in Haarlem?", engine: "chatgpt", value: "ja", raw: "yes", factKey: "payment", subject: "pin" },
+  { prompt: "Kan ik pinnen bij Bakkerij De Vries in Haarlem?", engine: "copilot", value: "ja", raw: "yes", factKey: "payment", subject: "pin" },
+  { prompt: "Bestaat Bakkerij De Vries in Haarlem nog?", engine: "google_ai", value: "open", raw: "open", factKey: "existence", subject: null },
+  { prompt: "Bestaat Bakkerij De Vries in Haarlem nog?", engine: "copilot", value: "open", raw: "open", factKey: "existence", subject: null },
   { prompt: "Wat is het adres van Bakkerij De Vries in Haarlem?", engine: "chatgpt", value: "Grote Houtstraat 112", factKey: "address", subject: null },
   { prompt: "Wat is het adres van Bakkerij De Vries in Haarlem?", engine: "google_ai", value: "Grote Houtstraat 112", factKey: "address", subject: null },
   { prompt: "Wat is het adres van Bakkerij De Vries in Haarlem?", engine: "copilot", value: "Grote Houtstraat 112", factKey: "address", subject: null },
-  { prompt: "Kan ik bij Bakkerij De Vries in Haarlem taarten bestellen?", engine: "chatgpt", value: "ja", factKey: "service", subject: "taarten op bestelling" },
-  { prompt: "Kan ik bij Bakkerij De Vries in Haarlem taarten bestellen?", engine: "google_ai", value: "ja", factKey: "service", subject: "taarten op bestelling" },
-  { prompt: "Kan ik bij Bakkerij De Vries in Haarlem taarten bestellen?", engine: "copilot", value: "ja", factKey: "service", subject: "taarten op bestelling" },
+  { prompt: "Kan ik bij Bakkerij De Vries in Haarlem taarten bestellen?", engine: "chatgpt", value: "ja", raw: "yes", factKey: "service", subject: "taarten op bestelling" },
+  { prompt: "Kan ik bij Bakkerij De Vries in Haarlem taarten bestellen?", engine: "google_ai", value: "ja", raw: "yes", factKey: "service", subject: "taarten op bestelling" },
+  { prompt: "Kan ik bij Bakkerij De Vries in Haarlem taarten bestellen?", engine: "copilot", value: "ja", raw: "yes", factKey: "service", subject: "taarten op bestelling" },
 ];
 
 export function demoReport(): ScanReport {
@@ -134,13 +135,16 @@ export function demoGreyReport(): ScanReport {
 export const DEMO_GREY_DOMAIN = "polyvale.nl";
 
 /** Source audit rows for the grey demo (ResultGGrey board). Real scans use the facts/business instead. */
-export const demoGreySources: SourceRowData[] = [
-  { label: "Eigen website", status: "1 pagina, geen adres, geen diensten", tone: "muted" },
-  { label: "Google-bedrijfsprofiel", status: "niet geclaimd", tone: "rood" },
-  { label: "Bing, Apple", status: "ontbreekt", tone: "rood" },
-  { label: "Nederlandse gidsen (12)", status: "in 1 van 12, zonder diensten", tone: "muted" },
-  { label: "KvK", status: "klopt", tone: "groen" },
-];
+export function demoGreySources(copy: CopyShape): SourceRowData[] {
+  const S = copy.result.sources;
+  return [
+    { label: S.rows.website, status: S.demoWebsite, tone: "muted" },
+    { label: S.rows.gbp, status: S.unclaimed, tone: "rood" },
+    { label: S.rows.bingApple, status: S.missing, tone: "rood" },
+    { label: S.rows.directories(12), status: S.demoDirectories, tone: "muted" },
+    { label: S.rows.kvk, status: S.ok, tone: "groen" },
+  ];
+}
 
 /** Mock-mode owner business with one finished free scan. Idempotent. */
 export async function seedDemo(db: Db): Promise<void> {

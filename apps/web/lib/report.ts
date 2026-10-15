@@ -10,7 +10,7 @@ import type { CopyShape } from "@vidalo/core/copy";
 import { findingSeverity } from "@vidalo/core/scanner";
 import type { ReportRowData } from "@/components/ReportRow";
 import type { SourceStatusTone } from "@/components/SourceRow";
-import { questionFor, recommendationQuestionFor, wrongText, correctText } from "./questions";
+import { questionFor, recommendationQuestionFor, wrongText, correctText, humanValue } from "./questions";
 import { hostOf } from "./format";
 
 export type ReportState = "rood" | "groen" | "grijs";
@@ -86,13 +86,16 @@ function groupQuestions(report: ScanReport, copy: CopyShape): QuestionGroup[] {
     return g;
   };
   for (const c of report.correct) {
+    // Older reports carry only the Dutch prompt and wording; newer ones let the page word both itself.
     const key = c.factKey ? keyOf(c.factKey, c.subject) : `p:${c.prompt}`;
-    get(key, c.prompt).correct.push({ engine: c.engine, value: c.value });
+    const question = c.factKey ? questionFor(c.factKey, c.subject ?? null, name, place, copy) : c.prompt;
+    const value = c.factKey && c.raw != null ? humanValue(c.factKey, c.raw, c.subject ?? null, copy) : c.value;
+    get(key, question).correct.push({ engine: c.engine, value });
   }
   for (const f of report.findings) {
     const rec = f.evidenceKind === "recommendation";
     const key = keyOf(f.factKey, f.subject, rec);
-    const q = rec ? recommendationQuestionFor(f.factKey, f.subject, place, copy) : questionFor(f.factKey, f.subject, name, place);
+    const q = rec ? recommendationQuestionFor(f.factKey, f.subject, place, copy) : questionFor(f.factKey, f.subject, name, place, copy);
     const g = groups.get(key) ?? get(key, q);
     g.findings.push(f);
   }
@@ -134,9 +137,9 @@ function rowFor(g: QuestionGroup, copy: CopyShape): ReportRowData {
     const src = sourceLabel(f, copy);
     return {
       question: g.question,
-      said: rec ? T.notNamed : wrongText(f),
+      said: rec ? T.notNamed : wrongText(f, copy),
       tone: "rood",
-      correct: rec ? copy.recommendation.shouldName : f.sourceType === "other_entity" ? `${correctText(f)} (${T.otherEntity})` : correctText(f),
+      correct: rec ? copy.recommendation.shouldName : f.sourceType === "other_entity" ? `${correctText(f, copy)} (${T.otherEntity})` : correctText(f, copy),
       source: src.label,
       sourceUrl: src.href,
       note: rec ? copy.recommendation.line : undefined,
@@ -144,7 +147,7 @@ function rowFor(g: QuestionGroup, copy: CopyShape): ReportRowData {
   }
   if (notFound.length) {
     const f = dominant(notFound)!;
-    return { question: g.question, said: T.notFound, tone: "grijs", correct: correctText(f), source: T.noSource };
+    return { question: g.question, said: T.notFound, tone: "grijs", correct: correctText(f, copy), source: T.noSource };
   }
   const value = g.correct[0]?.value ?? T.ok;
   return { question: g.question, said: value, tone: "groen", correct: T.ok, source: T.none };
@@ -152,12 +155,12 @@ function rowFor(g: QuestionGroup, copy: CopyShape): ReportRowData {
 
 function cardFor(f: Finding, business: ScanReport["business"], copy: CopyShape): AnswerCardData {
   const A = copy.result.answerCard;
-  const question = f.evidenceKind === "recommendation" ? recommendationQuestionFor(f.factKey, f.subject, business.place, copy) : questionFor(f.factKey, f.subject, business.name, business.place);
+  const question = f.evidenceKind === "recommendation" ? recommendationQuestionFor(f.factKey, f.subject, business.place, copy) : questionFor(f.factKey, f.subject, business.name, business.place, copy);
   const engine = ENGINE_LABEL[f.engine];
   const caption = A.frequency(f.frequency, f.sampleCount) + (f.sourceType === "other_entity" ? ` · ${A.otherEntity}` : "");
   if (f.verdict === "not_found") return { question, engine, highlight: A.notFoundQuote, highlightTone: "grijs", caption };
   if (f.evidenceKind === "recommendation") return { question, engine, highlight: A.notNamed, highlightTone: "bold", caption };
-  return { question, engine, highlight: wrongText(f), highlightTone: "rood", caption };
+  return { question, engine, highlight: wrongText(f, copy), highlightTone: "rood", caption };
 }
 
 function pickCards(findings: Finding[], business: ScanReport["business"], grey: boolean, copy: CopyShape): AnswerCardData[] {
@@ -202,7 +205,7 @@ export function buildReportView(report: ScanReport, copy: CopyShape, opts: Build
   const activeEngines = report.engines.filter((e) => !e.skipped);
   const perQuestion = report.findings[0]?.sampleCount ?? (questions && activeEngines.length ? Math.max(1, Math.round(report.totalAnswers / (questions * activeEngines.length))) : 3);
   const engineNames = activeEngines.map((e) => ENGINE_LABEL[e.engine]);
-  const enginesText = engineNames.length > 1 ? `${engineNames.slice(0, -1).join(", ")} en ${engineNames[engineNames.length - 1]}` : (engineNames[0] ?? "");
+  const enginesText = engineNames.length > 1 ? `${engineNames.slice(0, -1).join(", ")} ${copy.report.and} ${engineNames[engineNames.length - 1]}` : (engineNames[0] ?? "");
 
   const otherByEngine = new Map<Engine, number>();
   for (const f of report.findings) if (f.sourceType === "other_entity") otherByEngine.set(f.engine, (otherByEngine.get(f.engine) ?? 0) + f.frequency);
@@ -230,7 +233,7 @@ export function buildReportView(report: ScanReport, copy: CopyShape, opts: Build
     const fromFindings = g.findings.map((f) => ({
       question: g.question,
       engine: ENGINE_LABEL[f.engine],
-      value: f.verdict === "not_found" ? R.table.notFound : f.evidenceKind === "recommendation" ? R.table.notNamed : wrongText(f),
+      value: f.verdict === "not_found" ? R.table.notFound : f.evidenceKind === "recommendation" ? R.table.notNamed : wrongText(f, copy),
       tone: (f.verdict === "not_found" ? "grijs" : "rood") as ReportRowData["tone"],
     }));
     const fromCorrect = g.correct.map((c) => ({ question: g.question, engine: ENGINE_LABEL[c.engine], value: c.value, tone: "groen" as const }));
@@ -238,9 +241,9 @@ export function buildReportView(report: ScanReport, copy: CopyShape, opts: Build
   });
 
   const instable = report.instable.map((f) => ({
-    question: f.evidenceKind === "recommendation" ? recommendationQuestionFor(f.factKey, f.subject, report.business.place, copy) : questionFor(f.factKey, f.subject, report.business.name, report.business.place),
+    question: f.evidenceKind === "recommendation" ? recommendationQuestionFor(f.factKey, f.subject, report.business.place, copy) : questionFor(f.factKey, f.subject, report.business.name, report.business.place, copy),
     engine: ENGINE_LABEL[f.engine],
-    value: f.evidenceKind === "recommendation" ? R.table.notNamed : wrongText(f),
+    value: f.evidenceKind === "recommendation" ? R.table.notNamed : wrongText(f, copy),
     note: copy.instableLine,
   }));
 
@@ -313,7 +316,7 @@ export function buildReportView(report: ScanReport, copy: CopyShape, opts: Build
           .filter((f) => f.verdict !== "not_found")
           .map((f) => {
             const src = sourceLabel(f, copy);
-            return `${src.label}: ${ENGINE_LABEL[f.engine]} ${copy.findingVerdict.wrong.toLowerCase()} “${f.evidenceKind === "recommendation" ? R.table.notNamed : wrongText(f)}”, het is ${correctText(f)}. ${f.verdict === "wrong" ? copy.fixPath[f.sourceType] : ""}`.trim();
+            return copy.report.selfStep(src.label, ENGINE_LABEL[f.engine], copy.findingVerdict.wrong.toLowerCase(), f.evidenceKind === "recommendation" ? R.table.notNamed : wrongText(f, copy), correctText(f, copy), f.verdict === "wrong" ? copy.fixPath[f.sourceType] : "");
           });
 
   return {

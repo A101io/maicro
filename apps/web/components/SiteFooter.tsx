@@ -26,6 +26,7 @@ export async function SiteFooter({ variant = "full", note, tagline }: { variant?
             </Link>
             {hasCookieChoice && <CookieSettingsButton label={copy.consent.settings} />}
             <span>{note ?? f.copyright}</span>
+            <LangSwitch />
           </span>
         </div>
       </footer>
@@ -38,7 +39,8 @@ export async function SiteFooter({ variant = "full", note, tagline }: { variant?
           <div className="flex flex-col items-start gap-2.5">
             <Logo size={22} />
             <span className="max-w-[28ch] text-[14px] leading-[1.5] text-muted">{tagline ?? f.tagline}</span>
-            {note ? <span className="text-[13px] text-muted">{note}</span> : <LangSwitch />}
+            {note && <span className="text-[13px] text-muted">{note}</span>}
+            <LangSwitch />
           </div>
           {f.columns.map((c) => (
             <div key={c.title} className="flex flex-col gap-2.5 text-[14px]">

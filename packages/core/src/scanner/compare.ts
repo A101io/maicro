@@ -78,7 +78,7 @@ export interface CompareResult {
   /** Wrong values below the threshold (instable: true). Same list as `instable`. */
   unstable: FindingCandidate[];
   instable: FindingCandidate[];
-  correct: { prompt: string; engine: Engine; value: string; sampleId: string; factKey: FactKey; subject: string | null }[];
+  correct: { prompt: string; engine: Engine; value: string; raw: string; sampleId: string; factKey: FactKey; subject: string | null }[];
   verdicts: Map<string, SampleVerdict>;
   /** (factKey|subject|engine[|rec]) keys that were actually checked in this run. */
   checkedKeys: Set<string>;
@@ -183,7 +183,7 @@ export function compare(samples: ComparableSample[], facts: Facts): CompareResul
       if (g.kind === "recommendation") {
         if (s.claim.value === PRESENT_VALUE) {
           const promptText = samples.find((x) => x.sampleId === s.sampleId)?.prompt.textNl ?? "";
-          correct.push({ prompt: promptText, engine: g.engine, value: "genoemd", sampleId: s.sampleId, factKey: g.factKey, subject: g.subject });
+          correct.push({ prompt: promptText, engine: g.engine, value: "genoemd", raw: PRESENT_VALUE, sampleId: s.sampleId, factKey: g.factKey, subject: g.subject });
         } else if (s.claim.value === ABSENT_VALUE) {
           wrong.push({ sampleId: s.sampleId, value: ABSENT_LABEL, citations: s.citations, quote: s.claim.rawQuote });
           wrongSamples.add(s.sampleId);
@@ -198,7 +198,7 @@ export function compare(samples: ComparableSample[], facts: Facts): CompareResul
       if (valuesMatch(g.factKey, s.claim.value, g.expected)) {
         if (!wrongSamples.has(s.sampleId)) {
           const promptText = samples.find((x) => x.sampleId === s.sampleId)?.prompt.textNl ?? "";
-          correct.push({ prompt: promptText, engine: g.engine, value: describeValue(g.factKey, s.claim.value, g.subject), sampleId: s.sampleId, factKey: g.factKey, subject: g.subject });
+          correct.push({ prompt: promptText, engine: g.engine, value: describeValue(g.factKey, s.claim.value, g.subject), raw: s.claim.value, sampleId: s.sampleId, factKey: g.factKey, subject: g.subject });
         }
       } else {
         wrong.push({ sampleId: s.sampleId, value: s.claim.value, citations: s.citations, quote: s.claim.rawQuote });

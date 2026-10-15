@@ -903,6 +903,9 @@ export const copy = {
       unclaimed: "niet geclaimd",
       unchecked: "nog niet gecontroleerd",
       known: "gevonden",
+      /** The two free-text statuses of the grey example report (lib/demo.ts). */
+      demoWebsite: "1 pagina, geen adres, geen diensten",
+      demoDirectories: "in 1 van 12, zonder diensten",
       rows: { website: "Eigen website", gbp: "Google-bedrijfsprofiel", bingApple: "Bing, Apple", directories: (n: number) => `Nederlandse gidsen (${n})`, kvk: "KvK" },
     },
     plan: {
@@ -1456,6 +1459,53 @@ export const copy = {
     grijs: "AI vindt (bijna) niets over je. Je bestaat niet in het antwoord.",
   },
   instable: "Instabiel",
+  /** Text the result page builds from a finding (apps/web/lib/questions.ts, report.ts); the stored values are language-free. */
+  report: {
+    days: ["maandag", "dinsdag", "woensdag", "donderdag", "vrijdag", "zaterdag", "zondag"],
+    /** "ChatGPT, Gemini en Perplexity" */
+    and: "en",
+    /** The question a customer would ask; `who` is "Bakkerij De Vries in Haarlem". */
+    question: {
+      existence: (who: string) => `Bestaat ${who} nog en is het open?`,
+      hoursDay: (who: string, day: string) => `Is ${who} op ${day} open?`,
+      hours: (who: string) => `Wat zijn de openingstijden van ${who}?`,
+      phone: (who: string) => `Wat is het telefoonnummer van ${who}?`,
+      address: (who: string) => `Wat is het adres van ${who}?`,
+      website: (who: string) => `Wat is de website van ${who}?`,
+      serviceSubject: (who: string, subject: string) => `Doet ${who} ook aan ${subject}?`,
+      service: (who: string) => `Welke diensten biedt ${who}?`,
+      priceSubject: (who: string, subject: string) => `Wat kost ${subject} bij ${who}?`,
+      price: (who: string) => `Wat zijn de prijzen van ${who}?`,
+      policySubject: (who: string, subject: string) => `Geldt bij ${who}: ${subject}?`,
+      policy: (who: string) => `Welke afspraken gelden bij ${who}?`,
+      payment: (who: string) => `Kan ik pinnen bij ${who}?`,
+      paymentWith: (who: string, subject: string) => `Kan ik met ${subject} betalen bij ${who}?`,
+      areaSubject: (who: string, subject: string) => `Komt ${who} ook in ${subject}?`,
+      area: (who: string) => `Waar werkt ${who}?`,
+      urgency: (who: string) => `Heeft ${who} een spoeddienst?`,
+      credentialSubject: (who: string, subject: string) => `Is ${who} erkend voor ${subject}?`,
+      credential: (who: string) => `Welke erkenningen heeft ${who}?`,
+      identitySubject: (who: string, subject: string) => `Is ${who} hetzelfde als ${subject}?`,
+      identity: (who: string) => `Is ${who} hetzelfde als het bedrijf met die naam elders?`,
+    },
+    /** A stored value in words. */
+    value: {
+      notFound: "niet gevonden",
+      absent: "niet genoemd",
+      present: "genoemd",
+      open: "open",
+      temporarilyClosed: "tijdelijk gesloten",
+      permanentlyClosed: "permanent gesloten",
+      closed: (day: string) => `${day} gesloten`.trim(),
+      range: (day: string, from: string, to: string) => `${day} ${from} tot ${to}`.trim(),
+      yes: "ja",
+      no: "nee",
+      otherBusiness: "een ander bedrijf",
+      sameBusiness: "hetzelfde bedrijf",
+    },
+    /** One "do it yourself" step: source, engine, what it said, what is true, the fix. */
+    selfStep: (source: string, engine: string, verdict: string, said: string, truth: string, fix: string) => `${source}: ${engine} ${verdict} “${said}”, het is ${truth}. ${fix}`.trim(),
+  },
   instableLine: "Dit antwoord klopte af en toe niet. Te zelden om te herstellen; we houden het in de gaten.",
   /** Recommendation questions: the business was not named where its facts say it belongs. */
   recommendation: {
