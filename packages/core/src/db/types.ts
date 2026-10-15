@@ -14,6 +14,7 @@ import type {
   FindingStatus,
   Fix,
   Prompt,
+  PromptPool,
   Sample,
   ScanKind,
   ScanRun,
@@ -140,6 +141,8 @@ export interface Db {
   // --- prompts ---
   listPrompts(businessId: string, opts?: { activeOnly?: boolean }): Promise<Prompt[]>;
   insertPrompts(businessId: string, prompts: PromptInput[]): Promise<Prompt[]>;
+  /** Move a prompt between the fixed set and the rotating bank. */
+  setPromptPool(id: string, pool: PromptPool): Promise<void>;
 
   // --- scan runs, samples, claims ---
   createScanRun(input: ScanRunCreate): Promise<ScanRun>;

@@ -5,7 +5,7 @@
  * (`transform: postgres.camel`), Dates are converted to ISO strings here.
  */
 import postgres, { type Sql } from "postgres";
-import type { BusinessStatus, Channel, Claim, Facts, Finding, FindingStatus, Fix, Prompt, Sample, ScanRun } from "../types";
+import type { BusinessStatus, Channel, Claim, Facts, Finding, FindingStatus, Fix, Prompt, PromptPool, Sample, ScanRun } from "../types";
 import { slugify } from "../scanner/normalize";
 import { backoffMs } from "./mem";
 import type {
@@ -82,6 +82,9 @@ const mapPrompt = (r: Row): Prompt => ({
   active: r.active as boolean,
   criterium: (r.criterium as Prompt["criterium"]) ?? null,
   kind: ((r.kind as string | null) ?? "about") as Prompt["kind"],
+  intent: (r.intent as Prompt["intent"]) ?? null,
+  pool: ((r.pool as string | null) ?? "core") as Prompt["pool"],
+  season: (r.season as Prompt["season"]) ?? null,
 });
 
 const mapScanRun = (row: Row): ScanRun => {
@@ -329,9 +332,13 @@ export class PgDb implements Db {
 
   async insertPrompts(businessId: string, prompts: PromptInput[]): Promise<Prompt[]> {
     if (!prompts.length) return [];
-    const rows = prompts.map((p) => ({ businessId, category: p.category, textNl: p.textNl, probes: p.probes, active: p.active ?? true, criterium: p.criterium ?? null, kind: p.kind ?? "about" }));
+    const rows = prompts.map((p) => ({ businessId, category: p.category, textNl: p.textNl, probes: p.probes, active: p.active ?? true, criterium: p.criterium ?? null, kind: p.kind ?? "about", intent: p.intent ?? null, pool: p.pool ?? "core", season: p.season ?? null }));
     const out = await this.sql`insert into prompt ${this.sql(rows)} returning *`;
     return out.map(mapPrompt);
+  }
+
+  async setPromptPool(id: string, pool: PromptPool): Promise<void> {
+    await this.sql`update prompt set pool = ${pool} where id = ${id}`;
   }
 
   // --- scan runs ---

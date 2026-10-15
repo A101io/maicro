@@ -151,7 +151,11 @@ describe.each(backends)("%s", (_name, makeDb) => {
     const b = await db.upsertBusiness({ name: "Loodgieter Bos", place: "Zwolle", sector: "loodgieters-installateurs" });
     expect((await db.getBusiness(b.id))?.sector).toBe("loodgieters-installateurs");
     const [p] = await db.insertPrompts(b.id, [{ category: "service", textNl: "Wie installeert warmtepompen in Zwolle?", probes: ["service:warmtepompen"], active: true, kind: "recommendation", criterium: 6 }]);
-    expect(p).toMatchObject({ kind: "recommendation", criterium: 6 });
+    expect(p).toMatchObject({ kind: "recommendation", criterium: 6, intent: null, pool: "core", season: null });
+    const [banked] = await db.insertPrompts(b.id, [{ category: "service", textNl: "Verwarming doet het niet, wie helpt in Zwolle?", probes: ["service:warmtepompen"], active: true, kind: "recommendation", criterium: 6, intent: "specialty", pool: "bank", season: "winter" }]);
+    expect(banked).toMatchObject({ intent: "specialty", pool: "bank", season: "winter" });
+    await db.setPromptPool(banked!.id, "core");
+    expect((await db.listPrompts(b.id)).find((x) => x.id === banked!.id)?.pool).toBe("core");
     const run = await db.createScanRun({ businessId: b.id, kind: "baseline", engines: ["chatgpt"], samplesPerPrompt: 3 });
     const base = { businessId: b.id, scanRunId: run.id, factKey: "service" as const, subject: "warmtepompen", engine: "chatgpt" as const, correctValue: "yes", frequency: 2, sampleCount: 3, sourceUrl: null, sourceType: "none" as const, evidenceBefore: null };
     const [about] = await db.upsertFindings([{ ...base, wrongValue: "no", criterium: 6 }]);

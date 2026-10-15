@@ -32,6 +32,14 @@ export interface SourceRowData {
   href?: string | null;
 }
 
+/** One recommendation question where the business was left out: who AI named instead and where it got that. */
+export interface NamedBlock {
+  question: string;
+  you: string;
+  others: { name: string; times: string }[];
+  sources: { host: string; href: string; times: string }[];
+}
+
 export interface PlanStep {
   tone: Stip;
   text: string;
@@ -53,6 +61,8 @@ export interface ReportView {
   /** Every answer, for the "Alle n antwoorden" list: question → engine → value. */
   all: { question: string; engine: string; value: string; tone: ReportRowData["tone"] }[];
   instable: { question: string; engine: string; value: string; note: string }[];
+  /** "Wie AI wel noemt": up to three recommendation questions where the business was left out. */
+  named: NamedBlock[];
   sources: SourceRowData[];
   sourcesTitle: string;
   sourcesBody: string;
@@ -71,6 +81,26 @@ interface QuestionGroup {
 
 function keyOf(factKey: string, subject: string | null | undefined, rec = false): string {
   return `${factKey}:${subject ?? ""}${rec ? ":rec" : ""}`;
+}
+
+/** The stored question behind a recommendation finding (core first), else the generic wording. */
+function recQuestion(report: ScanReport, factKey: string, subject: string | null): string {
+  const probe = subject ? `${factKey}:${subject}` : factKey;
+  const hit = (report.recommendations ?? []).find((r) => r.probe === probe && r.pool === "core") ?? (report.recommendations ?? []).find((r) => r.probe === probe);
+  return hit?.prompt ?? recommendationQuestionFor(factKey as never, subject, report.business.place);
+}
+
+function namedBlocks(report: ScanReport): NamedBlock[] {
+  const N = copy.result.named;
+  return (report.recommendations ?? [])
+    .filter((r) => r.pool === "core" && r.named < r.answers && r.others.length > 0)
+    .slice(0, 3)
+    .map((r) => ({
+      question: r.prompt,
+      you: N.you(r.named, r.answers),
+      others: r.others.slice(0, 3).map((o) => ({ name: o.name, times: N.times(o.answers) })),
+      sources: r.sources.slice(0, 3).map((s) => ({ host: s.host, href: s.url, times: N.times(s.answers) })),
+    }));
 }
 
 /** Group findings and correct answers into one row per question. */
@@ -92,7 +122,7 @@ function groupQuestions(report: ScanReport): QuestionGroup[] {
   for (const f of report.findings) {
     const rec = f.evidenceKind === "recommendation";
     const key = keyOf(f.factKey, f.subject, rec);
-    const q = rec ? recommendationQuestionFor(f.factKey, f.subject, place) : questionFor(f.factKey, f.subject, name, place);
+    const q = rec ? recQuestion(report, f.factKey, f.subject) : questionFor(f.factKey, f.subject, name, place);
     const g = groups.get(key) ?? get(key, q);
     g.findings.push(f);
   }
@@ -150,9 +180,10 @@ function rowFor(g: QuestionGroup): ReportRowData {
   return { question: g.question, said: value, tone: "groen", correct: T.ok, source: T.none };
 }
 
-function cardFor(f: Finding, business: ScanReport["business"]): AnswerCardData {
+function cardFor(f: Finding, report: ScanReport): AnswerCardData {
   const A = copy.result.answerCard;
-  const question = f.evidenceKind === "recommendation" ? recommendationQuestionFor(f.factKey, f.subject, business.place) : questionFor(f.factKey, f.subject, business.name, business.place);
+  const business = report.business;
+  const question = f.evidenceKind === "recommendation" ? recQuestion(report, f.factKey, f.subject) : questionFor(f.factKey, f.subject, business.name, business.place);
   const engine = ENGINE_LABEL[f.engine];
   const caption = A.frequency(f.frequency, f.sampleCount) + (f.sourceType === "other_entity" ? ` · ${A.otherEntity}` : "");
   if (f.verdict === "not_found") return { question, engine, highlight: A.notFoundQuote, highlightTone: "grijs", caption };
@@ -160,7 +191,7 @@ function cardFor(f: Finding, business: ScanReport["business"]): AnswerCardData {
   return { question, engine, highlight: wrongText(f), highlightTone: "rood", caption };
 }
 
-function pickCards(findings: Finding[], business: ScanReport["business"], grey: boolean): AnswerCardData[] {
+function pickCards(findings: Finding[], report: ScanReport, grey: boolean): AnswerCardData[] {
   const sorted = [...findings].sort((a, b) => severityRank[findingSeverity(a)] - severityRank[findingSeverity(b)] || b.frequency - a.frequency);
   if (!grey) {
     // One card per question: the worst finding of each question first.
@@ -169,7 +200,7 @@ function pickCards(findings: Finding[], business: ScanReport["business"], grey: 
       const k = keyOf(f.factKey, f.subject, f.evidenceKind === "recommendation");
       return seen.has(k) ? false : (seen.add(k), true);
     });
-    return picks.slice(0, 3).map((f) => cardFor(f, business));
+    return picks.slice(0, 3).map((f) => cardFor(f, report));
   }
   // Grey: show the three kinds of "AI kent je niet" when they exist: not named, not found, another business.
   const picks: Finding[] = [];
@@ -178,7 +209,7 @@ function pickCards(findings: Finding[], business: ScanReport["business"], grey: 
   add(sorted.find((f) => f.verdict === "not_found"));
   add(sorted.find((f) => f.sourceType === "other_entity"));
   for (const f of sorted) if (picks.length < 3) add(f);
-  return picks.slice(0, 3).map((f) => cardFor(f, business));
+  return picks.slice(0, 3).map((f) => cardFor(f, report));
 }
 
 export interface BuildViewOptions {
@@ -223,7 +254,7 @@ export function buildReportView(report: ScanReport, opts: BuildViewOptions = {})
     return { name: ENGINE_LABEL[e.engine], text: e.skipped ? R.hero.engineSkipped : R.hero.engineCounts(e.correct, Math.max(0, e.wrong - other), e.notFound, other) };
   });
 
-  const cards = pickCards(report.findings, report.business, grey);
+  const cards = pickCards(report.findings, report, grey);
 
   const all = groups.flatMap((g) => {
     const row = rowFor(g);
@@ -238,7 +269,7 @@ export function buildReportView(report: ScanReport, opts: BuildViewOptions = {})
   });
 
   const instable = report.instable.map((f) => ({
-    question: f.evidenceKind === "recommendation" ? recommendationQuestionFor(f.factKey, f.subject, report.business.place) : questionFor(f.factKey, f.subject, report.business.name, report.business.place),
+    question: f.evidenceKind === "recommendation" ? recQuestion(report, f.factKey, f.subject) : questionFor(f.factKey, f.subject, report.business.name, report.business.place),
     engine: ENGINE_LABEL[f.engine],
     value: f.evidenceKind === "recommendation" ? R.table.notNamed : wrongText(f),
     note: copy.instableLine,
@@ -331,6 +362,7 @@ export function buildReportView(report: ScanReport, opts: BuildViewOptions = {})
     rows,
     all,
     instable,
+    named: namedBlocks(report),
     sources,
     sourcesTitle: state === "grijs" ? R.sources.h2Grey : R.sources.h2,
     sourcesBody: state === "grijs" ? R.sources.bodyGrey : R.sources.body,

@@ -4,7 +4,7 @@
  * Semantics mirror PgDb (same matching rules for upserts, same job backoff).
  */
 import { randomUUID } from "node:crypto";
-import type { BusinessStatus, Channel, Claim, Facts, Finding, FindingStatus, Fix, Prompt, Sample, ScanRun } from "../types";
+import type { BusinessStatus, Channel, Claim, Facts, Finding, FindingStatus, Fix, Prompt, PromptPool, Sample, ScanRun } from "../types";
 import { slugify } from "../scanner/normalize";
 import type {
   BusinessRecord,
@@ -162,10 +162,15 @@ export class MemDb implements Db {
 
   async insertPrompts(businessId: string, prompts: PromptInput[]): Promise<Prompt[]> {
     return prompts.map((p) => {
-      const row: Prompt = { id: randomUUID(), businessId, category: p.category, textNl: p.textNl, probes: [...p.probes], active: p.active ?? true, criterium: p.criterium ?? null, kind: p.kind ?? "about" };
+      const row: Prompt = { id: randomUUID(), businessId, category: p.category, textNl: p.textNl, probes: [...p.probes], active: p.active ?? true, criterium: p.criterium ?? null, kind: p.kind ?? "about", intent: p.intent ?? null, pool: p.pool ?? "core", season: p.season ?? null };
       this.prompts.set(row.id, row);
       return { ...row };
     });
+  }
+
+  async setPromptPool(id: string, pool: PromptPool): Promise<void> {
+    const row = this.prompts.get(id);
+    if (row) row.pool = pool;
   }
 
   // --- scan runs ---
