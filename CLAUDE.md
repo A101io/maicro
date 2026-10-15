@@ -7,7 +7,7 @@ The product is **Vidalo** (from *videre*, to see). The code, copy (NL + EN), pac
 
 | Thing | Status |
 |---|---|
-| GitHub repo `A101io/maicro` | Julian renames to `vidalo`. Then, in the same change: `scripts/site/snapshot.mjs` base path `/maicro/` → `/vidalo/`, and the Pages URL becomes `a101io.github.io/vidalo` |
+| GitHub repo | **Renamed to `A101io/vidalo` on 15 Oct 2026** (GitHub redirects the old `maicro` URLs). `scripts/site/snapshot.mjs` uses `/vidalo/`; the Pages URL is `a101io.github.io/vidalo` |
 | Supabase project name `maicro` (ref `bbynmqvaxpjdnkaasutd`) | display name only, Julian renames in the dashboard; the ref never changes |
 | Committed migrations | keep the word Maicro in two comments; migrations are never edited |
 | `docs/design-g/*.html` | the original design boards, kept as they were |
@@ -16,9 +16,9 @@ The product is **Vidalo** (from *videre*, to see). The code, copy (NL + EN), pac
 
 ## Resuming work — read this first
 - **`SETUP_STATUS.md`** is the baseline status (v3); work rows that are not `✓verified`. **`docs/go-live-checklist.md`** is the launch gate, decisions for Julian first.
-- Hosting is **Cloudflare** (decided 13 Oct 2026): `apps/web` runs as the Worker `vidalo-web` (OpenNext, custom entry `apps/web/worker.ts`), `apps/worker` as `vidalo-worker` (`src/cloudflare.ts`: cron, the `vidalo-scans` queue, facts pages). Deploys are manual: `.github/workflows/deploy.yml` (`preview` = mock data, `production`). The static mock preview also still goes to https://a101io.github.io/maicro/ on every push to main.
+- Hosting is **Cloudflare** (decided 13 Oct 2026): `apps/web` runs as the Worker `vidalo-web` (OpenNext, custom entry `apps/web/worker.ts`), `apps/worker` as `vidalo-worker` (`src/cloudflare.ts`: cron, the `vidalo-scans` queue, facts pages). Deploys are manual: `.github/workflows/deploy.yml` (`preview` = mock data, `production`). The static mock preview also still goes to https://a101io.github.io/vidalo/ on every push to main.
 - Domains: `vidalo.io` is the site; `www.vidalo.io` is a Custom Domain on `vidalo-web` that 301s to it (`core/shared/canonical.ts`, used by `apps/web/worker.ts`). `workers_dev` stays on explicitly. **The first production deploy puts the product on vidalo.io**: there is no coming-soon gate yet, so that run is the launch (`docs/go-live-checklist.md`, Domains).
-- **Local clone** (14 Oct 2026): `/Users/a101/Vidalo`, GitHub repo still `A101io/maicro`. `pnpm` comes from corepack; it was put on the PATH with `corepack enable --install-directory ~/bin`, because the OpenNext build spawns `pnpm build` in a child shell and dies with `pnpm: command not found` when only `corepack pnpm` works.
+- **Local clone** (14 Oct 2026): `/Users/a101/Vidalo`, GitHub repo `A101io/vidalo` (renamed from `maicro` 15 Oct 2026). `pnpm` comes from corepack; it was put on the PATH with `corepack enable --install-directory ~/bin`, because the OpenNext build spawns `pnpm build` in a child shell and dies with `pnpm: command not found` when only `corepack pnpm` works.
 - **Env**: the root `.env` (gitignored) is read by the web app too (`apps/web/next.config.ts` loads it; a value already in the environment wins). Julian's file holds the Supabase URL + anon key and no `DATABASE_URL`, so sign-in is real and business data lives in memory. `.claude/launch.json` defines `vidalo-dev` (:3000) and `vidalo-worker` (:8787) for the browser tools.
 - **Cloudflare**: account `37c9615a0d7d9629154eca03d7de59a6`. The mock preview is live at https://vidalo-web-preview.julian-devriend.workers.dev (deployed by hand 14 Oct 2026 from a local `wrangler login`); queue `vidalo-scans` exists. Production has no Hyperdrive, no secrets, and its Custom Domain cannot bind until `vidalo.io` is a zone in the account.
 - Test the Cloudflare build locally: `pnpm --filter @vidalo/web cf:build`, then in `apps/web`: `npx wrangler dev -c wrangler.jsonc -c ../worker/wrangler.jsonc` with a `.dev.vars` (gitignored) per app, e.g. `VIDALO_MOCK=1`, `VIDALO_DB=pg`, `DATABASE_URL=` a local Postgres.

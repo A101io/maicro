@@ -9,7 +9,7 @@
  * What the copy does and does not do:
  * - Every page is saved flat (`/vak/horeca` → `vak-horeca.html`) and every
  *   internal link is rewritten to its file, so it works under any base path
- *   (`https://<org>.github.io/maicro/`).
+ *   (`https://<org>.github.io/vidalo/`).
  * - The app's JavaScript is stripped: nothing hydrates, nothing is saved.
  *   The scripts kept are public/motion.js (scroll motion) and public/ask.js
  *   (the "Vraag het zelf" simulator); like motion.js, they work
@@ -192,12 +192,12 @@ async function main() {
     .replace("{{SECTORS}}", sectors.map((f) => `      <a href="${f}">${title(pages.get(f))}</a>`).join("\n"));
   await writeFile(path.join(out, "pages.html"), index);
   const missing = await get("/deze-pagina-bestaat-niet");
-  await writeFile(path.join(out, "404.html"), rewrite(missing.html).replaceAll('href="', 'href="/maicro/').replaceAll('href="/maicro/http', 'href="http').replaceAll('href="/maicro/#', 'href="#'));
+  await writeFile(path.join(out, "404.html"), rewrite(missing.html).replaceAll('href="', 'href="/vidalo/').replaceAll('href="/vidalo/http', 'href="http').replaceAll('href="/vidalo/#', 'href="#'));
 
   // 5. No link may point at a file that is not there.
   const files = new Set(await readdir(out));
   const broken = [];
-  // 404.html is served at any path, so its links are absolute (/maicro/…) and checked by name instead.
+  // 404.html is served at any path, so its links are absolute (/vidalo/…) and checked by name instead.
   for (const f of [...files].filter((x) => x.endsWith(".html") && x !== "404.html")) {
     const html = await readFile(path.join(out, f), "utf8");
     for (const [, href] of html.matchAll(/(?:href|action)="([^"#?:]+\.html)/g)) if (!files.has(href)) broken.push(`${f} → ${href}`);

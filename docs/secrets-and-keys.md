@@ -4,7 +4,7 @@ Every secret: where it comes from, where it is set, how to prove it landed. When
 
 ## Deploying (GitHub → Cloudflare)
 
-Set on **both** GitHub environments of `A101io/maicro` (Settings → Environments → `preview` and `production` → Environment secrets; an environment does not inherit a repository secret of the same name):
+Set on **both** GitHub environments of `A101io/vidalo` (Settings → Environments → `preview` and `production` → Environment secrets; an environment does not inherit a repository secret of the same name):
 
 | Name | Comes from | Prove it |
 |---|---|---|
