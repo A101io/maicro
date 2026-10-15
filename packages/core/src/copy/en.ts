@@ -709,7 +709,7 @@ export const en: CopyShape = {
         },
         { h: "Statistics and marketing", p: ["We measure nothing at the moment and set no third-party cookies. Should we ever keep visitor statistics, we will ask your consent first, with a refuse button the same size as the accept button. Until then there is nothing to switch off."] },
         { h: "Other parties", p: ["When you pay you go to a Stripe page; Stripe's cookies and privacy policy apply there. When you connect your Google Business Profile you sign in with Google; Google's rules apply there. On vidalo.io itself we load no scripts, fonts or buttons from other parties."] },
-        { h: "Changing your choice", p: ["‘Cookie settings’ sits at the bottom of every page. It shows your choice and lets you change it. You can also delete cookies in your browser settings."] },
+        { h: "Changing your choice", p: ["As soon as there is something to choose, ‘Cookie settings’ sits at the bottom of every page. It shows your choice and lets you change it. You can also delete cookies in your browser settings."] },
       ],
     },
   },

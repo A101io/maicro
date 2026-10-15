@@ -3,6 +3,10 @@ import { getI18n } from "@/lib/i18n";
 import { LangSwitch } from "@/components/LangSwitch";
 import { Logo } from "@/components/Logo";
 import { CookieSettingsButton } from "@/components/CookieConsent";
+import { OPTIONAL_CATEGORIES } from "@/lib/consent";
+
+/** The "Cookie-instellingen" button only exists once there is a choice to change; until then the statement link is enough. */
+const hasCookieChoice = OPTIONAL_CATEGORIES.length > 0;
 
 /**
  * Footer. `variant="full"`: four columns + legal line (landing, result).
@@ -20,7 +24,7 @@ export async function SiteFooter({ variant = "full", note, tagline }: { variant?
             <Link href={href("/cookies")} className="nav-link">
               {copy.legal.cookies.title}
             </Link>
-            <CookieSettingsButton label={copy.consent.settings} />
+            {hasCookieChoice && <CookieSettingsButton label={copy.consent.settings} />}
             <span>{note ?? f.copyright}</span>
           </span>
         </div>
@@ -45,7 +49,7 @@ export async function SiteFooter({ variant = "full", note, tagline }: { variant?
                 </Link>
               ))}
               {/* The cookie choice must be changeable from a named button; it sits under the legal links. */}
-              {c.links.some((l) => l.href === "/cookies") && <CookieSettingsButton label={copy.consent.settings} />}
+              {hasCookieChoice && c.links.some((l) => l.href === "/cookies") && <CookieSettingsButton label={copy.consent.settings} />}
             </div>
           ))}
         </div>
