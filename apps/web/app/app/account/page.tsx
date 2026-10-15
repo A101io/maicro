@@ -6,7 +6,8 @@ import { requireOwner } from "@/lib/owner";
 import { loadDashboard } from "@/lib/reads";
 import { getScanReport } from "@/lib/core";
 import { dateShort, dateTime } from "@/lib/format";
-import { checkNow } from "../actions";
+import { checkNow, setLanguage } from "../actions";
+import { LANGS } from "@/lib/lang-paths";
 
 export const dynamic = "force-dynamic";
 
@@ -25,7 +26,8 @@ function Row({ label, children }: { label: string; children: React.ReactNode }) 
  * finished report with its colour, the recent checks, and the plan. Reading
  * only; every change has its own page (gegevens, domein, google, abonnement).
  */
-export default async function AccountPage() {
+export default async function AccountPage({ searchParams }: { searchParams: Promise<{ taal?: string }> }) {
+  const sp = await searchParams;
   const { business, session } = await requireOwner("/app/account");
   const data = await loadDashboard(business.id);
   const { copy, href } = await getI18n();
@@ -63,6 +65,22 @@ export default async function AccountPage() {
                 </Link>
               )}
             </span>
+          </Row>
+          <Row label={A.language.label}>
+            <form action={setLanguage} className="flex flex-wrap items-center gap-3">
+              <select name="language" defaultValue={business.language} aria-label={A.language.label} className="field-sm w-auto">
+                {LANGS.map((l) => (
+                  <option key={l} value={l}>
+                    {A.language.names[l]}
+                  </option>
+                ))}
+              </select>
+              <button type="submit" className="btn-sm">
+                {A.language.save}
+              </button>
+              {sp.taal === "opgeslagen" && <span className="text-[14px] text-groen">{A.language.saved}</span>}
+            </form>
+            <p className="mt-2 text-[13px] text-muted">{A.language.body}</p>
           </Row>
         </div>
       </section>

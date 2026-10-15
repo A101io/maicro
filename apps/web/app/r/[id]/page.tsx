@@ -2,6 +2,8 @@ import type { Metadata } from "next";
 import { notFound } from "next/navigation";
 import type { ScanReport } from "@vidalo/core/types";
 import { getCopy, getI18n } from "@/lib/i18n";
+import { getSession, getOwnedBusiness } from "@/lib/session";
+import { followPreferredLang } from "@/lib/preferred-lang";
 import type { CopyShape } from "@vidalo/core/copy";
 import { SiteHeader } from "@/components/SiteHeader";
 import { SiteFooter } from "@/components/SiteFooter";
@@ -51,6 +53,10 @@ export default async function ResultPage({ params, searchParams }: { params: Pro
   const loaded = await load(id, copy);
   if (!loaded) notFound();
   const { report, opts, demo } = loaded;
+  // The owner reads their own report in the language saved on the account; visitors get the URL's language.
+  const viewer = demo ? null : await getSession();
+  const owned = viewer ? await getOwnedBusiness(viewer) : null;
+  if (owned && owned.id === report.business.id) await followPreferredLang(owned);
   const v = buildReportView(report, copy, opts);
   const R = copy.result;
   const grey = v.state === "grijs";

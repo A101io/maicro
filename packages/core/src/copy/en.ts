@@ -1660,6 +1660,7 @@ export const en: CopyShape = {
     ownerNotVerified: "Not yet confirmed with Google",
     verifyNow: "Confirm with Google",
     logout: "Log out",
+    language: { label: "Language", names: { nl: "Nederlands", en: "English" }, save: "Save", saved: "Language saved.", body: "Your dashboard and your report follow this language. The NL · EN switch at the bottom of every page changes it too." },
     fields: { name: "Name", place: "Town", address: "Address", phone: "Phone", email: "Email", website: "Website", kvk: "KvK", factsHost: "Facts page", factsVersion: "Details" },
     empty: "not filled in yet",
     noFactsHost: "no domain yet",

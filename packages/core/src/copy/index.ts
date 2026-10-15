@@ -1685,6 +1685,8 @@ export const copy = {
     ownerNotVerified: "Nog niet bevestigd met Google",
     verifyNow: "Bevestig met Google",
     logout: "Uitloggen",
+    /** The language row: the dashboard, the report and the e-mails follow it. */
+    language: { label: "Taal", names: { nl: "Nederlands", en: "English" }, save: "Opslaan", saved: "Taal opgeslagen.", body: "Je dashboard en je rapport volgen deze taal. De NL · EN-knop onderaan elke pagina past hem ook aan." },
     fields: { name: "Naam", place: "Plaats", address: "Adres", phone: "Telefoon", email: "E-mail", website: "Website", kvk: "KvK", factsHost: "Feitenpagina", factsVersion: "Gegevens" },
     empty: "nog niet ingevuld",
     noFactsHost: "nog geen domein",

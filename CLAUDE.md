@@ -49,6 +49,7 @@ Short. One action at a time. Real strings, not placeholders. End with one concre
 - **Launch gate**: `core/shared/gate.ts` + `apps/web/middleware.ts`; env `VIDALO_COMING_SOON`, `VIDALO_PREVIEW_BUTTON`, `VIDALO_PREVIEW_KEY`; page `/binnenkort` (EN `/coming-soon`), `/api/preview`, `components/PreviewBar.tsx`. `.claude/launch.json` has `vidalo-dev` (real auth), `vidalo-dev-gate` and `vidalo-dev-mock` (no Supabase keys → mock sign-in as `eigenaar@bakkerijdevries.nl`, gate on).
 - **Cookies**: `/cookies` statement (inventory in `copy.legal.cookies`), `lib/consent.ts`, `components/CookieConsent.tsx`; add a category to `OPTIONAL_CATEGORIES` and the statement's table in the same change.
 - **Account**: `/app/account`. **Checkout**: terms consent, B2B custom text, btw-nummer, return URLs from `lib/origin.ts` (`core/shared/origin.ts`); needs the Terms and Privacy URLs on the Stripe account. **Assistant**: `core/chat` (knowledge from the copy, rules, FAQ fallback, `modelAnswer`), `/api/chat`, `components/ChatWidget.tsx`.
+- **Language preference** (15 Oct 2026): `business.language` (`0006_language.sql`, applied on the hosted project). Set on `/app/account` or by the NL · EN switch while signed in (`/api/lang`). `lib/preferred-lang.ts` sends a signed-in owner to their language on every `/app` page and on their own report. The report itself is fully bilingual: question lines and value wording come from `copy.report`; `ScanReport.correct[].raw` carries the normalised value so the page words it (older reports fall back to the stored Dutch). E-mails are still Dutch-only.
 - **Content**: `docs/content-check.md` is the fact-check; every number on the site carries a verified source as of 14 Oct. Free reports expire after 30 days (`app/r/[id]/page.tsx`). Copilot is a stub (`scanner/engines/copilot.ts`): keep it out of free-check copy until the adapter ships.
 
 ## Read first
@@ -77,7 +78,7 @@ Not built: Bing/Apple/form-directory adapters (fall to operator queue), Copilot 
 
 ## Supabase
 Project `maicro`, ref **`bbynmqvaxpjdnkaasutd`**, eu-west-1 (Ireland), org A101BV — https://bbynmqvaxpjdnkaasutd.supabase.co.
-Migrations 0001–0005 are applied (ledger: `supabase_migrations.schema_migrations`). Every public table has RLS; the four internal tables (`prompt`, `sample`, `claim`, `job`) have no policies, so only the service role / table owner reach them.
+Migrations 0001–0006 are applied (ledger: `supabase_migrations.schema_migrations`). Every public table has RLS; the four internal tables (`prompt`, `sample`, `claim`, `job`) have no policies, so only the service role / table owner reach them.
 The same org holds **`hlelpndtejajipqwjwrf` (Sitty)** and **`muuijbupsnhascqzfbin` (Sonable)** — check the ref on every call; the names give no warning.
 Not done yet: `DATABASE_URL` / service-role key in a secret store, and a run of the pipeline against this project.
 

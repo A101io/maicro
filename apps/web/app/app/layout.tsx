@@ -2,11 +2,13 @@ import Link from "next/link";
 import { getI18n } from "@/lib/i18n";
 import { Wordmark } from "@/components/SiteHeader";
 import { requireOwner } from "@/lib/owner";
+import { followPreferredLang } from "@/lib/preferred-lang";
 
 export const dynamic = "force-dynamic";
 
 export default async function AppLayout({ children }: { children: React.ReactNode }) {
   const { business, session } = await requireOwner();
+  await followPreferredLang(business);
   const { copy, href } = await getI18n();
   const d = copy.dashboard;
   const links = [
