@@ -4,7 +4,7 @@
  * Semantics mirror PgDb (same matching rules for upserts, same job backoff).
  */
 import { randomUUID } from "node:crypto";
-import type { BusinessStatus, Channel, Claim, Facts, Finding, FindingStatus, Fix, Prompt, Sample, ScanRun } from "../types";
+import type { BusinessStatus, Channel, Claim, Facts, Finding, FindingStatus, Fix, Prompt, PromptPool, Sample, ScanRun } from "../types";
 import { slugify } from "../scanner/normalize";
 import type {
   BusinessRecord,
@@ -15,6 +15,8 @@ import type {
   EventRow,
   FindingInput,
   FixInput,
+  GoogleIndexState,
+  GoogleIndexUpsert,
   Job,
   JobKind,
   PromptInput,
@@ -39,6 +41,7 @@ export class MemDb implements Db {
   events: EventRow[] = [];
   channels = new Map<string, Channel>();
   fixes = new Map<string, Fix>();
+  googleIndex = new Map<string, GoogleIndexState>();
   private jobSeq = 1;
   private eventSeq = 1;
 
@@ -55,6 +58,7 @@ export class MemDb implements Db {
     this.events = [];
     this.channels.clear();
     this.fixes.clear();
+    this.googleIndex.clear();
   }
 
   // --- business ---
@@ -159,10 +163,15 @@ export class MemDb implements Db {
 
   async insertPrompts(businessId: string, prompts: PromptInput[]): Promise<Prompt[]> {
     return prompts.map((p) => {
-      const row: Prompt = { id: randomUUID(), businessId, category: p.category, textNl: p.textNl, probes: [...p.probes], active: p.active ?? true, criterium: p.criterium ?? null, kind: p.kind ?? "about" };
+      const row: Prompt = { id: randomUUID(), businessId, category: p.category, textNl: p.textNl, probes: [...p.probes], active: p.active ?? true, criterium: p.criterium ?? null, kind: p.kind ?? "about", intent: p.intent ?? null, pool: p.pool ?? "core", season: p.season ?? null };
       this.prompts.set(row.id, row);
       return { ...row };
     });
+  }
+
+  async setPromptPool(id: string, pool: PromptPool): Promise<void> {
+    const row = this.prompts.get(id);
+    if (row) row.pool = pool;
   }
 
   // --- scan runs ---
@@ -438,6 +447,21 @@ export class MemDb implements Db {
 
   async listDueRechecks(now: Date = new Date()): Promise<Fix[]> {
     return [...this.fixes.values()].filter((f) => f.resolvedAt === null && f.recheckAt !== null && new Date(f.recheckAt) <= now);
+  }
+
+  // --- Google Search Console state ---
+  async getGoogleIndex(businessId: string): Promise<GoogleIndexState | null> {
+    const row = this.googleIndex.get(businessId);
+    return row ? structuredClone(row) : null;
+  }
+
+  async upsertGoogleIndex(input: GoogleIndexUpsert): Promise<GoogleIndexState> {
+    const existing = this.googleIndex.get(input.businessId);
+    const empty: GoogleIndexState = { businessId: input.businessId, host: input.host, token: null, verifiedAt: null, addedAt: null, sitemapAt: null, lastAttemptAt: null, lastError: null, inspection: null, indexedAt: null, updatedAt: "" };
+    const defined = Object.fromEntries(Object.entries(input).filter(([, v]) => v !== undefined));
+    const row: GoogleIndexState = { ...(existing ?? empty), ...defined, updatedAt: new Date().toISOString() };
+    this.googleIndex.set(row.businessId, row);
+    return structuredClone(row);
   }
 
   async close(): Promise<void> {}
