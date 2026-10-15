@@ -7,6 +7,7 @@
     ".": "./src/index.ts",
     "./types": "./src/types.ts",
     "./criteria": "./src/criteria.ts",
+    "./progress": "./src/progress.ts",
     "./db": "./src/db/index.ts",
     "./scanner": "./src/scanner/index.ts",
     "./publisher": "./src/publisher/index.ts",
