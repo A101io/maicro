@@ -5,11 +5,12 @@
  */
 import { randomBytes } from "node:crypto";
 import { db as moduleDb, MemDb, type Db } from "@vidalo/core/db";
-import { resolveBusiness as coreResolveBusiness, draftProvisionalFacts, prepareBusiness as corePrepareBusiness, buildReport, SCAN_DEFAULTS, runScanWithProgress, persistScanState, readScanState, businessIdFromToken, type BusinessCandidate, type ScanProgressStep, type ScanJobState } from "@vidalo/core/scanner";
+import { resolveBusiness as coreResolveBusiness, draftProvisionalFacts, prepareBusiness as corePrepareBusiness, buildReport, buildSnapshot, SCAN_DEFAULTS, runScanWithProgress, persistScanState, readScanState, businessIdFromToken, type BusinessCandidate, type ScanProgressStep, type ScanJobState } from "@vidalo/core/scanner";
 import { renderFactsPage } from "@vidalo/core/publisher";
 import { getDb as scopedDb, setBusinessStatus, setDb } from "@vidalo/core/shared";
 import { ENGINE_LABEL, type BusinessStatus, type Engine, type ScanKind, type ScanReport } from "@vidalo/core/types";
 import type { CopyShape } from "@vidalo/core/copy";
+import { PROGRESS_SCAN_KINDS, type ScanSnapshot } from "@vidalo/core/progress";
 import { env } from "./env";
 import { seedDemo } from "./demo";
 
@@ -161,4 +162,23 @@ export async function latestScanReport(businessIdOrSlug: string): Promise<ScanRe
   const runs = await d.listScanRuns(business.id, 20);
   const done = runs.find((r) => r.status === "done");
   return done ? getScanReport(done.id) : null;
+}
+
+/** Most finished full scans the progress view reads (two years of monthly checks plus extras). */
+export const PROGRESS_MAX_SCANS = 30;
+
+/**
+ * Finished scans of a business as progress snapshots, oldest first. Rechecks
+ * are left out: they ask only the questions under repair. Built a few at a
+ * time so one dashboard load does not open a connection per scan at once.
+ */
+export async function loadSnapshots(businessId: string): Promise<ScanSnapshot[]> {
+  const d = await ready();
+  const runs = (await d.listScanRuns(businessId, PROGRESS_MAX_SCANS * 2)).filter((r) => r.status === "done" && PROGRESS_SCAN_KINDS.includes(r.kind)).slice(0, PROGRESS_MAX_SCANS);
+  const out: ScanSnapshot[] = [];
+  for (let i = 0; i < runs.length; i += 4) {
+    const batch = await Promise.all(runs.slice(i, i + 4).map((r) => buildSnapshot(r.id, d).catch(() => null)));
+    for (const s of batch) if (s) out.push(s);
+  }
+  return out.sort((a, b) => a.checkedAt.localeCompare(b.checkedAt));
 }

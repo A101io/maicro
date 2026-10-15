@@ -13,6 +13,7 @@ export default async function AppLayout({ children }: { children: React.ReactNod
   const d = copy.dashboard;
   const links = [
     { href: "/app", label: d.h1 },
+    { href: "/app/voortgang", label: copy.progress.nav },
     { href: "/app/gegevens", label: d.setupSteps.facts },
     { href: "/app/domein", label: d.setupSteps.domain },
     { href: "/app/google", label: d.setupSteps.google },

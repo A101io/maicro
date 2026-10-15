@@ -19,6 +19,7 @@ import { ENGINE_TIMEOUT_MS } from "./engines/types";
 import { defaultExtractMode, extractClaims } from "./extract";
 import { normalizeWebsite } from "./normalize";
 import { createLimiter, retry, withTimeout } from "./util";
+import { cellsFromSamples, type ScanSnapshot } from "../progress";
 
 export * from "./compare";
 export * from "./attribute";
@@ -313,6 +314,41 @@ function assembleReport(args: {
     findingsBySeverity: groupBySeverity(findings),
     instable,
     criteriaNotFound,
+  };
+}
+
+/**
+ * A stored scan as a progress snapshot (the owner's "Voortgang" view): per
+ * (question, AI system) the verdict most samples carried, and the colour of
+ * the dot. The colour uses the findings the comparison produced for this run
+ * itself, so an older run keeps its own colour after later scans moved the
+ * finding rows on. Judged against the current facts, like buildReport.
+ */
+export async function buildSnapshot(scanRunId: string, dbOverride?: Db): Promise<ScanSnapshot | null> {
+  const db = dbOverride ?? getDb();
+  const scanRun = await db.getScanRun(scanRunId);
+  if (!scanRun || scanRun.status !== "done") return null;
+  const facts = await db.latestFacts(scanRun.businessId);
+  if (!facts) return null;
+  const samples = await db.listSamples(scanRunId);
+  const claims = await db.listClaims(samples.map((s) => s.id));
+  const prompts = await db.listPrompts(scanRun.businessId);
+  const promptById = new Map(prompts.map((p) => [p.id, p]));
+  const comparable: ComparableSample[] = samples
+    .filter((s) => promptById.has(s.promptId))
+    .map((s) => ({ sampleId: s.id, engine: s.engine, prompt: promptById.get(s.promptId)!, claims: claims.filter((c) => c.sampleId === s.id), citations: s.citations }));
+  const result = compare(comparable, facts);
+  const unavailable = new Set(scanRun.engines.filter((e) => !samples.some((s) => s.engine === e)));
+  const ownFindings = result.findings.map((c) => ({ ...c, status: "open" as const })) as unknown as Finding[];
+  const { stip, engineStips } = computeStip({ engines: scanRun.engines, samples, verdicts: result.verdicts, findings: ownFindings, instable: result.instable, criteriaNotFound: result.criteriaNotFound, unavailable });
+  return {
+    scanRunId,
+    kind: scanRun.kind,
+    checkedAt: scanRun.finishedAt ?? scanRun.startedAt,
+    engines: scanRun.engines.filter((e) => !unavailable.has(e)),
+    stip,
+    engineStips: engineStips.filter((e) => !unavailable.has(e.engine)),
+    cells: cellsFromSamples(samples, result.verdicts, prompts),
   };
 }
 
