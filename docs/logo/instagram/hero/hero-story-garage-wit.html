@@ -1,0 +1,91 @@
+<!doctype html>
+<html lang="nl">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=1080">
+<title>Vidalo story: hero, garage, wit</title>
+<!-- Built by docs/logo/instagram/build.py. 1080 x 1920, one loop. Record it in Chrome with the device toolbar at 1080 x 1920. -->
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap">
+<style>
+html,body{margin:0;background:#E7E3DC}
+.page{position:relative;width:1080px;height:1920px;margin:0 auto;overflow:hidden;background:#FFFFFF;color:#111827;font-family:'Plus Jakarta Sans',system-ui,sans-serif;--t:1}
+.copy{position:absolute;left:96px;right:96px;font-weight:800;line-height:1.2;letter-spacing:-1.5px;color:#111827}
+.copy span{display:block;margin-top:0.45em;font-weight:500;line-height:1.35;letter-spacing:0;color:#374151}
+.site{position:absolute;left:96px;font-size:38px;font-weight:600;color:#2563EB}
+
+.viz, .viz *{box-sizing:border-box}
+.viz{position:relative;aspect-ratio:560/480;container-type:inline-size;overflow:hidden;border-radius:2.2cqw;
+  background:radial-gradient(circle at 1px 1px, rgb(17 24 39 / 0.07) 1px, transparent 0) 0 0 / 22px 22px, var(--viz-panel);
+  font-size:2.45cqw;line-height:1.3;color:#111827}
+.viz-svg,.viz-stage{position:absolute;inset:0;width:100%;height:100%}
+.viz-stage>*{position:absolute}
+.viz-q{background:#111827;color:#fff;font-weight:600;padding:.75em 1em;border-radius:1.1em 1.1em .3em 1.1em}
+.viz-src{height:12.5%;display:flex;flex-direction:column;justify-content:center;gap:.15em;padding:0 .85em;background:#fff;border:1.5px solid #e7e3dc;border-radius:.9em}
+.viz-src-name{font-weight:700}
+.viz-src-meta,.viz-swap>*{font-size:.86em;color:#6b7280;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.viz-src-bad{border-color:#86efac;background:#f0fdf4}
+.viz-swap{display:grid}.viz-swap>*{grid-area:1/1}
+.viz-before{opacity:0;color:#b91c1c}.viz-after{color:#166534;font-weight:600}
+.viz-card{background:#fff;border:1.5px solid #e7e3dc;border-radius:1.1em;padding:.85em 1em 1em;box-shadow:0 18px 40px -28px rgb(17 24 39 / .45)}
+.viz-card-head{display:flex;align-items:center;justify-content:space-between;font-size:.86em;font-weight:700;color:#6b7280}
+.viz-stip{width:.95em;height:.95em;border-radius:9999px;background:#2f855a}
+.viz-answer{display:grid;align-items:center;min-height:2.8em;margin-top:.35em;font-size:1.12em;font-weight:700}
+.viz-answer>*{grid-area:1/1}
+.viz-typing,.viz-wrong{opacity:0}
+.viz-typing{display:inline-flex;gap:.3em}.viz-typing i{width:.45em;height:.45em;border-radius:9999px;background:#9ca3af}
+.viz-wrong{color:#e11d48}.viz-right{color:#166534}
+.viz-vidalo{display:flex;align-items:center;gap:.75em;padding:.6em .9em;background:#fff;border:1.5px solid #2563eb;border-radius:9999px;font-size:.92em}
+.viz-vidalo-mark{font-weight:800;letter-spacing:-.02em;color:#2563eb}
+.viz-swap-3>*{color:#111827;font-size:1em;opacity:0}.viz-swap-3>:last-child{opacity:1}
+.viz-repair{stroke-dasharray:none}
+@media (prefers-reduced-motion: reduce){.viz-particles{display:none}.viz-bad-line{stroke:#2f855a}}
+@media (prefers-reduced-motion: no-preference){
+  .viz-repair{stroke-dasharray:1}
+  .viz-svg,.viz-stage{animation:viz-cycle 12s linear infinite}
+  .viz-q{animation:viz-q 12s cubic-bezier(.22,.7,.2,1) infinite}
+  .viz-typing{animation:viz-typing 12s linear infinite}
+  .viz-typing i{animation:viz-blink .9s ease-in-out infinite}
+  .viz-typing i:nth-child(2){animation-delay:.15s}.viz-typing i:nth-child(3){animation-delay:.3s}
+  .viz-wrong{animation:viz-wrong 12s cubic-bezier(.22,.7,.2,1) infinite}
+  .viz-right{animation:viz-right 12s cubic-bezier(.22,.7,.2,1) infinite}
+  .viz-stip{animation:viz-stip 12s linear infinite}
+  .viz-src-bad{animation:viz-bad 12s linear infinite}
+  .viz-before{animation:viz-before 12s linear infinite}.viz-after{animation:viz-after 12s linear infinite}
+  .viz-swap-3>:nth-child(1){animation:viz-m1 12s linear infinite}
+  .viz-swap-3>:nth-child(2){animation:viz-m2 12s linear infinite}
+  .viz-swap-3>:nth-child(3){animation:viz-m3 12s linear infinite}
+  .viz-vidalo{animation:viz-vidalo 12s linear infinite}
+  @keyframes viz-cycle{0%{opacity:0}3%{opacity:1}95%{opacity:1}100%{opacity:0}}
+  @keyframes viz-q{0%,1%{opacity:0;translate:0 10px}7%,100%{opacity:1;translate:none}}
+  @keyframes viz-typing{0%,9%{opacity:0}11%,20%{opacity:1}22%,100%{opacity:0}}
+  @keyframes viz-blink{0%,100%{opacity:.3}50%{opacity:1}}
+  @keyframes viz-wrong{0%,21%{opacity:0;translate:0 6px}25%,58%{opacity:1;translate:none}62%,100%{opacity:0;translate:0 -6px}}
+  @keyframes viz-right{0%,62%{opacity:0;translate:0 6px}67%,100%{opacity:1;translate:none}}
+  @keyframes viz-stip{0%,21%{background:#9ca3af;box-shadow:0 0 0 0 rgb(47 133 90 / 0)}24%,62%{background:#e11d48;box-shadow:0 0 0 0 rgb(47 133 90 / 0)}64%{background:#2f855a;box-shadow:0 0 0 0 rgb(47 133 90 / .55)}74%,100%{background:#2f855a;box-shadow:0 0 0 .9em rgb(47 133 90 / 0)}}
+  @keyframes viz-bad{0%,54%{border-color:#fca5a5;background:#fef2f2}57%,100%{border-color:#86efac;background:#f0fdf4}}
+  @keyframes viz-before{0%,54%{opacity:1}57%,100%{opacity:0}}
+  @keyframes viz-after{0%,54%{opacity:0}57%,100%{opacity:1}}
+  @keyframes viz-m1{0%,40%{opacity:1}42%,100%{opacity:0}}
+  @keyframes viz-m2{0%,41%{opacity:0}43%,57%{opacity:1}59%,100%{opacity:0}}
+  @keyframes viz-m3{0%,58%{opacity:0}60%,100%{opacity:1}}
+  @keyframes viz-vidalo{0%,40%{box-shadow:0 0 0 0 rgb(37 99 235 / 0)}43%{box-shadow:0 0 0 0 rgb(37 99 235 / .4)}52%,100%{box-shadow:0 0 0 .8em rgb(37 99 235 / 0)}}
+}
+.page{--viz-panel:#F4F1EC}
+.viz{position:absolute;left:50%;top:330px;width:960px;translate:-50% 0}
+.copy{top:1290px;font-size:60px} .copy span{font-size:40px} .site{bottom:168px}
+</style>
+</head>
+<body>
+<div class="page">
+<div class="viz" role="img" aria-label="Zo werkt het: een AI bouwt een antwoord uit bronnen. Eén verouderde bron maakte het antwoord fout. Vidalo herstelt die bron en het antwoord klopt weer."><svg class="viz-svg" viewBox="0 0 560 480" aria-hidden="true"><defs><path id="viz-line-0" d="M200 118 C 230 118, 222 245, 252 245"></path><path id="viz-line-1" d="M200 203 C 230 203, 222 245, 252 245"></path><path id="viz-line-2" d="M200 288 C 230 288, 222 245, 252 245"></path><path id="viz-line-3" d="M200 373 C 230 373, 222 245, 252 245"></path></defs><path d="M200 118 C 230 118, 222 245, 252 245" fill="none" stroke="#D1D5DB" stroke-width="1.5" stroke-linecap="round"></path><path d="M200 203 C 230 203, 222 245, 252 245" fill="none" stroke="#D1D5DB" stroke-width="1.5" stroke-linecap="round"></path><path class="viz-bad-line" d="M200 288 C 230 288, 222 245, 252 245" fill="none" stroke="#E11D48" stroke-width="2" stroke-linecap="round"><animate attributeName="stroke" dur="12s" repeatCount="indefinite" values="#E11D48;#E11D48;#2F855A;#2F855A" keyTimes="0;0.54;0.57;1"/></path><path d="M200 373 C 230 373, 222 245, 252 245" fill="none" stroke="#D1D5DB" stroke-width="1.5" stroke-linecap="round"></path><path class="viz-repair" d="M262 418 C 228 418, 236 288, 200 288" pathLength="1" fill="none" stroke="#2563EB" stroke-width="2" stroke-dasharray="1" stroke-linecap="round"><animate attributeName="stroke-dashoffset" dur="12s" repeatCount="indefinite" values="1;1;0;0;1" keyTimes="0;0.42;0.52;0.9;1"/></path><g class="viz-particles"><circle r="3" fill="#9CA3AF"><animateMotion dur="1.60s" begin="0.00s" repeatCount="indefinite" keyPoints="0;1" keyTimes="0;1" calcMode="linear"><mpath href="#viz-line-0"/></animateMotion><animate attributeName="opacity" dur="1.60s" begin="0.00s" repeatCount="indefinite" values="0;1;1;0" keyTimes="0;0.15;0.85;1"/></circle><circle r="3" fill="#9CA3AF"><animateMotion dur="1.60s" begin="0.55s" repeatCount="indefinite" keyPoints="0;1" keyTimes="0;1" calcMode="linear"><mpath href="#viz-line-0"/></animateMotion><animate attributeName="opacity" dur="1.60s" begin="0.55s" repeatCount="indefinite" values="0;1;1;0" keyTimes="0;0.15;0.85;1"/></circle><circle r="3" fill="#9CA3AF"><animateMotion dur="1.60s" begin="1.10s" repeatCount="indefinite" keyPoints="0;1" keyTimes="0;1" calcMode="linear"><mpath href="#viz-line-0"/></animateMotion><animate attributeName="opacity" dur="1.60s" begin="1.10s" repeatCount="indefinite" values="0;1;1;0" keyTimes="0;0.15;0.85;1"/></circle><circle r="3" fill="#9CA3AF"><animateMotion dur="1.75s" begin="0.20s" repeatCount="indefinite" keyPoints="0;1" keyTimes="0;1" calcMode="linear"><mpath href="#viz-line-1"/></animateMotion><animate attributeName="opacity" dur="1.75s" begin="0.20s" repeatCount="indefinite" values="0;1;1;0" keyTimes="0;0.15;0.85;1"/></circle><circle r="3" fill="#9CA3AF"><animateMotion dur="1.75s" begin="0.75s" repeatCount="indefinite" keyPoints="0;1" keyTimes="0;1" calcMode="linear"><mpath href="#viz-line-1"/></animateMotion><animate attributeName="opacity" dur="1.75s" begin="0.75s" repeatCount="indefinite" values="0;1;1;0" keyTimes="0;0.15;0.85;1"/></circle><circle r="3" fill="#9CA3AF"><animateMotion dur="1.75s" begin="1.30s" repeatCount="indefinite" keyPoints="0;1" keyTimes="0;1" calcMode="linear"><mpath href="#viz-line-1"/></animateMotion><animate attributeName="opacity" dur="1.75s" begin="1.30s" repeatCount="indefinite" values="0;1;1;0" keyTimes="0;0.15;0.85;1"/></circle><circle r="4" fill="#E11D48"><animateMotion dur="1.90s" begin="0.40s" repeatCount="indefinite" keyPoints="0;1" keyTimes="0;1" calcMode="linear"><mpath href="#viz-line-2"/></animateMotion><animate attributeName="fill" dur="12s" repeatCount="indefinite" values="#E11D48;#E11D48;#2F855A;#2F855A" keyTimes="0;0.55;0.57;1"/><animate attributeName="opacity" dur="1.90s" begin="0.40s" repeatCount="indefinite" values="0;1;1;0" keyTimes="0;0.15;0.85;1"/></circle><circle r="4" fill="#E11D48"><animateMotion dur="1.90s" begin="0.95s" repeatCount="indefinite" keyPoints="0;1" keyTimes="0;1" calcMode="linear"><mpath href="#viz-line-2"/></animateMotion><animate attributeName="fill" dur="12s" repeatCount="indefinite" values="#E11D48;#E11D48;#2F855A;#2F855A" keyTimes="0;0.55;0.57;1"/><animate attributeName="opacity" dur="1.90s" begin="0.95s" repeatCount="indefinite" values="0;1;1;0" keyTimes="0;0.15;0.85;1"/></circle><circle r="4" fill="#E11D48"><animateMotion dur="1.90s" begin="1.50s" repeatCount="indefinite" keyPoints="0;1" keyTimes="0;1" calcMode="linear"><mpath href="#viz-line-2"/></animateMotion><animate attributeName="fill" dur="12s" repeatCount="indefinite" values="#E11D48;#E11D48;#2F855A;#2F855A" keyTimes="0;0.55;0.57;1"/><animate attributeName="opacity" dur="1.90s" begin="1.50s" repeatCount="indefinite" values="0;1;1;0" keyTimes="0;0.15;0.85;1"/></circle><circle r="3" fill="#9CA3AF"><animateMotion dur="2.05s" begin="0.60s" repeatCount="indefinite" keyPoints="0;1" keyTimes="0;1" calcMode="linear"><mpath href="#viz-line-3"/></animateMotion><animate attributeName="opacity" dur="2.05s" begin="0.60s" repeatCount="indefinite" values="0;1;1;0" keyTimes="0;0.15;0.85;1"/></circle><circle r="3" fill="#9CA3AF"><animateMotion dur="2.05s" begin="1.15s" repeatCount="indefinite" keyPoints="0;1" keyTimes="0;1" calcMode="linear"><mpath href="#viz-line-3"/></animateMotion><animate attributeName="opacity" dur="2.05s" begin="1.15s" repeatCount="indefinite" values="0;1;1;0" keyTimes="0;0.15;0.85;1"/></circle><circle r="3" fill="#9CA3AF"><animateMotion dur="2.05s" begin="1.70s" repeatCount="indefinite" keyPoints="0;1" keyTimes="0;1" calcMode="linear"><mpath href="#viz-line-3"/></animateMotion><animate attributeName="opacity" dur="2.05s" begin="1.70s" repeatCount="indefinite" values="0;1;1;0" keyTimes="0;0.15;0.85;1"/></circle></g><circle class="viz-particles" cx="200" cy="288" r="6" fill="none" stroke="#2563EB" stroke-width="2" opacity="0"><animate attributeName="r" dur="12s" repeatCount="indefinite" values="6;6;22;22" keyTimes="0;0.52;0.6;1"/><animate attributeName="opacity" dur="12s" repeatCount="indefinite" values="0;0;0.8;0;0" keyTimes="0;0.52;0.53;0.62;1"/></circle></svg><div class="viz-stage" aria-hidden="true"><div class="viz-q" style="left:45.0000%;top:5.8333%;width:52.8571%">Doet Garage Jansen APK-keuringen?</div><div class="viz-src" style="left:2.1429%;top:18.3333%;width:33.5714%"><span class="viz-src-name">Eigen website</span><span class="viz-src-meta">APK zonder afspraak</span></div><div class="viz-src" style="left:2.1429%;top:36.0417%;width:33.5714%"><span class="viz-src-name">Google-profiel</span><span class="viz-src-meta">APK zonder afspraak</span></div><div class="viz-src viz-src-bad" style="left:2.1429%;top:53.7500%;width:33.5714%"><span class="viz-src-name">garagegids.nl</span><span class="viz-swap"><span class="viz-before">alleen onderhoud · uit 2020</span><span class="viz-after">bijgewerkt: ook APK</span></span></div><div class="viz-src" style="left:2.1429%;top:71.4583%;width:33.5714%"><span class="viz-src-name">Krantenbericht</span><span class="viz-src-meta">naamgenoot, Delft</span></div><div class="viz-card" style="left:45.0000%;top:38.9583%;width:52.8571%"><div class="viz-card-head"><span>ChatGPT</span><span class="viz-stip"></span></div><div class="viz-answer"><span class="viz-typing"><i></i><i></i><i></i></span><span class="viz-wrong">Nee, alleen onderhoud.</span><span class="viz-right">Ja, APK zonder afspraak.</span></div></div><div class="viz-vidalo" style="left:45.0000%;top:81.6667%;width:52.8571%"><span class="viz-vidalo-mark">vidalo</span><span class="viz-swap viz-swap-3"><span>Controleert de bronnen</span><span>Fout gevonden: garagegids.nl</span><span>Bron hersteld · antwoord klopt</span></span></div></div></div>
+  <div class="copy">Wat zegt AI over jouw bedrijf?<span>Eén verouderde bron bepaalt het antwoord. Wij herstellen die bron.</span></div>
+  <div class="site">vidalo.io</div>
+</div>
+
+<script>
+// Preview: shrink the page to fit the window. At the real size this is 1.
+(function(){function fit(){var s=document.querySelector('.page');s.style.zoom=Math.min(1,innerWidth/1080,innerHeight/1920);}fit();addEventListener('resize',fit);})();
+</script>
+</body>
+</html>
