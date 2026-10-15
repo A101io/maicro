@@ -1,0 +1,93 @@
+{
+  "v": 3,
+  "attachments": {},
+  "boards": {
+    "Applications.dc.html": {
+      "h": 720,
+      "title": "Toepassingen",
+      "w": 1840,
+      "x": 0,
+      "y": 1360
+    },
+    "Directions.dc.html": {
+      "h": 760,
+      "title": "Andere richtingen",
+      "w": 1840,
+      "x": 0,
+      "y": 2200
+    },
+    "Directions2.dc.html": {
+      "h": 760,
+      "title": "Andere richtingen, vervolg",
+      "w": 1840,
+      "x": 0,
+      "y": 3080
+    },
+    "Fonts.dc.html": {
+      "h": 1000,
+      "title": "Lettertypes bij het logo",
+      "w": 1840,
+      "x": 0,
+      "y": 3960
+    },
+    "Motion.dc.html": {
+      "h": 800,
+      "title": "Animaties",
+      "w": 1840,
+      "x": 0,
+      "y": 5080,
+      "is_interactive": true
+    },
+    "Main.dc.html": {
+      "h": 560,
+      "title": "Primair logo",
+      "w": 880,
+      "x": 0,
+      "y": 0
+    },
+    "Mark.dc.html": {
+      "h": 560,
+      "title": "Beeldmerk en ruimte",
+      "w": 880,
+      "x": 960,
+      "y": 0
+    },
+    "Variants.dc.html": {
+      "h": 560,
+      "title": "Varianten",
+      "w": 1840,
+      "x": 0,
+      "y": 680
+    }
+  },
+  "createdOnFiles": {
+    "at": "2026-10-13T12:00:00Z",
+    "v": 1
+  },
+  "designSystems": [],
+  "launch": {
+    "view": "canvas"
+  },
+  "notes": {
+    "t1": {
+      "kind": "title1",
+      "maxW": 1840,
+      "text": "Vidalo logo",
+      "w": 240,
+      "x": 0,
+      "y": -300
+    }
+  },
+  "order": [
+    "Main.dc.html",
+    "Mark.dc.html",
+    "Variants.dc.html",
+    "Applications.dc.html",
+    "Directions.dc.html",
+    "Directions2.dc.html",
+    "Fonts.dc.html",
+    "Motion.dc.html"
+  ],
+  "pages": [],
+  "title": "Vidalo"
+}

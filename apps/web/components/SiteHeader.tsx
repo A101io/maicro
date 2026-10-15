@@ -6,7 +6,7 @@ import { Logo } from "@/components/Logo";
 export async function Wordmark({ href = "/" }: { href?: string }) {
   const { href: to } = await getI18n();
   return (
-    <Link href={to(href)} className="inline-flex hover:text-ink">
+    <Link href={to(href)} className="logo-hover inline-flex hover:text-ink">
       <Logo size={24} />
     </Link>
   );

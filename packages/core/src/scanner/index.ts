@@ -307,7 +307,7 @@ function assembleReport(args: {
     visibility: visibilityFor(samples.length, notFoundAnswers),
     engines: engineStats(engines, samples, result.verdicts, unavailable),
     findings,
-    correct: result.correct.map(({ prompt, engine, value, factKey, subject }) => ({ prompt, engine, value, factKey, subject })),
+    correct: result.correct.map(({ prompt, engine, value, raw, factKey, subject }) => ({ prompt, engine, value, raw, factKey, subject })),
     stip,
     engineStips,
     findingsBySeverity: groupBySeverity(findings),

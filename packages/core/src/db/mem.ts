@@ -90,6 +90,7 @@ export class MemDb implements Db {
       anniversaryDay: null,
       ownerVerifiedAt: null,
       ownerVerifiedVia: null,
+      language: "nl",
       createdAt: nowIso(),
     };
     const merged: BusinessRecord = { ...base };

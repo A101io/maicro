@@ -1,0 +1,111 @@
+<!doctype html>
+<html lang="nl">
+<head>
+<meta charset="utf-8">
+<title>Vidalo toepassingen</title>
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&amp;display=swap">
+<style>
+body{margin:0;font-family:'Plus Jakarta Sans',system-ui,sans-serif;color:#111827}
+a{color:#111827;text-decoration:none}a:hover{color:#2563EB}
+</style>
+</helmet>
+<div style="width: 1840px; height: 720px; box-sizing: border-box; background: #FFFFFF; padding: 40px; display: flex; flex-direction: column; gap: 40px; font-family: 'Plus Jakarta Sans', system-ui, sans-serif">
+
+  <div style="display: flex; flex-direction: column; gap: 12px">
+    <div style="font-size: 13px; font-weight: 600; color: #6B7280; letter-spacing: 0.4px; text-transform: uppercase">Navigatie op de site</div>
+    <div style="border: 1.5px solid #E7E3DC; border-radius: 22px; overflow: hidden; background: #FFFFFF">
+      <div style="display: flex; align-items: center; justify-content: space-between; gap: 24px; padding: 20px 40px; border-bottom: 1.5px solid #E7E3DC">
+        <a href="#" aria-label="Vidalo" style="display: flex; align-items: flex-end; gap: 6px; color: #111827">
+          <span style="width: 18px; height: 18px; border-radius: 999px 999px 999px 2px; background: {{dot}}; margin-bottom: 3px"></span>
+          <span style="font-weight: 800; font-size: 24px; line-height: 1; letter-spacing: -0.5px">vidalo</span>
+        </a>
+        <nav aria-label="Hoofdmenu" style="display: flex; flex-wrap: wrap; align-items: center; gap: 28px; font-size: 15px; font-weight: 500; color: #374151">
+          <a href="#" style="color: #374151">Hoe het werkt</a>
+          <a href="#" style="color: #374151">Waarom</a>
+          <a href="#" style="color: #374151">Per vak</a>
+          <a href="#" style="color: #374151">Prijs</a>
+          <a href="#" style="color: #374151">Vragen</a>
+          <a href="#" style="color: #111827; border: 1.5px solid #E7E3DC; border-radius: 999px; padding: 9px 16px; font-weight: 600">Inloggen</a>
+        </nav>
+      </div>
+      <div style="display: flex; flex-direction: column; gap: 18px; padding: 36px 40px 40px; background: radial-gradient(38% 55% at 78% 30%, rgba(37, 99, 235, 0.13), transparent 70%), radial-gradient(30% 45% at 12% 75%, rgba(245, 158, 11, 0.13), transparent 70%), #FFFFFF">
+        <h1 style="margin: 0; font-size: 52px; font-weight: 800; line-height: 1.02; letter-spacing: -2px; color: #111827">Wat zegt <span style="background: linear-gradient(transparent 62%, #FDE68A 62%, #FDE68A 92%, transparent 92%); padding: 0 0.06em">AI over jouw bedrijf</span>?</h1>
+        <div style="display: flex; gap: 10px; max-width: 640px">
+          <label for="bedrijf" style="position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0)">Bedrijfsnaam en plaats</label>
+          <input id="bedrijf" type="text" placeholder="Bedrijfsnaam, plaats" style="flex: 1; height: 52px; box-sizing: border-box; border: 1.5px solid #E7E3DC; border-radius: 12px; padding: 0 16px; font-family: 'Plus Jakarta Sans', system-ui, sans-serif; font-size: 17px; color: #111827; background: #FFFFFF">
+          <button type="button" style="height: 52px; border: 0; border-radius: 12px; padding: 0 22px; background: #2563EB; color: #FFFFFF; font-family: 'Plus Jakarta Sans', system-ui, sans-serif; font-size: 16px; font-weight: 600; cursor: pointer">Controleer gratis</button>
+        </div>
+        <div style="font-size: 14px; color: #6B7280">Twee minuten. Geen account.</div>
+      </div>
+    </div>
+  </div>
+
+  <div style="display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 40px; flex: 1">
+
+    <div style="display: flex; flex-direction: column; gap: 16px; border: 1.5px solid #E7E3DC; border-radius: 22px; padding: 28px; box-sizing: border-box; background: #FBF8F3">
+      <div style="font-size: 13px; font-weight: 600; color: #6B7280; letter-spacing: 0.4px; text-transform: uppercase">App-icoon en favicon</div>
+      <div style="display: flex; align-items: flex-end; gap: 28px; flex: 1">
+        <div style="width: 120px; height: 120px; border-radius: 28px; background: #111827; display: flex; align-items: center; justify-content: center">
+          <span style="display: flex; align-items: center; justify-content: center; width: 72px; height: 72px; border-radius: 999px 999px 999px 7px; background: {{dot}}" role="img" aria-label="Vidalo app-icoon"></span>
+        </div>
+        <div style="width: 64px; height: 64px; border-radius: 16px; background: #FFFFFF; border: 1.5px solid #E7E3DC; display: flex; align-items: center; justify-content: center">
+          <span style="display: flex; align-items: center; justify-content: center; width: 38px; height: 38px; border-radius: 999px 999px 999px 4px; background: {{dot}}" role="img" aria-label="Vidalo favicon"></span>
+        </div>
+        <div style="width: 32px; height: 32px; border-radius: 8px; background: #FFFFFF; border: 1.5px solid #E7E3DC; display: flex; align-items: center; justify-content: center">
+          <span style="width: 19px; height: 19px; border-radius: 999px 999px 999px 2px; background: {{dot}}" role="img" aria-label="Vidalo favicon klein"></span>
+        </div>
+      </div>
+      <div style="font-size: 14px; line-height: 1.5; color: #374151">Donker icoon voor telefoon en Google Business, licht voor het tabblad. Altijd dezelfde vorm, hoek linksonder.</div>
+    </div>
+
+    <div style="display: flex; flex-direction: column; gap: 16px; border: 1.5px solid #E7E3DC; border-radius: 22px; padding: 28px; box-sizing: border-box; background: #FFFFFF">
+      <div style="font-size: 13px; font-weight: 600; color: #6B7280; letter-spacing: 0.4px; text-transform: uppercase">Kop van een rapport</div>
+      <div style="flex: 1; display: flex; flex-direction: column; gap: 16px; justify-content: center">
+        <div style="display: flex; align-items: center; justify-content: space-between; gap: 16px; padding-bottom: 14px; border-bottom: 1.5px solid #E7E3DC">
+          <div style="display: flex; align-items: flex-end; gap: 6px" role="img" aria-label="Vidalo, rode stip">
+            <span style="width: 18px; height: 18px; border-radius: 999px 999px 999px 2px; background: #E11D48; margin-bottom: 3px"></span>
+            <span style="font-weight: 800; font-size: 24px; line-height: 1; letter-spacing: -0.5px; color: #111827">vidalo</span>
+          </div>
+          <span style="font-size: 14px; color: #6B7280">Gecontroleerd op 7 oktober 2026, 09:12</span>
+        </div>
+        <div style="display: flex; align-items: center; gap: 18px">
+          <span style="width: 56px; height: 56px; border-radius: 999px; background: #E11D48; display: flex; align-items: center; justify-content: center; color: #FFFFFF; font-weight: 800; font-size: 20px" aria-hidden="true">3</span>
+          <div style="display: flex; flex-direction: column; gap: 2px">
+            <span style="font-size: 20px; font-weight: 700; color: #111827; letter-spacing: -0.4px">Bakkerij De Vries, Haarlem</span>
+            <span style="font-size: 15px; color: #374151">3 van 7 antwoorden kloppen niet</span>
+          </div>
+        </div>
+      </div>
+      <div style="font-size: 14px; line-height: 1.5; color: #374151">De stip in het logo volgt hier de uitslag, net als de grote stip eronder.</div>
+    </div>
+
+    <div style="display: flex; flex-direction: column; gap: 16px; border: 1.5px solid #E7E3DC; border-radius: 22px; padding: 28px; box-sizing: border-box; background: #FBF8F3">
+      <div style="font-size: 13px; font-weight: 600; color: #6B7280; letter-spacing: 0.4px; text-transform: uppercase">Voet van de site en e-mail</div>
+      <div style="flex: 1; display: flex; flex-direction: column; gap: 14px; justify-content: center">
+        <div style="display: flex; align-items: flex-end; gap: 6px" role="img" aria-label="Vidalo">
+          <span style="width: 18px; height: 18px; border-radius: 999px 999px 999px 2px; background: {{dot}}; margin-bottom: 3px"></span>
+          <span style="font-weight: 800; font-size: 24px; line-height: 1; letter-spacing: -0.5px; color: #111827">vidalo</span>
+        </div>
+        <div style="font-size: 15px; line-height: 1.5; color: #374151">Je klanten vragen het aan ChatGPT. Wij zorgen dat het antwoord klopt.</div>
+        <div style="font-size: 13px; line-height: 1.5; color: #6B7280">A101 B.V. (handelend als Vidalo) · Factorij 80, 3071 AV Rotterdam · KvK 42057858 · Prijzen excl. btw</div>
+      </div>
+      <div style="font-size: 14px; line-height: 1.5; color: #374151">Tagline en bedrijfsregel blijven; alleen de handelsnaam wisselt.</div>
+    </div>
+  </div>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props='{"dot":{"editor":"color","default":"#2563EB","options":["#2563EB","#2F855A","#E11D48","#9CA3AF"],"section":"Stip"},"$preview":{"width":1840,"height":720}}'>
+class Component extends DCLogic {
+  renderVals() {
+    return { dot: this.props.dot ?? '#2563EB' };
+  }
+}
+</script>
+</body>
+</html>

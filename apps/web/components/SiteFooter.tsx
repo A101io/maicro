@@ -3,6 +3,10 @@ import { getI18n } from "@/lib/i18n";
 import { LangSwitch } from "@/components/LangSwitch";
 import { Logo } from "@/components/Logo";
 import { CookieSettingsButton } from "@/components/CookieConsent";
+import { OPTIONAL_CATEGORIES } from "@/lib/consent";
+
+/** The "Cookie-instellingen" button only exists once there is a choice to change; until then the statement link is enough. */
+const hasCookieChoice = OPTIONAL_CATEGORIES.length > 0;
 
 /**
  * Footer. `variant="full"`: four columns + legal line (landing, result).
@@ -20,8 +24,9 @@ export async function SiteFooter({ variant = "full", note, tagline }: { variant?
             <Link href={href("/cookies")} className="nav-link">
               {copy.legal.cookies.title}
             </Link>
-            <CookieSettingsButton label={copy.consent.settings} />
+            {hasCookieChoice && <CookieSettingsButton label={copy.consent.settings} />}
             <span>{note ?? f.copyright}</span>
+            <LangSwitch />
           </span>
         </div>
       </footer>
@@ -34,7 +39,8 @@ export async function SiteFooter({ variant = "full", note, tagline }: { variant?
           <div className="flex flex-col items-start gap-2.5">
             <Logo size={22} />
             <span className="max-w-[28ch] text-[14px] leading-[1.5] text-muted">{tagline ?? f.tagline}</span>
-            {note ? <span className="text-[13px] text-muted">{note}</span> : <LangSwitch />}
+            {note && <span className="text-[13px] text-muted">{note}</span>}
+            <LangSwitch />
           </div>
           {f.columns.map((c) => (
             <div key={c.title} className="flex flex-col gap-2.5 text-[14px]">
@@ -45,7 +51,7 @@ export async function SiteFooter({ variant = "full", note, tagline }: { variant?
                 </Link>
               ))}
               {/* The cookie choice must be changeable from a named button; it sits under the legal links. */}
-              {c.links.some((l) => l.href === "/cookies") && <CookieSettingsButton label={copy.consent.settings} />}
+              {hasCookieChoice && c.links.some((l) => l.href === "/cookies") && <CookieSettingsButton label={copy.consent.settings} />}
             </div>
           ))}
         </div>

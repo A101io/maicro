@@ -366,7 +366,17 @@ a.pill:hover { background: var(--panel); }
   .viz-bad-line { stroke: var(--green); }
 }
 
+/* The logo in the navigation (docs/logo, board 4 "Beweeg erover"): on hover the
+   mark tips its corner towards the name and springs back; the name loosens a
+   touch. The only motion that belongs there. */
+.logo-hover .logo-mark { transform-origin: 50% 50%; }
+.logo-hover:hover .logo-mark,
+.logo-hover:focus-visible .logo-mark { transform: rotate(-14deg) translateY(-0.08em); }
+.logo-hover:hover .logo-name { letter-spacing: -0.01em !important; }
+
 @media (prefers-reduced-motion: no-preference) {
+  .logo-hover .logo-mark { transition: transform 0.55s cubic-bezier(0.3, 1.5, 0.5, 1); }
+  .logo-hover .logo-name { transition: letter-spacing 0.55s cubic-bezier(0.3, 1.5, 0.5, 1); }
   .viz-repair { stroke-dasharray: 1; }
   .viz-svg, .viz-stage { animation: viz-cycle 12s linear infinite; }
   .viz-q { animation: viz-q 12s var(--ease-out) infinite; }

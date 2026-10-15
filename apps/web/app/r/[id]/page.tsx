@@ -2,6 +2,9 @@ import type { Metadata } from "next";
 import { notFound } from "next/navigation";
 import type { ScanReport } from "@vidalo/core/types";
 import { getCopy, getI18n } from "@/lib/i18n";
+import { getSession, getOwnedBusiness } from "@/lib/session";
+import { followPreferredLang } from "@/lib/preferred-lang";
+import type { CopyShape } from "@vidalo/core/copy";
 import { SiteHeader } from "@/components/SiteHeader";
 import { SiteFooter } from "@/components/SiteFooter";
 import { StipHero, Stip } from "@/components/Stip";
@@ -20,9 +23,9 @@ export const dynamic = "force-dynamic";
 /** copy.landing.footer.reportNote and the privacy text promise this number. */
 const FREE_REPORT_DAYS = 30;
 
-async function load(id: string): Promise<{ report: ScanReport; opts: BuildViewOptions; demo: boolean } | null> {
+async function load(id: string, copy: CopyShape): Promise<{ report: ScanReport; opts: BuildViewOptions; demo: boolean } | null> {
   if (id === DEMO_IDS.red) return { report: demoReport(), opts: { domain: DEMO_DOMAIN }, demo: true };
-  if (id === DEMO_IDS.grey) return { report: demoGreyReport(), opts: { domain: DEMO_GREY_DOMAIN, sources: demoGreySources }, demo: true };
+  if (id === DEMO_IDS.grey) return { report: demoGreyReport(), opts: { domain: DEMO_GREY_DOMAIN, sources: demoGreySources(copy) }, demo: true };
   const report = (await getScanReport(id)) ?? (await latestScanReport(id));
   if (!report) return null;
   // A free report is reachable for 30 days, as the footer and the privacy
@@ -37,8 +40,8 @@ async function load(id: string): Promise<{ report: ScanReport; opts: BuildViewOp
 
 export async function generateMetadata({ params }: { params: Promise<{ id: string }> }): Promise<Metadata> {
   const { id } = await params;
-  const loaded = await load(id);
   const copy = await getCopy();
+  const loaded = await load(id, copy);
   if (!loaded) return { title: copy.result.notFound };
   return { title: copy.email.subjects.report(loaded.report.business.name), robots: { index: false } };
 }
@@ -46,10 +49,14 @@ export async function generateMetadata({ params }: { params: Promise<{ id: strin
 export default async function ResultPage({ params, searchParams }: { params: Promise<{ id: string }>; searchParams: Promise<{ mail?: string; betaling?: string }> }) {
   const { id } = await params;
   const sp = await searchParams;
-  const loaded = await load(id);
+  const { copy, href } = await getI18n();
+  const loaded = await load(id, copy);
   if (!loaded) notFound();
   const { report, opts, demo } = loaded;
-  const { copy, href } = await getI18n();
+  // The owner reads their own report in the language saved on the account; visitors get the URL's language.
+  const viewer = demo ? null : await getSession();
+  const owned = viewer ? await getOwnedBusiness(viewer) : null;
+  if (owned && owned.id === report.business.id) await followPreferredLang(owned);
   const v = buildReportView(report, copy, opts);
   const R = copy.result;
   const grey = v.state === "grijs";

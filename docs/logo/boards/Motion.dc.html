@@ -1,0 +1,180 @@
+<!doctype html>
+<html lang="nl">
+<head>
+<meta charset="utf-8">
+<title>Vidalo animaties</title>
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&amp;display=swap">
+<style>
+body{margin:0;font-family:'Plus Jakarta Sans',system-ui,sans-serif;color:#111827}
+a{color:#2563EB}a:hover{color:#1D4ED8}
+
+/* 1. Intro: a round dot lands, the corner snaps in, the name slides out of it. */
+@keyframes vd-land{
+  0%{transform:translateY(-70px) scale(.5);opacity:0;border-radius:999px}
+  22%{transform:translateY(0) scale(1.06);opacity:1;border-radius:999px}
+  30%{transform:scale(1);border-radius:999px}
+  42%{border-radius:999px 999px 999px 7px}
+  88%{opacity:1;border-radius:999px 999px 999px 7px}
+  100%{opacity:0;border-radius:999px 999px 999px 7px}
+}
+@keyframes vd-name{
+  0%,42%{opacity:0;transform:translateX(-18px);clip-path:inset(0 100% 0 0)}
+  62%{opacity:1;transform:translateX(0);clip-path:inset(0 0 0 0)}
+  88%{opacity:1}
+  100%{opacity:0}
+}
+.a1-mark{animation:vd-land calc(4.6s * var(--t)) cubic-bezier(.22,.7,.2,1) infinite}
+.a1-name{animation:vd-name calc(4.6s * var(--t)) cubic-bezier(.22,.7,.2,1) infinite}
+
+/* 2. Status: the mark takes the colour of the result, in the order of the plan. */
+@keyframes vd-status{
+  0%,18%{background:#9CA3AF}
+  25%,43%{background:#E11D48}
+  50%,68%{background:#F59E0B}
+  75%,93%{background:#2F855A}
+  100%{background:#9CA3AF}
+}
+@keyframes vd-label1{0%,18%{opacity:1}25%,100%{opacity:.25}}
+@keyframes vd-label2{0%,18%{opacity:.25}25%,43%{opacity:1}50%,100%{opacity:.25}}
+@keyframes vd-label3{0%,43%{opacity:.25}50%,68%{opacity:1}75%,100%{opacity:.25}}
+@keyframes vd-label4{0%,68%{opacity:.25}75%,93%{opacity:1}100%{opacity:.25}}
+.a2-mark{animation:vd-status calc(7s * var(--t)) ease-in-out infinite}
+.a2-l1{animation:vd-label1 calc(7s * var(--t)) linear infinite}
+.a2-l2{animation:vd-label2 calc(7s * var(--t)) linear infinite}
+.a2-l3{animation:vd-label3 calc(7s * var(--t)) linear infinite}
+.a2-l4{animation:vd-label4 calc(7s * var(--t)) linear infinite}
+
+/* 3. Controleren: the mark breathes and sends out a ring, like a check going out. */
+@keyframes vd-breathe{0%,100%{transform:scale(1)}50%{transform:scale(1.07)}}
+@keyframes vd-ring{0%{transform:scale(1);opacity:.55}100%{transform:scale(2.1);opacity:0}}
+.a3-mark{animation:vd-breathe calc(1.8s * var(--t)) ease-in-out infinite}
+.a3-ring{animation:vd-ring calc(1.8s * var(--t)) cubic-bezier(.2,.6,.3,1) infinite}
+.a3-ring2{animation:vd-ring calc(1.8s * var(--t)) cubic-bezier(.2,.6,.3,1) infinite;animation-delay:calc(.6s * var(--t))}
+
+/* 4. Hover: the mark tips its corner towards the name and springs back. */
+.a4-mark{transition:transform calc(.55s * var(--t)) cubic-bezier(.3,1.5,.5,1)}
+.a4-lockup:hover .a4-mark,.a4-lockup:focus-visible .a4-mark{transform:rotate(-14deg) translateY(-5px)}
+.a4-name{transition:letter-spacing calc(.55s * var(--t)) cubic-bezier(.3,1.5,.5,1)}
+.a4-lockup:hover .a4-name{letter-spacing:-2px}
+
+/* 5. App icon: the answer grows out of its own corner. */
+@keyframes vd-grow{
+  0%{transform:scale(0)}
+  28%{transform:scale(1.1)}
+  42%{transform:scale(1)}
+  86%{transform:scale(1)}
+  100%{transform:scale(0)}
+}
+.a5-mark{transform-origin:0% 100%;animation:vd-grow calc(3.6s * var(--t)) cubic-bezier(.22,.7,.2,1) infinite}
+
+/* 6. Antwoord: the bubble pops in, the answer types out, short and certain. */
+@keyframes vd-pop{0%{transform:scale(.4);opacity:0}14%{transform:scale(1.08);opacity:1}22%{transform:scale(1)}86%{opacity:1}100%{opacity:0}}
+@keyframes vd-type{0%,24%{width:0}60%,86%{width:6ch}100%{width:6ch;opacity:0}}
+@keyframes vd-caret{0%,24%{opacity:0}25%,86%{opacity:1}50%,76%{opacity:0}100%{opacity:0}}
+.a6-mark{animation:vd-pop calc(4.2s * var(--t)) cubic-bezier(.3,1.4,.5,1) infinite}
+.a6-text{animation:vd-type calc(4.2s * var(--t)) steps(6,end) infinite}
+.a6-caret{animation:vd-caret calc(4.2s * var(--t)) steps(1,end) infinite}
+
+@media (prefers-reduced-motion: reduce){
+  .a1-mark,.a1-name,.a2-mark,.a2-l1,.a2-l2,.a2-l3,.a2-l4,.a3-mark,.a3-ring,.a3-ring2,.a5-mark,.a6-mark,.a6-text,.a6-caret{animation:none}
+  .a1-name,.a6-text{opacity:1;clip-path:none;width:6ch}
+  .a3-ring,.a3-ring2{display:none}
+}
+</style>
+</helmet>
+<div style="width: 1840px; height: 800px; box-sizing: border-box; background: #FFFFFF; padding: 40px; display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 32px; font-family: 'Plus Jakarta Sans', system-ui, sans-serif; --t: {{speed}}">
+
+  <div style="display: flex; flex-direction: column; gap: 14px; border: 1.5px solid #E7E3DC; border-radius: 22px; padding: 28px; box-sizing: border-box; background: #FFFFFF">
+    <span style="font-size: 13px; font-weight: 600; color: #6B7280; letter-spacing: 0.4px; text-transform: uppercase">1 · Intro</span>
+    <div style="flex: 1; display: flex; align-items: center; justify-content: center; overflow: hidden">
+      <div style="display: flex; align-items: flex-end; gap: 14px" role="img" aria-label="Vidalo logo dat verschijnt">
+        <span class="a1-mark" style="width: 60px; height: 60px; border-radius: 999px 999px 999px 7px; background: {{dot}}; margin-bottom: 9px"></span>
+        <span class="a1-name" style="font-weight: 800; font-size: 80px; line-height: 1; letter-spacing: -3px; color: #111827">vidalo</span>
+      </div>
+    </div>
+    <div style="font-size: 14px; line-height: 1.5; color: #374151">Een ronde stip landt, de hoek klikt erin, de naam schuift eruit. Voor de eerste seconde van de site en het einde van een video.</div>
+  </div>
+
+  <div style="display: flex; flex-direction: column; gap: 14px; border: 1.5px solid #E7E3DC; border-radius: 22px; padding: 28px; box-sizing: border-box; background: #F4F1EC">
+    <span style="font-size: 13px; font-weight: 600; color: #6B7280; letter-spacing: 0.4px; text-transform: uppercase">2 · Kleur van de uitslag</span>
+    <div style="flex: 1; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 22px">
+      <div style="display: flex; align-items: flex-end; gap: 14px" role="img" aria-label="Vidalo logo waarvan de stip van kleur wisselt">
+        <span class="a2-mark" style="width: 60px; height: 60px; border-radius: 999px 999px 999px 7px; background: #9CA3AF; margin-bottom: 9px"></span>
+        <span style="font-weight: 800; font-size: 80px; line-height: 1; letter-spacing: -3px; color: #111827">vidalo</span>
+      </div>
+      <div style="display: flex; gap: 10px; font-size: 13px; font-weight: 600">
+        <span class="a2-l1" style="color: #374151; background: #FFFFFF; border: 1.5px solid #E7E3DC; border-radius: 999px; padding: 4px 12px">niet gevonden</span>
+        <span class="a2-l2" style="color: #E11D48; background: #FDECEA; border-radius: 999px; padding: 4px 12px">klopt niet</span>
+        <span class="a2-l3" style="color: #B45309; background: #FEF3C7; border-radius: 999px; padding: 4px 12px">bezig</span>
+        <span class="a2-l4" style="color: #166534; background: #DCFCE7; border-radius: 999px; padding: 4px 12px">klopt</span>
+      </div>
+    </div>
+    <div style="font-size: 14px; line-height: 1.5; color: #374151">De stip neemt de kleur van de uitslag, in de volgorde van het plan. Voor de kop van een rapport terwijl de controle loopt.</div>
+  </div>
+
+  <div style="display: flex; flex-direction: column; gap: 14px; border: 1.5px solid #E7E3DC; border-radius: 22px; padding: 28px; box-sizing: border-box; background: #FFFFFF">
+    <span style="font-size: 13px; font-weight: 600; color: #6B7280; letter-spacing: 0.4px; text-transform: uppercase">3 · Controleren</span>
+    <div style="flex: 1; display: flex; align-items: center; justify-content: center">
+      <div style="display: flex; align-items: flex-end; gap: 14px" role="img" aria-label="Vidalo logo dat ademt met ringen">
+        <span style="position: relative; width: 60px; height: 60px; margin-bottom: 9px; display: block">
+          <span class="a3-ring" style="position: absolute; inset: 0; border-radius: 999px 999px 999px 7px; border: 2px solid {{dot}}"></span>
+          <span class="a3-ring2" style="position: absolute; inset: 0; border-radius: 999px 999px 999px 7px; border: 2px solid {{dot}}"></span>
+          <span class="a3-mark" style="position: absolute; inset: 0; border-radius: 999px 999px 999px 7px; background: {{dot}}"></span>
+        </span>
+        <span style="font-weight: 800; font-size: 80px; line-height: 1; letter-spacing: -3px; color: #111827">vidalo</span>
+      </div>
+    </div>
+    <div style="font-size: 14px; line-height: 1.5; color: #374151">De stip ademt en stuurt ringen uit: er wordt gevraagd. Voor het wachtscherm tijdens de gratis controle, twee minuten lang.</div>
+  </div>
+
+  <div style="display: flex; flex-direction: column; gap: 14px; border: 1.5px solid #E7E3DC; border-radius: 22px; padding: 28px; box-sizing: border-box; background: #FFFFFF">
+    <span style="font-size: 13px; font-weight: 600; color: #6B7280; letter-spacing: 0.4px; text-transform: uppercase">4 · Beweeg erover</span>
+    <div style="flex: 1; display: flex; align-items: center; justify-content: center">
+      <a href="#" class="a4-lockup" aria-label="Vidalo" style="display: flex; align-items: flex-end; gap: 14px; color: #111827; text-decoration: none; padding: 12px 16px; border-radius: 14px">
+        <span class="a4-mark" style="width: 60px; height: 60px; border-radius: 999px 999px 999px 7px; background: {{dot}}; margin-bottom: 9px"></span>
+        <span class="a4-name" style="font-weight: 800; font-size: 80px; line-height: 1; letter-spacing: -3px">vidalo</span>
+      </a>
+    </div>
+    <div style="font-size: 14px; line-height: 1.5; color: #374151">Bij hover tipt de stip zijn hoek naar de naam en veert terug. Voor het logo in de navigatie, de enige beweging die daar hoort.</div>
+  </div>
+
+  <div style="display: flex; flex-direction: column; gap: 14px; border-radius: 22px; padding: 28px; box-sizing: border-box; background: #111827">
+    <span style="font-size: 13px; font-weight: 600; color: #94A3B8; letter-spacing: 0.4px; text-transform: uppercase">5 · App-icoon</span>
+    <div style="flex: 1; display: flex; align-items: center; justify-content: center">
+      <div style="width: 150px; height: 150px; border-radius: 34px; background: #0F172A; display: flex; align-items: center; justify-content: center; overflow: hidden" role="img" aria-label="Vidalo app-icoon dat uit zijn hoek groeit">
+        <span class="a5-mark" style="width: 90px; height: 90px; border-radius: 999px 999px 999px 9px; background: {{dot}}"></span>
+      </div>
+    </div>
+    <div style="font-size: 14px; line-height: 1.5; color: #CBD5E1">Het antwoord groeit uit zijn eigen hoek. Voor het opstartscherm van de app en de eerste seconde van een video op donker.</div>
+  </div>
+
+  <div style="display: flex; flex-direction: column; gap: 14px; border: 1.5px solid #E7E3DC; border-radius: 22px; padding: 28px; box-sizing: border-box; background: #FBF8F3">
+    <span style="font-size: 13px; font-weight: 600; color: #6B7280; letter-spacing: 0.4px; text-transform: uppercase">6 · Het antwoord</span>
+    <div style="flex: 1; display: flex; align-items: center; justify-content: center">
+      <div style="display: flex; align-items: center; gap: 18px" role="img" aria-label="De stip verschijnt en het antwoord Klopt wordt getypt">
+        <span class="a6-mark" style="width: 56px; height: 56px; border-radius: 999px 999px 999px 6px; background: {{dot}}"></span>
+        <span style="display: flex; align-items: baseline; font-weight: 800; font-size: 56px; line-height: 1; letter-spacing: -2px; color: #111827">
+          <span class="a6-text" style="display: inline-block; overflow: hidden; white-space: nowrap; width: 0">Klopt.</span>
+          <span class="a6-caret" style="display: inline-block; width: 4px; height: 0.9em; background: {{dot}}; margin-left: 4px; align-self: center"></span>
+        </span>
+      </div>
+    </div>
+    <div style="font-size: 14px; line-height: 1.5; color: #374151">De stip is een antwoordballon: hij verschijnt, het antwoord wordt getypt. Voor de groene uitslag en voor korte video's.</div>
+  </div>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props='{"dot":{"editor":"color","default":"#2563EB","options":["#2563EB","#2F855A","#E11D48","#9CA3AF"],"section":"Stip"},"speed":{"editor":"range","default":1,"min":0.5,"max":2.5,"step":0.1,"section":"Beweging"},"$preview":{"width":1840,"height":800}}'>
+class Component extends DCLogic {
+  renderVals() {
+    return { dot: this.props.dot ?? '#2563EB', speed: this.props.speed ?? 1 };
+  }
+}
+</script>
+</body>
+</html>

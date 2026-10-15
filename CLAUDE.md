@@ -7,7 +7,7 @@ The product is **Vidalo** (from *videre*, to see). The code, copy (NL + EN), pac
 
 | Thing | Status |
 |---|---|
-| GitHub repo `A101io/maicro` | Julian renames to `vidalo`. Then, in the same change: `scripts/site/snapshot.mjs` base path `/maicro/` → `/vidalo/`, and the Pages URL becomes `a101io.github.io/vidalo` |
+| GitHub repo | **Renamed to `A101io/vidalo` on 15 Oct 2026** (GitHub redirects the old `maicro` URLs). `scripts/site/snapshot.mjs` uses `/vidalo/`; the Pages URL is `a101io.github.io/vidalo` |
 | Supabase project name `maicro` (ref `bbynmqvaxpjdnkaasutd`) | display name only, Julian renames in the dashboard; the ref never changes |
 | Committed migrations | keep the word Maicro in two comments; migrations are never edited |
 | `docs/design-g/*.html` | the original design boards, kept as they were |
@@ -16,9 +16,9 @@ The product is **Vidalo** (from *videre*, to see). The code, copy (NL + EN), pac
 
 ## Resuming work — read this first
 - **`SETUP_STATUS.md`** is the baseline status (v3); work rows that are not `✓verified`. **`docs/go-live-checklist.md`** is the launch gate, decisions for Julian first.
-- Hosting is **Cloudflare** (decided 13 Oct 2026): `apps/web` runs as the Worker `vidalo-web` (OpenNext, custom entry `apps/web/worker.ts`), `apps/worker` as `vidalo-worker` (`src/cloudflare.ts`: cron, the `vidalo-scans` queue, facts pages). Deploys are manual: `.github/workflows/deploy.yml` (`preview` = mock data, `production`). The static mock preview also still goes to https://a101io.github.io/maicro/ on every push to main.
+- Hosting is **Cloudflare** (decided 13 Oct 2026): `apps/web` runs as the Worker `vidalo-web` (OpenNext, custom entry `apps/web/worker.ts`), `apps/worker` as `vidalo-worker` (`src/cloudflare.ts`: cron, the `vidalo-scans` queue, facts pages). Deploys are manual: `.github/workflows/deploy.yml` (`preview` = mock data, `production`). The static mock preview also still goes to https://a101io.github.io/vidalo/ on every push to main.
 - Domains: `vidalo.io` is the site; `www.vidalo.io` is a Custom Domain on `vidalo-web` that 301s to it (`core/shared/canonical.ts`, used by `apps/web/worker.ts`). `workers_dev` stays on explicitly. **The first production deploy puts the product on vidalo.io**: there is no coming-soon gate yet, so that run is the launch (`docs/go-live-checklist.md`, Domains).
-- **Local clone** (14 Oct 2026): `/Users/a101/Vidalo`, GitHub repo still `A101io/maicro`. `pnpm` comes from corepack; it was put on the PATH with `corepack enable --install-directory ~/bin`, because the OpenNext build spawns `pnpm build` in a child shell and dies with `pnpm: command not found` when only `corepack pnpm` works.
+- **Local clone** (14 Oct 2026): `/Users/a101/Vidalo`, GitHub repo `A101io/vidalo` (renamed from `maicro` 15 Oct 2026). `pnpm` comes from corepack; it was put on the PATH with `corepack enable --install-directory ~/bin`, because the OpenNext build spawns `pnpm build` in a child shell and dies with `pnpm: command not found` when only `corepack pnpm` works.
 - **Env**: the root `.env` (gitignored) is read by the web app too (`apps/web/next.config.ts` loads it; a value already in the environment wins). Julian's file holds the Supabase URL + anon key and no `DATABASE_URL`, so sign-in is real and business data lives in memory. `.claude/launch.json` defines `vidalo-dev` (:3000) and `vidalo-worker` (:8787) for the browser tools.
 - **Cloudflare**: account `37c9615a0d7d9629154eca03d7de59a6`. The mock preview is live at https://vidalo-web-preview.julian-devriend.workers.dev (deployed by hand 14 Oct 2026 from a local `wrangler login`); queue `vidalo-scans` exists. Production has no Hyperdrive, no secrets, and its Custom Domain cannot bind until `vidalo.io` is a zone in the account.
 - Test the Cloudflare build locally: `pnpm --filter @vidalo/web cf:build`, then in `apps/web`: `npx wrangler dev -c wrangler.jsonc -c ../worker/wrangler.jsonc` with a `.dev.vars` (gitignored) per app, e.g. `VIDALO_MOCK=1`, `VIDALO_DB=pg`, `DATABASE_URL=` a local Postgres.
@@ -49,6 +49,7 @@ Short. One action at a time. Real strings, not placeholders. End with one concre
 - **Launch gate**: `core/shared/gate.ts` + `apps/web/middleware.ts`; env `VIDALO_COMING_SOON`, `VIDALO_PREVIEW_BUTTON`, `VIDALO_PREVIEW_KEY`; page `/binnenkort` (EN `/coming-soon`), `/api/preview`, `components/PreviewBar.tsx`. `.claude/launch.json` has `vidalo-dev` (real auth), `vidalo-dev-gate` and `vidalo-dev-mock` (no Supabase keys → mock sign-in as `eigenaar@bakkerijdevries.nl`, gate on).
 - **Cookies**: `/cookies` statement (inventory in `copy.legal.cookies`), `lib/consent.ts`, `components/CookieConsent.tsx`; add a category to `OPTIONAL_CATEGORIES` and the statement's table in the same change.
 - **Account**: `/app/account`. **Checkout**: terms consent, B2B custom text, btw-nummer, return URLs from `lib/origin.ts` (`core/shared/origin.ts`); needs the Terms and Privacy URLs on the Stripe account. **Assistant**: `core/chat` (knowledge from the copy, rules, FAQ fallback, `modelAnswer`), `/api/chat`, `components/ChatWidget.tsx`.
+- **Language preference** (15 Oct 2026): `business.language` (`0006_language.sql`, applied on the hosted project). Set on `/app/account` or by the NL · EN switch while signed in (`/api/lang`). `lib/preferred-lang.ts` sends a signed-in owner to their language on every `/app` page and on their own report. The report itself is fully bilingual: question lines and value wording come from `copy.report`; `ScanReport.correct[].raw` carries the normalised value so the page words it (older reports fall back to the stored Dutch). E-mails are still Dutch-only.
 - **Content**: `docs/content-check.md` is the fact-check; every number on the site carries a verified source as of 14 Oct. Free reports expire after 30 days (`app/r/[id]/page.tsx`). Copilot is a stub (`scanner/engines/copilot.ts`): keep it out of free-check copy until the adapter ships.
 
 ## Read first
@@ -77,7 +78,7 @@ Not built: Bing/Apple/form-directory adapters (fall to operator queue), Copilot 
 
 ## Supabase
 Project `maicro`, ref **`bbynmqvaxpjdnkaasutd`**, eu-west-1 (Ireland), org A101BV — https://bbynmqvaxpjdnkaasutd.supabase.co.
-Migrations 0001–0005 are applied (ledger: `supabase_migrations.schema_migrations`). Every public table has RLS; the four internal tables (`prompt`, `sample`, `claim`, `job`) have no policies, so only the service role / table owner reach them.
+Migrations 0001–0006 are applied (ledger: `supabase_migrations.schema_migrations`). Every public table has RLS; the four internal tables (`prompt`, `sample`, `claim`, `job`) have no policies, so only the service role / table owner reach them.
 The same org holds **`hlelpndtejajipqwjwrf` (Sitty)** and **`muuijbupsnhascqzfbin` (Sonable)** — check the ref on every call; the names give no warning.
 Not done yet: `DATABASE_URL` / service-role key in a secret store, and a run of the pipeline against this project.
 

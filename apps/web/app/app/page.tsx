@@ -122,10 +122,10 @@ export default async function DashboardPage({ searchParams }: { searchParams: Pr
                   <span className="text-[12px] text-muted">{dateShort(f.firstSeenAt)}</span>
                 </div>
                 <div className="text-[15px]">
-                  <p className="italic text-muted">{questionFor(f.factKey, f.subject, business.name, business.place)}</p>
+                  <p className="italic text-muted">{questionFor(f.factKey, f.subject, business.name, business.place, copy)}</p>
                   <p className="mt-1">
                     {ENGINE_LABEL[f.engine]}:{" "}
-                    {f.verdict === "not_found" ? <span className="mark-grey">{copy.result.table.notFound}</span> : <span className="mark-wrong">{f.evidenceKind === "recommendation" ? copy.result.table.notNamed : wrongText(f)}</span>} <span className="text-muted">→</span> {correctText(f)}
+                    {f.verdict === "not_found" ? <span className="mark-grey">{copy.result.table.notFound}</span> : <span className="mark-wrong">{f.evidenceKind === "recommendation" ? copy.result.table.notNamed : wrongText(f, copy)}</span>} <span className="text-muted">→</span> {correctText(f, copy)}
                   </p>
                   <p className="mt-2 text-[13px] text-muted">
                     {f.verdict === "not_found" ? (
@@ -160,8 +160,8 @@ export default async function DashboardPage({ searchParams }: { searchParams: Pr
                   </span>
                   <span>{f.resolvedAt ? `${copy.findingStatus.resolved} ${dateShort(f.resolvedAt)}` : copy.findingStatus.resolved}</span>
                 </div>
-                <StipRow tone="rood" text={f.verdict === "not_found" ? copy.result.table.notFound : wrongText(f)} />
-                <StipRow tone="groen" text={correctText(f)} />
+                <StipRow tone="rood" text={f.verdict === "not_found" ? copy.result.table.notFound : wrongText(f, copy)} />
+                <StipRow tone="groen" text={correctText(f, copy)} />
                 <p className="text-[13px] text-muted">
                   {f.sourceUrl ? hostOf(f.sourceUrl) : copy.sourceType[f.sourceType]} · {dateShort(f.firstSeenAt)}
                   {f.resolvedAt ? ` → ${dateShort(f.resolvedAt)}` : ""}

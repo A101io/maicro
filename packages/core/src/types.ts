@@ -339,7 +339,7 @@ export interface ScanReport {
   engines: { engine: Engine; correct: number; wrong: number; notFound: number; skipped: boolean }[];
   findings: Finding[];
   /** Answers that matched the facts; factKey/subject identify the question (absent on reports stored before the G redesign). */
-  correct: { prompt: string; engine: Engine; value: string; factKey?: FactKey; subject?: string | null }[];
+  correct: { prompt: string; engine: Engine; value: string; factKey?: FactKey; subject?: string | null; /** The normalised value, so the web can word it in its own language (absent on older reports). */ raw?: string }[];
   /** Overall colour: worst colour among the engines that count (>= 10% NL usage). */
   stip: Stip;
   engineStips: EngineStip[];
