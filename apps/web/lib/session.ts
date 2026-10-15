@@ -2,9 +2,9 @@ import { cookies } from "next/headers";
 import { env } from "./env";
 import { createServerSupabase } from "./supabase";
 import { ready } from "./core";
-import type { BusinessRecord } from "@maicro/core/db";
+import type { BusinessRecord } from "@vidalo/core/db";
 
-export const MOCK_SESSION_COOKIE = "maicro_mock_session";
+export const MOCK_SESSION_COOKIE = "vidalo_mock_session";
 
 export interface Session {
   userId: string;

@@ -1,13 +1,13 @@
 /**
  * Facts host logic.
  *
- * Preferred: `feiten.{domain}` on the owner's own domain, pointed at Maicro with
+ * Preferred: `feiten.{domain}` on the owner's own domain, pointed at Vidalo with
  * one CNAME record. Fallback: `{slug}.feiten.{FACTS_HOST_SUFFIX}`.
  *
  * Cloudflare for SaaS (custom hostnames) is used when CLOUDFLARE_API_TOKEN and
  * CLOUDFLARE_ZONE_ID are set; otherwise every call is a logged no-op so the
- * whole flow runs in MAICRO_MOCK=1 without keys. In mock mode DNS lookups are
- * skipped and report success (set MAICRO_MOCK_DNS_OK=0 to force a real lookup).
+ * whole flow runs in VIDALO_MOCK=1 without keys. In mock mode DNS lookups are
+ * skipped and report success (set VIDALO_MOCK_DNS_OK=0 to force a real lookup).
  */
 import { resolveCname } from "node:dns/promises";
 import type { Business } from "../types.js";
@@ -16,7 +16,7 @@ import { defaultFactsHost } from "./render.js";
 export { defaultFactsHost };
 
 export function factsHostSuffix(): string {
-  return process.env.FACTS_HOST_SUFFIX || "maicro.nl";
+  return process.env.FACTS_HOST_SUFFIX || "vidalo.io";
 }
 
 /** The CNAME target an owner must point `feiten.{domain}` at. */
@@ -59,7 +59,7 @@ export interface CnameCheck {
  */
 export async function verifyCname(host: string, expectedTarget = cnameTarget()): Promise<CnameCheck> {
   const expected = expectedTarget.toLowerCase().replace(/\.$/, "");
-  if (process.env.MAICRO_MOCK === "1" && process.env.MAICRO_MOCK_DNS_OK !== "0") {
+  if (process.env.VIDALO_MOCK === "1" && process.env.VIDALO_MOCK_DNS_OK !== "0") {
     console.log(JSON.stringify({ msg: "dns.verify.mock", host, expected }));
     return { host, ok: true, found: [expected], expected };
   }

@@ -1,5 +1,5 @@
 import Link from "next/link";
-import { copy } from "@maicro/core/copy";
+import { getI18n } from "@/lib/i18n";
 import { SiteHeader } from "@/components/SiteHeader";
 import { SiteFooter } from "@/components/SiteFooter";
 import { getSession } from "@/lib/session";
@@ -28,6 +28,7 @@ export const dynamic = "force-dynamic";
 export default async function WelcomePage({ searchParams }: { searchParams: Promise<{ mock?: string; session_id?: string; business?: string }> }) {
   const sp = await searchParams;
   const session = await getSession();
+  const { copy, href } = await getI18n();
   const w = copy.welcome;
   const pay = await paymentState(sp.session_id);
   return (
@@ -58,7 +59,7 @@ export default async function WelcomePage({ searchParams }: { searchParams: Prom
                 <h2 className="h3">{s.title}</h2>
                 <p className="mt-1 text-[15px] text-ink-2">{s.body}</p>
               </div>
-              <Link href={session ? s.href : `/inloggen?next=${encodeURIComponent(s.href)}${sp.business ? `&business=${sp.business}` : ""}`} className={i === 0 ? "btn-primary h-[52px]" : "btn-sm"}>
+              <Link href={href(session ? s.href : `/inloggen?next=${encodeURIComponent(s.href)}${sp.business ? `&business=${sp.business}` : ""}`)} className={i === 0 ? "btn-primary h-[52px]" : "btn-sm"}>
                 {s.cta}
               </Link>
             </li>

@@ -2,9 +2,10 @@
 
 import { revalidatePath } from "next/cache";
 import { redirect } from "next/navigation";
-import type { Facts, Hours, PriceItem, SectorSlug } from "@maicro/core/types";
-import { SECTOR_SLUGS } from "@maicro/core/types";
+import type { Facts, Hours, PriceItem, SectorSlug } from "@vidalo/core/types";
+import { SECTOR_SLUGS } from "@vidalo/core/types";
 import { ready } from "@/lib/db";
+import { getI18n } from "@/lib/i18n";
 import { requireVerifiedOwner } from "@/lib/owner";
 
 const str = (form: FormData, k: string): string | null => {
@@ -60,7 +61,7 @@ export async function saveFacts(form: FormData) {
   const { business } = await requireVerifiedOwner("/app/gegevens");
   const db = await ready();
   const data = parseFacts(form, business.id);
-  if (!data.name || !data.place) redirect("/app/gegevens?fout=1");
+  if (!data.name || !data.place) redirect((await getI18n()).href("/app/gegevens?fout=1"));
   const now = new Date().toISOString();
   const facts = await db.insertFacts(business.id, data, { provisional: false, verifiedAt: now });
   await db.upsertBusiness({
@@ -76,5 +77,5 @@ export async function saveFacts(form: FormData) {
   await db.logEvent(business.id, "facts.confirmed", { version: facts.version });
   revalidatePath("/app");
   revalidatePath("/app/gegevens");
-  redirect("/app/gegevens?opgeslagen=1");
+  redirect((await getI18n()).href("/app/gegevens?opgeslagen=1"));
 }

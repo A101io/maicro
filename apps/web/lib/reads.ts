@@ -3,7 +3,7 @@
  * through the anon client, so RLS (supabase/migrations/0001_init.sql) decides
  * what is visible. Without Supabase they fall back to the service db (mock).
  */
-import type { Channel, Facts, Finding, ScanRun } from "@maicro/core/types";
+import type { Channel, Facts, Finding, ScanRun } from "@vidalo/core/types";
 import { createServerSupabase } from "./supabase";
 import { ready } from "./core";
 

@@ -3,8 +3,8 @@
  * `publish`, `sync`, `report` and `email`; everything else is enqueued by the
  * worker itself.
  */
-import type { Engine, ScanKind } from "@maicro/core/types";
-import type { Job } from "@maicro/core/db";
+import type { Engine, ScanKind } from "@vidalo/core/types";
+import type { Job } from "@vidalo/core/db";
 
 export interface ScanJob {
   businessId: string;
@@ -18,7 +18,7 @@ export interface ScanJob {
 
 export interface SetupJob {
   businessId: string;
-  /** "domain" = feiten.{domain} via CNAME (default when the business has a domain), "fallback" = {slug}.feiten.maicro.nl */
+  /** "domain" = feiten.{domain} via CNAME (default when the business has a domain), "fallback" = {slug}.feiten.vidalo.io */
   hostChoice?: "domain" | "fallback";
   /** skip the welcome mail (e.g. re-run) */
   skipWelcome?: boolean;

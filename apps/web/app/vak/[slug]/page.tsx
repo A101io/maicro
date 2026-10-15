@@ -1,9 +1,10 @@
 import type { Metadata } from "next";
 import Link from "next/link";
 import { notFound } from "next/navigation";
-import { SECTOR_SLUGS, type SectorSlug } from "@maicro/core/types";
-import { isSectorSlug } from "@maicro/core/prompts";
-import { copy } from "@maicro/core/copy";
+import { SECTOR_SLUGS, type SectorSlug } from "@vidalo/core/types";
+import { isSectorSlug } from "@vidalo/core/prompts";
+import { pageMetadata } from "@/lib/seo";
+import { getI18n, localizeHref } from "@/lib/i18n";
 import { SiteHeader } from "@/components/SiteHeader";
 import { SiteFooter } from "@/components/SiteFooter";
 import { ScanField } from "@/components/ScanField";
@@ -20,16 +21,18 @@ export function generateStaticParams(): { slug: SectorSlug }[] {
 export async function generateMetadata({ params }: { params: Promise<{ slug: string }> }): Promise<Metadata> {
   const { slug } = await params;
   if (!isSectorSlug(slug)) return {};
+  const { copy, lang } = await getI18n();
   const p = copy.sectorPages[slug];
-  return { title: `${p.short}: ${p.h1}`, description: p.intro, alternates: { canonical: `/vak/${slug}` } };
+  return pageMetadata({ title: `${p.short}: ${p.h1}`, description: p.intro, route: `/vak/${slug}`, lang });
 }
 
 export default async function SectorPage({ params }: { params: Promise<{ slug: string }> }) {
   const { slug } = await params;
   if (!isSectorSlug(slug)) notFound();
+  const { copy, href } = await getI18n();
   const S = copy.sector;
   const P = copy.sectorPages[slug];
-  const questions = sectorQuestions(slug);
+  const questions = sectorQuestions(slug, copy);
 
   return (
     <>
@@ -43,7 +46,7 @@ export default async function SectorPage({ params }: { params: Promise<{ slug: s
                 {copy.sectorPages[s].short}
               </span>
             ) : (
-              <Link key={s} href={`/vak/${s}`} className="pill hover:border-ink">
+              <Link key={s} href={href(`/vak/${s}`)} className="pill hover:border-ink">
                 {copy.sectorPages[s].short}
               </Link>
             ),
@@ -82,7 +85,7 @@ export default async function SectorPage({ params }: { params: Promise<{ slug: s
         </section>
 
         {/* Three facts */}
-        <section className="bg-panel-2">
+        <section className="ground-sky">
           <div className="wrap section flex flex-col gap-9">
             <h2 className="h2 max-w-[22ch]">{S.factsH2(P.noun)}</h2>
             <div className="grid grid-cols-1 gap-5 md:grid-cols-3">
@@ -192,7 +195,7 @@ export default async function SectorPage({ params }: { params: Promise<{ slug: s
         </section>
 
         {/* CTA */}
-        <section className="bg-panel-2">
+        <section className="ground-warm">
           <div className="wrap section flex flex-col items-center gap-6 text-center">
             <h2 className="h2 max-w-[22ch]">{S.ctaH2(P.nounYour)}</h2>
             <ScanField id="slot" className="max-w-[440px]" />

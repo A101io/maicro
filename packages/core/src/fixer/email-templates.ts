@@ -136,7 +136,7 @@ Lukt het niet of heb je hulp nodig van je websitebouwer? Stuur deze mail door, d
 Je overzicht: ${dashboardUrl}
 
 Groet,
-Maicro
+Vidalo
 `;
   return { subject, text };
 }
@@ -158,7 +158,7 @@ Zolang dit op je website staat, blijft AI het overnemen. Het is één tekstwijzi
 Je overzicht: ${dashboardUrl}
 
 Groet,
-Maicro
+Vidalo
 `;
   return { subject, text };
 }

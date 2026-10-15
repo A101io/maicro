@@ -1,5 +1,5 @@
 {
-  "name": "@maicro/web",
+  "name": "@vidalo/web",
   "version": "0.1.0",
   "private": true,
   "type": "module",
@@ -9,13 +9,17 @@
     "start": "next start",
     "typecheck": "tsc --noEmit",
     "lint": "next lint",
-    "stripe:setup": "node scripts/stripe-setup.mjs"
+    "stripe:setup": "node scripts/stripe-setup.mjs",
+    "cf:build": "opennextjs-cloudflare build",
+    "cf:preview": "opennextjs-cloudflare build && opennextjs-cloudflare preview",
+    "cf:deploy": "opennextjs-cloudflare deploy"
   },
   "dependencies": {
-    "@maicro/core": "workspace:*",
+    "@vidalo/core": "workspace:*",
+    "@opennextjs/cloudflare": "1.20.10",
     "@supabase/ssr": "^0.5.2",
     "@supabase/supabase-js": "^2.47.10",
-    "next": "15.1.6",
+    "next": "15.5.27",
     "react": "19.0.0",
     "react-dom": "19.0.0",
     "stripe": "^17.5.0"
@@ -27,6 +31,7 @@
     "autoprefixer": "^10.4.20",
     "postcss": "^8.4.49",
     "tailwindcss": "^3.4.17",
-    "typescript": "^5.6.3"
+    "typescript": "^5.6.3",
+    "wrangler": "4.149.0"
   }
 }

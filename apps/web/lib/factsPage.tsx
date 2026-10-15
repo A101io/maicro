@@ -2,8 +2,8 @@
  * Facts page helpers for the owner preview. Rendering is done by the core
  * publisher (`renderFactsPage(facts, business, { host })`).
  */
-import type { Business, Facts } from "@maicro/core/types";
-import { renderFactsPage as coreRenderFactsPage, preferredFactsHost, cnameTarget } from "@maicro/core/publisher";
+import type { Business, Facts } from "@vidalo/core/types";
+import { renderFactsPage as coreRenderFactsPage, preferredFactsHost, cnameTarget } from "@vidalo/core/publisher";
 
 export interface RenderedFactsPage {
   html: string;

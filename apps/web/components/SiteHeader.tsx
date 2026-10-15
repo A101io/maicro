@@ -1,10 +1,13 @@
 import Link from "next/link";
-import { copy } from "@maicro/core/copy";
+import { getI18n } from "@/lib/i18n";
+import { LangSwitch } from "@/components/LangSwitch";
+import { Logo } from "@/components/Logo";
 
-export function Wordmark({ href = "/" }: { href?: string }) {
+export async function Wordmark({ href = "/" }: { href?: string }) {
+  const { href: to } = await getI18n();
   return (
-    <Link href={href} aria-label={copy.brand} className="text-[24px] font-extrabold hover:text-ink" style={{ letterSpacing: "-0.5px" }}>
-      {copy.nav.wordmark}
+    <Link href={to(href)} className="logo-hover inline-flex hover:text-ink">
+      <Logo size={24} />
     </Link>
   );
 }
@@ -14,13 +17,14 @@ export function Wordmark({ href = "/" }: { href?: string }) {
  * `variant="short"`: wordmark + two links + Inloggen (sector pages).
  * `variant="minimal"`: wordmark + an optional right-hand line (result, scan, login).
  */
-export function SiteHeader({ variant = "full", right }: { variant?: "full" | "short" | "minimal"; right?: React.ReactNode }) {
+export async function SiteHeader({ variant = "full", right }: { variant?: "full" | "short" | "minimal"; right?: React.ReactNode }) {
+  const { copy, href } = await getI18n();
   const n = copy.nav;
   const links =
     variant === "full"
       ? [
-          { href: "/#werkt", label: n.how },
-          { href: "/#criteria", label: n.criteria },
+          { href: "/hoe-het-werkt", label: n.how },
+          { href: "/waarom", label: n.why },
           { href: "/#vak", label: n.sectors },
           { href: "/#prijs", label: n.pricing },
           { href: "/#vragen", label: n.faq },
@@ -36,15 +40,33 @@ export function SiteHeader({ variant = "full", right }: { variant?: "full" | "sh
       <div className="wrap flex flex-wrap items-center justify-between gap-4 py-4 sm:py-5">
         <Wordmark />
         {variant === "minimal" ? (
-          right && <span className="text-[14px] text-muted">{right}</span>
+          <span className="flex items-center gap-4">
+            {right && <span className="text-[14px] text-muted">{right}</span>}
+            <LangSwitch />
+          </span>
         ) : (
           <nav className="flex items-center gap-4 text-[15px] font-semibold sm:gap-7">
             {links.map((l) => (
-              <Link key={l.href} href={l.href} className="nav-link hidden md:inline">
+              <Link key={l.href} href={href(l.href)} className="nav-link hidden md:inline">
                 {l.label}
               </Link>
             ))}
-            <Link href="/inloggen" className="rounded-pill border-[1.5px] border-ink px-[18px] py-[9px] transition-colors duration-200 hover:border-blue">
+            {links.length > 0 && (
+              <details className="site-menu md:hidden">
+                <summary aria-label={n.menu} className="flex h-10 w-10 items-center justify-center rounded-full border-[1.5px] border-line">
+                  <span aria-hidden className="site-menu-icon" />
+                </summary>
+                <div className="site-menu-panel">
+                  {links.map((l) => (
+                    <Link key={l.href} href={href(l.href)}>
+                      {l.label}
+                    </Link>
+                  ))}
+                </div>
+              </details>
+            )}
+            <LangSwitch />
+            <Link href={href("/inloggen")} className="rounded-pill border-[1.5px] border-ink px-[18px] py-[9px] transition-colors duration-200 hover:border-blue">
               {n.login}
             </Link>
           </nav>

@@ -3,15 +3,16 @@
  * GitHub Pages. Pages only serves files, and the app is a Next.js server, so
  * this crawls it page by page instead of exporting it.
  *
- *   MAICRO_MOCK=1 PUBLIC_BASE_URL=http://localhost:3000 pnpm --filter @maicro/web start &
+ *   VIDALO_MOCK=1 PUBLIC_BASE_URL=http://localhost:3000 pnpm --filter @vidalo/web start &
  *   node scripts/site/snapshot.mjs http://localhost:3000 out/site
  *
  * What the copy does and does not do:
  * - Every page is saved flat (`/vak/horeca` → `vak-horeca.html`) and every
  *   internal link is rewritten to its file, so it works under any base path
- *   (`https://<org>.github.io/maicro/`).
+ *   (`https://<org>.github.io/vidalo/`).
  * - The app's JavaScript is stripped: nothing hydrates, nothing is saved.
- *   The one script kept is public/motion.js, the scroll motion, which works
+ *   The scripts kept are public/motion.js (scroll motion) and public/ask.js
+ *   (the "Vraag het zelf" simulator); like motion.js, they work
  *   on plain HTML and hides nothing if it fails.
  *   Forms are pointed at the page a visitor would land on (the scan form at
  *   the example report, checkout at the welcome page).
@@ -29,13 +30,16 @@ import path from "node:path";
 import { execSync } from "node:child_process";
 import { fileURLToPath } from "node:url";
 
+/** Plain scripts that work without React and stay in the static copy. */
+const KEPT_SCRIPTS = ["motion.js", "ask.js"];
+
 const here = path.dirname(fileURLToPath(import.meta.url));
 const repo = path.resolve(here, "../..");
 const base = (process.argv[2] ?? "http://localhost:3000").replace(/\/$/, "");
 const out = path.resolve(process.argv[3] ?? "out/site");
 
 const DEMO = { userId: "mock-eigenaar@bakkerijdevries.nl", email: "eigenaar@bakkerijdevries.nl" };
-const cookies = new Map([["maicro_mock_session", encodeURIComponent(JSON.stringify(DEMO))]]);
+const cookies = new Map([["vidalo_mock_session", encodeURIComponent(JSON.stringify(DEMO))]]);
 const cookieHeader = () => [...cookies].map(([k, v]) => `${k}=${v}`).join("; ");
 
 const SKIP = ["/api/", "/auth/", "/_next/"];
@@ -115,7 +119,10 @@ async function crawl(start) {
 }
 
 function rewrite(html) {
-  html = html.replace(/<script\b[^>]*>[\s\S]*?<\/script>/g, (tag) => (tag.includes('src="/motion.js"') ? tag.replace('src="/motion.js"', 'src="motion.js"') : ""));
+  html = html.replace(/<script\b[^>]*>[\s\S]*?<\/script>/g, (tag) => {
+    const kept = KEPT_SCRIPTS.find((f) => tag.includes(`src="/${f}"`));
+    return kept ? tag.replace(`src="/${kept}"`, `src="${kept}"`) : "";
+  });
   html = html.replace(/<link\b[^>]*\bas="script"[^>]*\/?>/g, "");
   html = html.replaceAll('"/_next/static/', '"assets/');
   html = html.replace(/href="(\/[^"]*)"/g, (_, url) => {
@@ -163,7 +170,7 @@ async function main() {
     }
   }
   await copyFile(path.join(repo, "apps/web/app/icon.svg"), path.join(out, "icon.svg"));
-  await copyFile(path.join(repo, "apps/web/public/motion.js"), path.join(out, "motion.js"));
+  for (const f of KEPT_SCRIPTS) await copyFile(path.join(repo, "apps/web/public", f), path.join(out, f));
   await writeFile(path.join(out, ".nojekyll"), "");
   await writeFile(path.join(out, "robots.txt"), "User-agent: *\nDisallow: /\n");
 
@@ -185,12 +192,12 @@ async function main() {
     .replace("{{SECTORS}}", sectors.map((f) => `      <a href="${f}">${title(pages.get(f))}</a>`).join("\n"));
   await writeFile(path.join(out, "pages.html"), index);
   const missing = await get("/deze-pagina-bestaat-niet");
-  await writeFile(path.join(out, "404.html"), rewrite(missing.html).replaceAll('href="', 'href="/maicro/').replaceAll('href="/maicro/http', 'href="http').replaceAll('href="/maicro/#', 'href="#'));
+  await writeFile(path.join(out, "404.html"), rewrite(missing.html).replaceAll('href="', 'href="/vidalo/').replaceAll('href="/vidalo/http', 'href="http').replaceAll('href="/vidalo/#', 'href="#'));
 
   // 5. No link may point at a file that is not there.
   const files = new Set(await readdir(out));
   const broken = [];
-  // 404.html is served at any path, so its links are absolute (/maicro/…) and checked by name instead.
+  // 404.html is served at any path, so its links are absolute (/vidalo/…) and checked by name instead.
   for (const f of [...files].filter((x) => x.endsWith(".html") && x !== "404.html")) {
     const html = await readFile(path.join(out, f), "utf8");
     for (const [, href] of html.matchAll(/(?:href|action)="([^"#?:]+\.html)/g)) if (!files.has(href)) broken.push(`${f} → ${href}`);

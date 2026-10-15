@@ -1,10 +1,10 @@
-import { copy } from "@maicro/core/copy";
+import { getI18n } from "@/lib/i18n";
 
 /**
  * Name + place in one bordered field, blue button underneath (docs/DESIGN_G.md).
  * Plain form POST to /api/scan so it works without JavaScript.
  */
-export function ScanField({
+export async function ScanField({
   defaultName = "",
   defaultPlace = "",
   namePlaceholder,
@@ -23,6 +23,7 @@ export function ScanField({
   className?: string;
   style?: React.CSSProperties;
 }) {
+  const { copy } = await getI18n();
   const s = copy.scanField;
   return (
     <form action="/api/scan" method="post" className={`flex w-full flex-col gap-2.5 ${className}`} style={style}>

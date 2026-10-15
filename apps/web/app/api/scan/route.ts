@@ -1,5 +1,8 @@
+import { cloudflareBindings } from "@/lib/cloudflare";
 import { NextResponse, after } from "next/server";
-import { copy } from "@maicro/core/copy";
+import { copyFor } from "@vidalo/core/copy";
+import { localizeHref } from "@/lib/lang-paths";
+import { langFromReferer } from "@/lib/request-lang";
 import { env } from "@/lib/env";
 import { ready } from "@/lib/db";
 import { resolveBusiness, prepareBusiness, parseQuery, createScanState, startFreeScan, FREE_SCAN_ENGINES, progressTemplate, type BusinessCandidate } from "@/lib/core";
@@ -29,14 +32,18 @@ async function readInput(req: Request): Promise<{ q: string; pick: number | null
  */
 export async function POST(req: Request) {
   const { q, pick, place: placeInput } = await readInput(req);
+  const lang = langFromReferer(req);
+  const copy = copyFor(lang);
+  // Redirects land on pages in the language the form was posted from.
   const base = env.baseUrl;
-  if (!q) return NextResponse.redirect(`${base}/?fout=leeg#controle`, 303);
+  const to = (path: string) => `${base}${localizeHref(path, lang)}`;
+  if (!q) return NextResponse.redirect(to("/?fout=leeg#controle"), 303);
   await ready();
 
   const parsed = parseQuery(q);
   const place = placeInput ?? parsed.place;
   const candidates = await resolveBusiness(parsed.query, place);
-  const kies = `${base}/scan/kies?q=${encodeURIComponent(q)}${place ? `&place=${encodeURIComponent(place)}` : ""}`;
+  const kies = to(`/scan/kies?q=${encodeURIComponent(q)}${place ? `&place=${encodeURIComponent(place)}` : ""}`);
   if (candidates.length === 0) return NextResponse.redirect(kies, 303);
 
   let candidate: BusinessCandidate | undefined;
@@ -50,7 +57,7 @@ export async function POST(req: Request) {
   const dayAgo = new Date(Date.now() - DAY_MS);
   if (env.realEngines && (await db.countEventsSince("scan.requested", dayAgo)) >= env.freeScansPerDay) {
     await db.logEvent(null, "scan.refused", { reason: "daily_cap", cap: env.freeScansPerDay });
-    return NextResponse.redirect(`${base}/scan/druk`, 303);
+    return NextResponse.redirect(to("/scan/druk"), 303);
   }
 
   const { business, created } = await prepareBusiness({ name: candidate.name, place: finalPlace, candidate });
@@ -59,20 +66,29 @@ export async function POST(req: Request) {
   const recent = (await db.listScanRuns(business.id, 5)).find((r) => r.kind === "free" && r.status === "done" && r.finishedAt && new Date(r.finishedAt) >= dayAgo);
   if (recent) {
     await db.logEvent(business.id, "scan.reused", { scanRunId: recent.id, via: "web" });
-    return NextResponse.redirect(`${base}/r/${recent.id}`, 303);
+    return NextResponse.redirect(to(`/r/${recent.id}`), 303);
   }
 
   await db.logEvent(business.id, "scan.requested", { q, created, via: "web" });
 
-  const state = await createScanState(business.id, FREE_SCAN_ENGINES);
-  // v1: run the scan directly after the response is sent; the waiting room polls /api/scan/[token]/status.
-  after(async () => {
-    await startFreeScan(state, { kind: "free", engines: FREE_SCAN_ENGINES });
-  });
+  const state = await createScanState(business.id, copy, FREE_SCAN_ENGINES);
+  // On Cloudflare a scan outlives a request (several minutes with live
+  // engines; waitUntil allows 30 s), so it goes on the queue and the
+  // background worker runs it. Elsewhere (local, mock) it runs right after
+  // the response. Either way the waiting room polls /api/scan/[token]/status.
+  const queue = cloudflareBindings()?.SCAN_QUEUE;
+  if (queue) {
+    await queue.send({ token: state.token, kind: "free", engines: FREE_SCAN_ENGINES });
+  } else {
+    after(async () => {
+      await startFreeScan(state, { kind: "free", engines: FREE_SCAN_ENGINES });
+    });
+  }
 
-  return NextResponse.redirect(`${base}/scan/${state.token}`, 303);
+  return NextResponse.redirect(to(`/scan/${state.token}`), 303);
 }
 
-export async function GET() {
-  return NextResponse.json({ ok: true, steps: progressTemplate(FREE_SCAN_ENGINES).map((s) => s.label), note: copy.scan.waiting });
+export async function GET(req: Request) {
+  const copy = copyFor(langFromReferer(req));
+  return NextResponse.json({ ok: true, steps: progressTemplate(FREE_SCAN_ENGINES, copy).map((s) => s.label), note: copy.scan.waiting });
 }

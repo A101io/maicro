@@ -1,4 +1,4 @@
-import { copy } from "@maicro/core/copy";
+import { getI18n } from "@/lib/i18n";
 import { requireVerifiedOwner } from "@/lib/owner";
 import { loadDashboard } from "@/lib/reads";
 import { dateShort } from "@/lib/format";
@@ -8,6 +8,7 @@ export default async function FactsPage({ searchParams }: { searchParams: Promis
   const sp = await searchParams;
   const { business } = await requireVerifiedOwner("/app/gegevens");
   const { facts } = await loadDashboard(business.id);
+  const { copy, lang } = await getI18n();
   const F = copy.facts;
   const initial = facts ?? {
     businessId: business.id,
@@ -44,7 +45,7 @@ export default async function FactsPage({ searchParams }: { searchParams: Promis
         )}
         {sp.fout === "1" && <p className="mt-3 text-[14px] text-rood">{copy.errors.generic}</p>}
       </header>
-      <FactsForm facts={initial} />
+      <FactsForm facts={initial} lang={lang} />
     </div>
   );
 }

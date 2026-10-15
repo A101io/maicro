@@ -1,4 +1,4 @@
--- Google Search Console state per facts page. Maicro verifies the facts host
+-- Google Search Console state per facts page. Vidalo verifies the facts host
 -- (meta tag on the page it serves), adds it as a Search Console property,
 -- submits the sitemap and inspects the page, so we know Google has read it
 -- instead of hoping. One row per business; a new facts host resets the row.

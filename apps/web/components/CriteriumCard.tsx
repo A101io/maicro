@@ -1,12 +1,13 @@
-import type { Severity } from "@maicro/core/types";
-import { CRITERIA } from "@maicro/core/criteria";
-import { copy } from "@maicro/core/copy";
+import type { Severity } from "@vidalo/core/types";
+import { CRITERIA } from "@vidalo/core/criteria";
+import { getI18n } from "@/lib/i18n";
 import { Stip, type Tone } from "./Stip";
 
 export const severityTone: Record<Severity, Tone> = { afhaker: "rood", misleider: "oranje", verwarring: "grijs" };
 
 /** One of the three criteria cards: afhakers / misleiders / verwarring, rows from `CRITERIA` in core. */
-export function CriteriumCard({ severity, children }: { severity: Severity; children?: React.ReactNode }) {
+export async function CriteriumCard({ severity, children }: { severity: Severity; children?: React.ReactNode }) {
+  const { copy } = await getI18n();
   const C = copy.landing.criteria;
   const group = C.groups[severity];
   const rows = CRITERIA.filter((c) => c.severity === severity);

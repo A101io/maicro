@@ -1,7 +1,10 @@
 import type { Metadata } from "next";
 import { notFound } from "next/navigation";
-import type { ScanReport } from "@maicro/core/types";
-import { copy } from "@maicro/core/copy";
+import type { ScanReport } from "@vidalo/core/types";
+import { getCopy, getI18n } from "@/lib/i18n";
+import { getSession, getOwnedBusiness } from "@/lib/session";
+import { followPreferredLang } from "@/lib/preferred-lang";
+import type { CopyShape } from "@vidalo/core/copy";
 import { SiteHeader } from "@/components/SiteHeader";
 import { SiteFooter } from "@/components/SiteFooter";
 import { StipHero, Stip } from "@/components/Stip";
@@ -17,11 +20,18 @@ import { EmailCapture } from "./EmailCapture";
 
 export const dynamic = "force-dynamic";
 
-async function load(id: string): Promise<{ report: ScanReport; opts: BuildViewOptions; demo: boolean } | null> {
+/** copy.landing.footer.reportNote and the privacy text promise this number. */
+const FREE_REPORT_DAYS = 30;
+
+async function load(id: string, copy: CopyShape): Promise<{ report: ScanReport; opts: BuildViewOptions; demo: boolean } | null> {
   if (id === DEMO_IDS.red) return { report: demoReport(), opts: { domain: DEMO_DOMAIN }, demo: true };
-  if (id === DEMO_IDS.grey) return { report: demoGreyReport(), opts: { domain: DEMO_GREY_DOMAIN, sources: demoGreySources }, demo: true };
+  if (id === DEMO_IDS.grey) return { report: demoGreyReport(), opts: { domain: DEMO_GREY_DOMAIN, sources: demoGreySources(copy) }, demo: true };
   const report = (await getScanReport(id)) ?? (await latestScanReport(id));
   if (!report) return null;
+  // A free report is reachable for 30 days, as the footer and the privacy
+  // text say (docs/content-check.md). Paid customers' reports stay with the
+  // account. Expired: the same "niet gevonden" page as an unknown link.
+  if (report.kind === "free" && Date.now() - new Date(report.checkedAt).getTime() > FREE_REPORT_DAYS * 86_400_000) return null;
   const db = await ready();
   const business = await db.getBusiness(report.business.id);
   const facts = await db.latestFacts(report.business.id);
@@ -30,7 +40,8 @@ async function load(id: string): Promise<{ report: ScanReport; opts: BuildViewOp
 
 export async function generateMetadata({ params }: { params: Promise<{ id: string }> }): Promise<Metadata> {
   const { id } = await params;
-  const loaded = await load(id);
+  const copy = await getCopy();
+  const loaded = await load(id, copy);
   if (!loaded) return { title: copy.result.notFound };
   return { title: copy.email.subjects.report(loaded.report.business.name), robots: { index: false } };
 }
@@ -38,10 +49,15 @@ export async function generateMetadata({ params }: { params: Promise<{ id: strin
 export default async function ResultPage({ params, searchParams }: { params: Promise<{ id: string }>; searchParams: Promise<{ mail?: string; betaling?: string }> }) {
   const { id } = await params;
   const sp = await searchParams;
-  const loaded = await load(id);
+  const { copy, href } = await getI18n();
+  const loaded = await load(id, copy);
   if (!loaded) notFound();
   const { report, opts, demo } = loaded;
-  const v = buildReportView(report, opts);
+  // The owner reads their own report in the language saved on the account; visitors get the URL's language.
+  const viewer = demo ? null : await getSession();
+  const owned = viewer ? await getOwnedBusiness(viewer) : null;
+  if (owned && owned.id === report.business.id) await followPreferredLang(owned);
+  const v = buildReportView(report, copy, opts);
   const R = copy.result;
   const grey = v.state === "grijs";
   const business = demo ? null : await (await ready()).getBusiness(report.business.id);
@@ -211,7 +227,7 @@ export default async function ResultPage({ params, searchParams }: { params: Pro
             </form>
             <p className="text-center text-[13px] text-muted">{v.plan.excl}</p>
             {!demo && !business?.ownerVerifiedAt && (
-              <a href={`/eigenaar/bevestigen?business=${encodeURIComponent(report.business.id)}`} className="text-center text-[14px] font-semibold text-blue">
+              <a href={href(`/eigenaar/bevestigen?business=${encodeURIComponent(report.business.id)}`)} className="text-center text-[14px] font-semibold text-blue">
                 {copy.owner.claimLink}
               </a>
             )}

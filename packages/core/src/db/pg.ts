@@ -69,6 +69,7 @@ function mapBusiness(row: Row): BusinessRecord {
     anniversaryDay: (r.anniversaryDay as number | null) ?? null,
     ownerVerifiedAt: (r.ownerVerifiedAt as string | null) ?? null,
     ownerVerifiedVia: (r.ownerVerifiedVia as string | null) ?? null,
+    language: r.language === "en" ? "en" : "nl",
     createdAt: r.createdAt as string,
   };
 }
@@ -226,11 +227,16 @@ export class PgDb implements Db {
   readonly kind = "pg" as const;
   readonly sql: Sql;
 
-  constructor(databaseUrl: string) {
+  /**
+   * `opts` for a short-lived handle (one Worker request through Hyperdrive):
+   * few connections, closed soon after the last query, because the next
+   * request may not reuse them.
+   */
+  constructor(databaseUrl: string, opts: { max?: number; idleTimeout?: number } = {}) {
     this.sql = postgres(databaseUrl, {
       transform: postgres.camel,
-      max: Number(process.env.PG_POOL_MAX ?? 5),
-      idle_timeout: 30,
+      max: opts.max ?? Number(process.env.PG_POOL_MAX ?? 5),
+      idle_timeout: opts.idleTimeout ?? 30,
       connect_timeout: 10,
       prepare: false, // Supabase pooler (pgbouncer transaction mode) friendly
     });
@@ -250,7 +256,7 @@ export class PgDb implements Db {
     const cols: Row = {};
     const keys: (keyof BusinessUpsert)[] = [
       "name", "place", "domain", "kvk", "googlePlaceId", "sector", "plan", "status", "ownerEmail", "ownerUserId",
-      "stripeCustomerId", "stripeSubscriptionId", "factsHost", "anniversaryDay", "ownerVerifiedVia",
+      "stripeCustomerId", "stripeSubscriptionId", "factsHost", "anniversaryDay", "ownerVerifiedVia", "language",
     ];
     for (const k of keys) if (input[k] !== undefined) cols[k] = input[k];
     if (input.factsHostVerifiedAt !== undefined) cols.factsHostVerifiedAt = toDate(input.factsHostVerifiedAt);

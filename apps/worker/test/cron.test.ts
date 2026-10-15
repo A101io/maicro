@@ -1,6 +1,6 @@
 import { beforeEach, describe, expect, it } from "vitest";
-import { MemDb } from "@maicro/core/db";
-import { setDb } from "@maicro/core/shared";
+import { MemDb } from "@vidalo/core/db";
+import { setDb } from "@vidalo/core/shared";
 import { amsterdamParts, amsterdamToUtc, enqueueIndexChecks, enqueueSiteChecks, monthlySlot } from "../src/cron";
 
 describe("cron time helpers", () => {

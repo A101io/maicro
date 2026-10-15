@@ -1,5 +1,5 @@
-import type { Stip as StipColour } from "@maicro/core/types";
-import { copy } from "@maicro/core/copy";
+import type { Stip as StipColour } from "@vidalo/core/types";
+import { getI18n } from "@/lib/i18n";
 import { Stip } from "./Stip";
 
 export interface ReportRowData {
@@ -21,7 +21,8 @@ const saidColour = { rood: "text-rood", grijs: "text-muted", groen: "text-groen"
 const grid = "sm:grid sm:grid-cols-[32px_1.3fr_1.2fr_1fr_1fr] sm:items-center sm:gap-4";
 
 /** Header row of the question table. Hidden on phones, where rows become stacked cards. */
-export function ReportHeaderRow({ compact = false }: { compact?: boolean }) {
+export async function ReportHeaderRow({ compact = false }: { compact?: boolean }) {
+  const { copy } = await getI18n();
   const h = copy.result.table.headers;
   return (
     <div className={`hidden border-b-[1.5px] border-ink font-semibold text-muted ${compact ? "py-2.5 text-[12px]" : "py-3 text-[13px]"} ${grid}`}>
@@ -35,7 +36,8 @@ export function ReportHeaderRow({ compact = false }: { compact?: boolean }) {
 }
 
 /** One question of the report: dot, question, what AI said, what is right, where it came from. */
-export function ReportRow({ row, compact = false }: { row: ReportRowData; compact?: boolean }) {
+export async function ReportRow({ row, compact = false }: { row: ReportRowData; compact?: boolean }) {
+  const { copy } = await getI18n();
   const h = copy.result.table.headers;
   const ok = row.tone === "groen";
   const source = row.sourceUrl ? (

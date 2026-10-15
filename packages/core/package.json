@@ -1,5 +1,5 @@
 {
-  "name": "@maicro/core",
+  "name": "@vidalo/core",
   "version": "0.1.0",
   "private": true,
   "type": "module",
@@ -7,6 +7,7 @@
     ".": "./src/index.ts",
     "./types": "./src/types.ts",
     "./criteria": "./src/criteria.ts",
+    "./progress": "./src/progress.ts",
     "./db": "./src/db/index.ts",
     "./scanner": "./src/scanner/index.ts",
     "./publisher": "./src/publisher/index.ts",
@@ -15,7 +16,9 @@
     "./prompts": "./src/prompts/index.ts",
     "./copy": "./src/copy/index.ts",
     "./shared": "./src/shared/index.ts",
-    "./billing": "./src/billing/index.ts"
+    "./shared/gate": "./src/shared/gate.ts",
+    "./billing": "./src/billing/index.ts",
+    "./chat": "./src/chat/index.ts"
   },
   "scripts": {
     "typecheck": "tsc --noEmit",

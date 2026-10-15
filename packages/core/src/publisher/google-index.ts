@@ -4,7 +4,7 @@
  *
  *   1. token     Site Verification API hands out a meta-tag token; serve.ts
  *                puts it on the facts page
- *   2. verify    Site Verification API checks the tag; Maicro's service
+ *   2. verify    Site Verification API checks the tag; Vidalo's service
  *                account becomes owner of https://{host}/
  *   3. add       the host becomes a Search Console property
  *   4. sitemap   submit https://{host}/sitemap.xml
@@ -16,7 +16,7 @@
  * the honest lever (Bing gets IndexNow on every publish).
  *
  * Needs GOOGLE_SERVICE_ACCOUNT_JSON (the key file as JSON, or base64 of it).
- * Without it every call is a logged no-op; in MAICRO_MOCK=1 a fake API runs
+ * Without it every call is a logged no-op; in VIDALO_MOCK=1 a fake API runs
  * the whole flow so the pipeline can be tested offline.
  */
 import { createSign } from "node:crypto";

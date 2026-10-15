@@ -123,7 +123,7 @@ describe("sitecheckEmail", () => {
     const r = await checkSite("bakkerijjansen.nl", facts, {
       fetch: site({ "/robots.txt": [200, "User-agent: OAI-SearchBot\nDisallow: /\n"], "/": [200, "<html></html>"] }),
     });
-    const m = sitecheckEmail({ name: "Bakkerij Jansen" }, r, { factsPageUrl: "https://feiten.bakkerijjansen.nl/", dashboardUrl: "https://maicro.nl/app" });
+    const m = sitecheckEmail({ name: "Bakkerij Jansen" }, r, { factsPageUrl: "https://feiten.bakkerijjansen.nl/", dashboardUrl: "https://vidalo.io/app" });
     expect(m.subject).toBe("2 aanpassingen op je website voor Bakkerij Jansen");
     expect(m.text).toContain("ChatGPT mag je website niet lezen");
     expect(m.text).toContain("https://bakkerijjansen.nl/robots.txt");

@@ -12,11 +12,11 @@ import { createHmac, timingSafeEqual } from "node:crypto";
 import type { Db } from "../db/types.js";
 
 export const UNSUBSCRIBED_EVENT = "email.unsubscribed";
-const DEV_SECRET = "maicro-dev-unsubscribe-secret";
+const DEV_SECRET = "vidalo-dev-unsubscribe-secret";
 
 function secret(): string | null {
   if (process.env.UNSUBSCRIBE_SECRET) return process.env.UNSUBSCRIBE_SECRET;
-  return process.env.MAICRO_MOCK === "1" ? DEV_SECRET : null;
+  return process.env.VIDALO_MOCK === "1" ? DEV_SECRET : null;
 }
 
 /** True when opt-out links can be signed, i.e. commercial mail may be sent. */

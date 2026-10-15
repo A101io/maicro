@@ -31,6 +31,8 @@ export interface BusinessRecord extends Business {
   /** Set when the owner proved ownership (see shared/ownership.ts); null = only claimed. */
   ownerVerifiedAt: string | null;
   ownerVerifiedVia: string | null;
+  /** The owner's language ("nl" | "en"); the dashboard and the report follow it; e-mails are still Dutch. */
+  language: "nl" | "en";
 }
 
 /** What Google's URL Inspection API last said about the facts page. */

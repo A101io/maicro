@@ -6,7 +6,7 @@
  * the Business Information API, diff against the facts and PATCH
  * regularHours / phoneNumbers / websiteUri.
  *
- * Mock mode (no keys or MAICRO_MOCK=1): a deterministic "current" location is
+ * Mock mode (no keys or VIDALO_MOCK=1): a deterministic "current" location is
  * synthesised, the diff is logged, nothing is called.
  */
 import type { Channel, Facts, Hours } from "../../types.js";
@@ -40,7 +40,7 @@ type ChannelWithMeta = Channel & { meta?: { refreshToken?: string; accessToken?:
 function oauthConfig(): { clientId: string; clientSecret: string } | null {
   const clientId = process.env.GOOGLE_OAUTH_CLIENT_ID;
   const clientSecret = process.env.GOOGLE_OAUTH_CLIENT_SECRET;
-  if (!clientId || !clientSecret || process.env.MAICRO_MOCK === "1") return null;
+  if (!clientId || !clientSecret || process.env.VIDALO_MOCK === "1") return null;
   return { clientId, clientSecret };
 }
 

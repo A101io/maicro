@@ -1,4 +1,4 @@
-# Maicro — competitor design & positioning notes
+# Vidalo — competitor design & positioning notes
 
 Date: 2026-10-07. Method: every page below was loaded in a headless Chromium (Playwright, 1280px viewport) and a script extracted the rendered H1/subhead, visible CTAs with their computed background/colour/radius, headings in document order, computed `font-family` of H1/body/p, loaded font files, hero `<img>`/`<video>`/`<canvas>`/`<input>` elements, counts of gradient / large-blur / large-shadow elements, jargon word counts and visible prices. Otterly and Scrunch timed out in the browser run and were read as text only (no CSS data). ING Zakelijk returned an empty bot-wall page and is excluded. Colour values marked "(unreliable)" came back from pages that use modern colour syntax the extractor could not parse.
 
@@ -93,7 +93,7 @@ Quick legend for the visual counts: `grad` = elements with a CSS gradient backgr
 - **Hero visual:** large SVG illustration; animated counters.
 - **Section order:** hero → "Trusted by 1000+ Brands Worldwide to Win Locally" (Adidas, KFC, Shell, PostNL, Puma, M&S…) → "Everything You Need to Win Locally" (Listings / GEO Studio "The First Generative Engine Optimization Solution for Multi-Location Brands" / Reviews / Local Pages / Local Social) → stat strip (211%, 78%, 214%…) → "Why Operators, Marketers, and Execs Trust Uberall" (G2-style review headlines) → integrations → newsletter → CTA.
 - **Visual tells:** **Tiempos Headline (serif) 54px bold** + IBM Plex Sans 18px; white; 181 gradient elements; Webflow + HubSpot. Serif headline is the one thing that separates it visually from the AI pack.
-- **Tone:** GEO ×9 but zero LLM/AEO; the line "the accuracy, trust signals, and local context AI needs to select your locations" is closest to Maicro's "fix at the source" idea.
+- **Tone:** GEO ×9 but zero LLM/AEO; the line "the accuracy, trust signals, and local context AI needs to select your locations" is closest to Vidalo's "fix at the source" idea.
 
 ### 10. Birdeye — https://birdeye.com/
 - **H1:** "AI Coworkers for Multi-location Brands". Subhead "Win AI visibility, book appointments, and drive consistent CX at every location." Header CTA **"Check My AI Visibility"** (brown-grey `#4d403a`, pill). "Watch Demo".
@@ -110,7 +110,7 @@ Quick legend for the visual counts: `grad` = elements with a CSS gradient backgr
 - **Hero visual:** rotating 608×1043 portrait photos of real-looking Dutch owners (alt: "Horeca-ondernemer werkt aan AI-vindbaarheid van haar website", winkelier, catering, boekwinkel). **Lead form right in the hero** (NAAM / E-MAILADRES / TELEFOONNUMMER / WEBSITE → "Vraag mijn Quick Check aan") with disclosure "De Quick Check is gratis. Een volledige Citeerbaar Scan is optioneel (€ 295 excl. btw)."
 - **Section order:** hero+form → "De nieuwe manier van zoeken — Je klant zoekt niet meer alleen via Google" with a **sourced statistic** ("8,6 miljoen Nederlanders tussen 18 en 65 jaar gebruiken AI… Bron: Newcom, AI Monitor 2026") → 4 pillars (AI-vindbaarheid / Bedrijfsprofiel / Technische basis / Antwoordblokken) → "De AI-test — AI geeft maar een paar namen. Sta jij ertussen?" → **a mock AI answer block** ("VOORBEELD: EEN WEBSHOP · AI-ASSISTENT · JIJ VROEG: Welke webshop verkoopt dit product het beste? · ANTWOORD: Meestal verwijs ik naar een paar bekende shops… Voorbeeld ter illustratie. Geen live AI-resultaat") → packages (Scan / Fix / Sprint / Groei) → segments (Horeca, MKB, Webshops, Agencies, Events) → footer with **KvK 30215165, street address, phone 06…, "Over Ronald"**.
 - **Visual tells:** Inter **weight 900 at 91px** (very heavy display) + IBM Plex Sans 17px body + Instrument Serif accents; warm paper background `#f0eee9`; lime/navy palette; WordPress + Tailwind; 16 gradients, 10 shadows, no glow blobs. Logos are local businesses (DOT Groningen, Boutique Hotel Scheepers, Pro VVE Beheer, Strandpaviljoen Zee en Zon).
-- **Tone:** almost no acronyms (GEO ×2 only in footer nav), plain Dutch "je", concrete ("3 concrete punten", "binnen 2 werkdagen"). This is the closest existing analogue to Maicro's audience and the mock-answer block is the exact idea proposed for Maicro's hero — Maicro must do it better (real answer, real wrong fact, visibly corrected).
+- **Tone:** almost no acronyms (GEO ×2 only in footer nav), plain Dutch "je", concrete ("3 concrete punten", "binnen 2 werkdagen"). This is the closest existing analogue to Vidalo's audience and the mock-answer block is the exact idea proposed for Vidalo's hero — Vidalo must do it better (real answer, real wrong fact, visibly corrected).
 
 ### 12. Searchlab (Amsterdam) — https://searchlab.nl/
 - **Eyebrow:** "AI IN JOUW SYSTEMEN". **H1:** "Online marketing bureau met een eigen AI-brein. In jouw systemen."
@@ -162,7 +162,7 @@ Quick legend for the visual counts: `grad` = elements with a CSS gradient backgr
 ### 18. RDW — APK page — https://www.rdw.nl/particulier/voertuigen/auto/apk
 - **H1:** "APK". Intro: "De APK (Algemene Periodieke Keuring) is een verplichte keuring voor voertuigen. Het hangt van het voertuig af wanneer en hoe vaak dit moet. Lees hier alles over de APK."
 - **Structure:** a single search field ("Zoeken naar…"), then a plain grid of topic cards: "Over de APK", "Wanneer en hoe vaak APK keuren — Check direct de APK-datum", "Tips voor een veilig voertuig", "Voertuig in het buitenland en APK", "APK-keuringsrapport opvragen", "Niet eens met de goedkeuring APK", "Niet eens met afkeuring APK". 1,483px tall. No CTAs, no proof, no adjectives.
-- **Visual tells:** Roboto Slab 36px/400 headings in navy `#121845` + Roboto body 20px; white; radius 5px; zero decoration. The vocabulary it owns — *keuring, goedkeuring, afkeuring, keuringsrapport, herinnering* — is a ready-made Dutch frame for Maicro ("een APK voor wat AI over je bedrijf zegt").
+- **Visual tells:** Roboto Slab 36px/400 headings in navy `#121845` + Roboto body 20px; white; radius 5px; zero decoration. The vocabulary it owns — *keuring, goedkeuring, afkeuring, keuringsrapport, herinnering* — is a ready-made Dutch frame for Vidalo ("een APK voor wat AI over je bedrijf zegt").
 
 ---
 
@@ -181,7 +181,7 @@ Counted across Profound, Peec, Otterly, Promptwatch, Scrunch, AthenaHQ, Rankscal
 7. **Gradient/glow décor and emoji badges.** Rankscale 136 gradients + 19 blur blobs + 🔥 ✨ ⭐; Peec 218 gradients; Profound 48–70; Promptwatch 62; AthenaHQ 5 blur blobs + ❝ ❞; Otterly 🦦 ⚠️. Contrast: Mollie pricing 1 gradient/0 shadows, Yext 0 blurs, Linear 0 blurs.
 8. **Geist or Inter as the only typeface, weight 400–500, tight negative tracking.** Peec (Geist 400), Promptwatch (Aeonik + Geist), Profound (Inter), Birdeye (Geist), OpsCode (Geist), Searchlab (Outfit + Inter), Citeerbaar (Inter 900). Geist specifically now reads as "Vercel-template".
 9. **Black or indigo/violet primary button, radius 6–8px, "Start Free Trial" + "Book a Demo" pair.** Peec `#171717`, Promptwatch `#2b1850`, AthenaHQ `#4f39f6`, Profound white-on-black, Stripe `#533afd`. Only Rankscale (green pill) and Citeerbaar (lime) differ.
-10. **G2/Gartner badge strip + 10–25 scrolling testimonials from SEO managers.** Otterly (~25 quotes, Gartner Cool Vendor), AthenaHQ (three G2 awards), Promptwatch (4.7/5 G2 in the pricing eyebrow), Rankscale, Peec. Testimonials are from "Head of SEO", "VP SEO Strategy" — a persona Maicro's buyer is not.
+10. **G2/Gartner badge strip + 10–25 scrolling testimonials from SEO managers.** Otterly (~25 quotes, Gartner Cool Vendor), AthenaHQ (three G2 awards), Promptwatch (4.7/5 G2 in the pricing eyebrow), Rankscale, Peec. Testimonials are from "Head of SEO", "VP SEO Strategy" — a persona Vidalo's buyer is not.
 11. **Pages 13,000–18,000px tall** (Rankscale 15,469; Promptwatch 13,450; AthenaHQ 14,116; OpsCode 18,206; Citeerbaar 16,245) versus Yext 6,678, Linear 10,024, Mollie 8,194, RDW 1,483.
 
 ### 2. Most credible-looking sites and why
@@ -194,12 +194,12 @@ Counted across Profound, Peec, Otterly, Promptwatch, Scrunch, AthenaHQ, Rankscal
 
 Honourable mentions: **Stripe pricing** for the two-card Standard/Custom pattern and the footnote discipline; **Moneybird /prijzen** for Dutch SMB pricing grammar ("Bespaar € 36 per jaar", "Meest gekozen", "Start gratis proefperiode", hard limits as the last line); **RDW** for owning the keuring vocabulary with no decoration at all.
 
-### 3. Recommended visual direction for Maicro (Dutch SMB owners)
+### 3. Recommended visual direction for Vidalo (Dutch SMB owners)
 
 **Positioning frame.** Not "AI visibility platform" but **"een keuring van wat AI over je bedrijf zegt"** — an inspection report with a fix. Borrow the APK mental model from RDW (keuring → rapport → goedgekeurd/afgekeurd → herstel), the plain-Dutch register of Citeerbaar/Moneybird, and the pricing honesty of Mollie. Visually it should look like a well-designed Dutch institution or accountancy tool, not a Vercel template.
 
 **Typography (all on Google Fonts or system):**
-- Headlines: **"Instrument Serif"** (Google Fonts) at 56–72px, weight 400, letter-spacing −0.5px, line-height 1.05. A serif immediately separates Maicro from the Geist/Inter pack (only Uberall uses a serif, Tiempos, and it reads as the most "established" of the AI set). Use it only for H1/H2 and pull-quotes.
+- Headlines: **"Instrument Serif"** (Google Fonts) at 56–72px, weight 400, letter-spacing −0.5px, line-height 1.05. A serif immediately separates Vidalo from the Geist/Inter pack (only Uberall uses a serif, Tiempos, and it reads as the most "established" of the AI set). Use it only for H1/H2 and pull-quotes.
 - Everything else: **"IBM Plex Sans"** 16–18px body, 500 for labels, 600 for buttons. Plex has a Dutch-institutional feel (used by Citeerbaar and Uberall) and renders diacritics well. Alternative pairing if a serif is rejected: "Fraunces" 500 for headlines + "Source Sans 3" body.
 - Report/data elements: **"IBM Plex Mono"** 13–14px for the scan output (URLs, dates, "Gecontroleerd op 7 okt 2026 14:32", status codes). Mono signals "machine-read, not marketing".
 - Never: Geist, Inter at display size, Space Grotesk bold, Outfit, uppercase letter-spaced H1s (see OpsCode's typo).
@@ -215,7 +215,7 @@ Honourable mentions: **Stripe pricing** for the two-card Standard/Custom pattern
 - No gradients, no blur blobs, no box-shadows larger than `0 1px 2px rgba(21,32,43,.08)`. Cards are 1px `#D9D4C7` borders on `#FFFFFF`.
 
 **Hero structure (desktop 1200px container, 2 columns 5/7):**
-- Left column (5/12): eyebrow in Plex Mono 13px uppercase ink-60% — "AI-CONTROLE VOOR BEDRIJVEN"; H1 Instrument Serif 64px: **"Wat zegt ChatGPT over jouw bedrijf? Klopt het?"**; subhead Plex Sans 19px, max 46ch: "Maicro vraagt ChatGPT, Google AI en Copilot wat ze over je bedrijf weten, zet elke fout in een rapport en herstelt de bron waar de fout vandaan komt."; then the scan input (see below); under it a one-line trust row in 14px: "Eerste controle gratis · Resultaat binnen 2 minuten · Geen account nodig".
+- Left column (5/12): eyebrow in Plex Mono 13px uppercase ink-60% — "AI-CONTROLE VOOR BEDRIJVEN"; H1 Instrument Serif 64px: **"Wat zegt ChatGPT over jouw bedrijf? Klopt het?"**; subhead Plex Sans 19px, max 46ch: "Vidalo vraagt ChatGPT, Google AI en Copilot wat ze over je bedrijf weten, zet elke fout in een rapport en herstelt de bron waar de fout vandaan komt."; then the scan input (see below); under it a one-line trust row in 14px: "Eerste controle gratis · Resultaat binnen 2 minuten · Geen account nodig".
 - Right column (7/12): the **wrong-fact answer card** (below). No screenshot of a dashboard anywhere above the fold.
 - Height: the hero should finish by 760px; the first proof element must be visible without scrolling at 1366×768.
 
@@ -235,7 +235,7 @@ Honourable mentions: **Stripe pricing** for the two-card Standard/Custom pattern
 
 **Section order (keep the homepage under ~7,500px):**
 1. Hero with input + wrong-fact card.
-2. "Zo werkt een Maicro-controle" — three numbered steps in a single row, each a 1px-bordered card with a mono step number: **01 Vragen** ("We stellen ChatGPT, Google AI en Copilot de vragen die je klanten stellen"), **02 Rapport** ("Elke uitspraak krijgt: klopt / verouderd / onjuist, met de bron"), **03 Herstel** ("We corrigeren de bron: je website, Google-bedrijfsprofiel, KvK-vermelding, Wikipedia…"). Use the report card component as the illustration, not icons.
+2. "Zo werkt een Vidalo-controle" — three numbered steps in a single row, each a 1px-bordered card with a mono step number: **01 Vragen** ("We stellen ChatGPT, Google AI en Copilot de vragen die je klanten stellen"), **02 Rapport** ("Elke uitspraak krijgt: klopt / verouderd / onjuist, met de bron"), **03 Herstel** ("We corrigeren de bron: je website, Google-bedrijfsprofiel, KvK-vermelding, Wikipedia…"). Use the report card component as the illustration, not icons.
 3. "Een voorbeeldrapport" — one real-looking report page: header with company, date, score "7 van 12 antwoorden klopt", then rows. This replaces the dashboard screenshot.
 4. Proof — three named Dutch businesses with city and trade ("Fysiotherapie Van Dijk, Zwolle") and one sentence each, with the before/after fact ("Oud telefoonnummer in Copilot → hersteld"). No logo wall until there are 12 recognisable Dutch names. Add one sourced statistic in the RDW/Citeerbaar manner with the source in mono beneath it.
 5. Pricing (below).
@@ -259,11 +259,11 @@ Honourable mentions: **Stripe pricing** for the two-card Standard/Custom pattern
 
 ### 4. Five micro-patterns worth borrowing (with source)
 
-1. **Footnote markers inside the headline and plan cards** — Stripe's H1 carries a superscript "¹" after "business banking" (https://stripe.com/); Linear's pricing matrix closes with "** Requires AI credits — View docs" (https://linear.app/pricing). Use the same for Maicro's "Herstel aan de bron¹" so caveats live next to the claim instead of in a FAQ.
-2. **Negative-list pricing promise + one fixed rate grammar** — Mollie: "No minimum costs, no lock-in contracts, no hidden fees. With Mollie, you only pay for successful transactions." and every fee as "1.80% + €0.25" (https://www.mollie.com/pricing). Maicro: "Geen opzettermijn, geen verborgen kosten, maandelijks opzegbaar" and every price as "€29 per maand excl. btw".
-3. **Uppercase mono category eyebrow + one plain sentence + one concrete example** — Yext Scout's "SENTIMENT ANALYSIS — Understand how AI describes your brand… recurring themes (i.e. 'long wait times')" (https://www.yext.com/platform/scout). Maicro: "OPENINGSTIJDEN — Klopt wat AI zegt over wanneer je open bent? (bijv. 'op zondag gesloten')".
+1. **Footnote markers inside the headline and plan cards** — Stripe's H1 carries a superscript "¹" after "business banking" (https://stripe.com/); Linear's pricing matrix closes with "** Requires AI credits — View docs" (https://linear.app/pricing). Use the same for Vidalo's "Herstel aan de bron¹" so caveats live next to the claim instead of in a FAQ.
+2. **Negative-list pricing promise + one fixed rate grammar** — Mollie: "No minimum costs, no lock-in contracts, no hidden fees. With Mollie, you only pay for successful transactions." and every fee as "1.80% + €0.25" (https://www.mollie.com/pricing). Vidalo: "Geen opzettermijn, geen verborgen kosten, maandelijks opzegbaar" and every price as "€29 per maand excl. btw".
+3. **Uppercase mono category eyebrow + one plain sentence + one concrete example** — Yext Scout's "SENTIMENT ANALYSIS — Understand how AI describes your brand… recurring themes (i.e. 'long wait times')" (https://www.yext.com/platform/scout). Vidalo: "OPENINGSTIJDEN — Klopt wat AI zegt over wanneer je open bent? (bijv. 'op zondag gesloten')".
 4. **Dutch plan-card grammar** — Moneybird: audience line ("Ideaal voor freelancers en starters"), price "per maand", savings line "Bespaar € 36 per jaar", "Meest gekozen", button "Start gratis proefperiode", hard limits last ("20 verwerkte transacties · 1 gebruiker") (https://www.moneybird.nl/prijzen). Copy the order exactly; Dutch owners recognise it.
-5. **Fixed-height feature chapters and a hero that is the real product state** — Linear's four homepage chapters are each ~1,240px with one H2 and one product frame, and the hero screenshot contains timestamps and real-looking activity ("Linear created the issue via Slack on behalf of Karri · 2min ago") (https://linear.app/). Maicro: three equal-height sections, and the hero card shows a dated, sourced finding rather than an illustration. Related: OpsCode's "Dit is geen screenshot: dit is wat draait" (https://opscode.nl/) — render the example report in live HTML with the same component the product uses.
+5. **Fixed-height feature chapters and a hero that is the real product state** — Linear's four homepage chapters are each ~1,240px with one H2 and one product frame, and the hero screenshot contains timestamps and real-looking activity ("Linear created the issue via Slack on behalf of Karri · 2min ago") (https://linear.app/). Vidalo: three equal-height sections, and the hero card shows a dated, sourced finding rather than an illustration. Related: OpsCode's "Dit is geen screenshot: dit is wat draait" (https://opscode.nl/) — render the example report in live HTML with the same component the product uses.
 
 Bonus pattern from the Dutch set: Citeerbaar's sourced statistic with the source printed in full ("Bron: Newcom, AI Monitor 2026 (augustus 2026): 8,6 miljoen Nederlanders van 18 tot 65 jaar gebruiken AI", https://citeerbaar.nl/) and its footer transparency (KvK number, street address, founder name). Both are cheap credibility for a new Dutch BV.
 

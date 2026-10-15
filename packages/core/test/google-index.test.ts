@@ -56,8 +56,8 @@ describe("Google API plumbing", () => {
 
   it("reads the service account as JSON or base64 and signs a valid RS256 assertion", () => {
     const { privateKey, publicKey } = generateKeyPairSync("rsa", { modulusLength: 2048, privateKeyEncoding: { type: "pkcs8", format: "pem" }, publicKeyEncoding: { type: "spki", format: "pem" } });
-    const json = JSON.stringify({ client_email: "maicro@project.iam.gserviceaccount.com", private_key: privateKey });
-    expect(serviceAccountFromEnv(json)?.client_email).toBe("maicro@project.iam.gserviceaccount.com");
+    const json = JSON.stringify({ client_email: "vidalo@project.iam.gserviceaccount.com", private_key: privateKey });
+    expect(serviceAccountFromEnv(json)?.client_email).toBe("vidalo@project.iam.gserviceaccount.com");
     const sa = serviceAccountFromEnv(Buffer.from(json).toString("base64"))!;
     expect(serviceAccountFromEnv("")).toBeNull();
 
@@ -158,7 +158,7 @@ describe("checkGoogleIndex", () => {
   });
 
   it("starts over for a new facts host, and waits for an unverified one", async () => {
-    const b = await seed("x.feiten.maicro.nl");
+    const b = await seed("x.feiten.vidalo.io");
     const { api, calls } = fakeApi();
     await checkGoogleIndex(b.id, { api });
     await db.upsertBusiness({ id: b.id, name: b.name, place: b.place, factsHost: "feiten.bakkerijjansen.nl" });

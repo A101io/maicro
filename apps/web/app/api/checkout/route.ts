@@ -1,11 +1,15 @@
 import { NextResponse } from "next/server";
+import type Stripe from "stripe";
 import { ready } from "@/lib/db";
 import { transitionStatus } from "@/lib/core";
 import { env } from "@/lib/env";
 import { getStripe } from "@/lib/stripe";
+import { safeOrigin } from "@/lib/origin";
 import { getSession, getOwnedBusiness } from "@/lib/session";
-import { isVerifiedOwner } from "@maicro/core/shared";
-import { copy, PRICES } from "@maicro/core/copy";
+import { isVerifiedOwner } from "@vidalo/core/shared";
+import { copyFor, PRICES } from "@vidalo/core/copy";
+import { localizeHref } from "@/lib/lang-paths";
+import { langFromReferer } from "@/lib/request-lang";
 
 export const runtime = "nodejs";
 
@@ -17,8 +21,20 @@ export const runtime = "nodejs";
  * Prices are excl. btw: every line carries the 21% NL tax rate, and a live
  * checkout without one refuses rather than undercharge by 21%.
  * Mock mode (no STRIPE_SECRET_KEY): marks the business paid and goes to /welkom.
+ *
+ * The session is set up as for Sonable (playbook/STRIPE.md): the customer
+ * ticks the terms (consent_collection; this needs the Terms URL set on the
+ * Stripe account, or session creation fails), the B2B confirmation with the
+ * terms and privacy links sits above the pay button, the billing address and
+ * the btw-nummer are collected, and the return URLs follow the host the
+ * visitor is on (lib/origin.ts), never a hostname baked in at deploy time.
  */
 export async function POST(req: Request) {
+  const lang = langFromReferer(req);
+  const copy = copyFor(lang);
+  // Pages we send people to, in the language they posted from, on the host they are on.
+  const origin = safeOrigin(req);
+  const page = (path: string) => `${origin}${localizeHref(path, lang)}`;
   const form = await req.formData();
   const businessId = String(form.get("business") ?? "");
   const scanRunId = String(form.get("scan") ?? "");
@@ -26,13 +42,13 @@ export async function POST(req: Request) {
   const plan = raw === "setup" ? "setup" : raw === "monitor_addon" ? "monitor_addon" : "monitor";
   const db = await ready();
   const business = await db.getBusiness(businessId);
-  const back = plan === "monitor_addon" ? `${env.baseUrl}/app/abonnement` : `${env.baseUrl}/r/${encodeURIComponent(scanRunId)}`;
-  if (!business) return NextResponse.redirect(`${env.baseUrl}/`, 303);
+  const back = plan === "monitor_addon" ? page(`/app/abonnement`) : page(`/r/${encodeURIComponent(scanRunId)}`);
+  if (!business) return NextResponse.redirect(page(`/`), 303);
 
   if (plan === "monitor_addon") {
     // Adding monitoring changes an existing customer's bill: owner only.
     const session = await getSession();
-    if (!session || !isVerifiedOwner(business, session.userId)) return NextResponse.redirect(`${env.baseUrl}/app/google?eerst=1`, 303);
+    if (!session || !isVerifiedOwner(business, session.userId)) return NextResponse.redirect(page(`/app/google?eerst=1`), 303);
   }
 
   const stripe = await getStripe();
@@ -44,7 +60,7 @@ export async function POST(req: Request) {
       await db.enqueueJob("setup", { businessId: business.id });
     }
     await db.logEvent(business.id, "checkout.mock", { plan });
-    return NextResponse.redirect(plan === "monitor_addon" ? `${env.baseUrl}/app/abonnement?toegevoegd=1` : `${env.baseUrl}/welkom?mock=1&business=${business.id}`, 303);
+    return NextResponse.redirect(plan === "monitor_addon" ? page(`/app/abonnement?toegevoegd=1`) : page(`/welkom?mock=1&business=${business.id}`), 303);
   }
 
   const taxRate = env.stripeTaxRateId;
@@ -62,21 +78,37 @@ export async function POST(req: Request) {
     : { price_data: { currency: "eur", unit_amount: PRICES.monitorEurPerMonth * 100, recurring: { interval: "month" as const }, product_data: { name: copy.checkout.productMonitor } }, quantity: 1, tax_rates };
 
   const payment = plan === "setup";
-  const session = await stripe.checkout.sessions.create({
+  const terms = page("/voorwaarden");
+  const privacy = page("/privacy");
+  // `managed_payments` is newer than the stripe@17 types; it is off because it
+  // cannot be combined with custom_text, and the custom text carries the B2B
+  // confirmation and the legal links the Dutch information duty asks for.
+  const params: Stripe.Checkout.SessionCreateParams & { managed_payments?: { enabled: boolean } } = {
+    managed_payments: { enabled: false },
     mode: payment ? "payment" : "subscription",
     line_items: plan === "setup" ? [setupLine] : plan === "monitor" ? [monitorLine, setupLine] : [monitorLine],
     payment_method_types: payment ? ["ideal", "card"] : ["ideal", "card", "sepa_debit"],
-    locale: "nl",
-    tax_id_collection: { enabled: true },
+    ...(payment ? {} : { payment_method_collection: "always" as const }),
+    locale: lang,
+    // Business customers enter their btw-nummer; it goes on the invoice.
+    tax_id_collection: { enabled: true, required: "if_supported" },
     billing_address_collection: "required",
     allow_promotion_codes: false,
+    // An explicit checkbox for the terms, not passive text. Needs the Terms
+    // URL on the Stripe account (dashboard → Settings → Public details).
+    consent_collection: { terms_of_service: "required" },
+    custom_text: {
+      submit: { message: copy.checkout.consentSubmit(terms, privacy) },
+      terms_of_service_acceptance: { message: copy.checkout.consentAccept(terms, privacy) },
+    },
     ...(business.stripeCustomerId ? { customer: business.stripeCustomerId, customer_update: { name: "auto" as const, address: "auto" as const } } : { customer_email: business.ownerEmail ?? undefined }),
     ...(payment ? { customer_creation: business.stripeCustomerId ? undefined : ("always" as const), invoice_creation: { enabled: true } } : {}),
     metadata: { businessId: business.id, plan, scanRunId },
     subscription_data: payment ? undefined : { metadata: { businessId: business.id } },
-    success_url: plan === "monitor_addon" ? `${env.baseUrl}/app/abonnement?toegevoegd=1` : `${env.baseUrl}/welkom?session_id={CHECKOUT_SESSION_ID}&business=${business.id}`,
+    success_url: plan === "monitor_addon" ? page(`/app/abonnement?toegevoegd=1`) : page(`/welkom?session_id={CHECKOUT_SESSION_ID}&business=${business.id}`),
     cancel_url: `${back}?betaling=geannuleerd`,
-  });
-  await db.logEvent(business.id, "checkout.started", { plan, sessionId: session.id });
+  };
+  const session = await stripe.checkout.sessions.create(params);
+  await db.logEvent(business.id, "checkout.started", { plan, sessionId: session.id, origin });
   return NextResponse.redirect(session.url ?? back, 303);
 }

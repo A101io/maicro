@@ -1,16 +1,21 @@
 import type { Metadata } from "next";
-import { copy } from "@maicro/core/copy";
+import type { CopyShape } from "@vidalo/core/copy";
+import { getCopy, getI18n } from "@/lib/i18n";
 import { SiteHeader } from "@/components/SiteHeader";
 import { SiteFooter } from "@/components/SiteFooter";
 
-export const metadata: Metadata = { title: copy.owner.h1, robots: { index: false } };
+export async function generateMetadata(): Promise<Metadata> {
+  const copy = await getCopy();
+  return { title: copy.owner.h1, robots: { index: false } };
+}
 export const dynamic = "force-dynamic";
 
-type Reason = keyof typeof copy.owner.reasons;
+type Reason = keyof CopyShape["owner"]["reasons"];
 
 /** Where /api/google/callback sends someone whose Google account did not prove ownership. */
 export default async function OwnerFailedPage({ searchParams }: { searchParams: Promise<{ fout?: string; business?: string }> }) {
   const sp = await searchParams;
+  const { copy } = await getI18n();
   const O = copy.owner;
   const reason: Reason = sp.fout && sp.fout in O.reasons ? (sp.fout as Reason) : "error";
   const retry = sp.business ? `/api/google/start?business=${encodeURIComponent(sp.business)}` : "/api/google/start";

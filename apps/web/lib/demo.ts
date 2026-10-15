@@ -8,11 +8,13 @@
  *     (login: eigenaar@bakkerijdevries.nl) with a finished free scan so the
  *     dashboard has content.
  */
-import type { Db } from "@maicro/core/db";
-import type { CriteriumId, Engine, EngineStip, Finding, ScanReport } from "@maicro/core/types";
-import { ABSENT_LABEL, NOT_FOUND_LABEL } from "@maicro/core/types";
-import { prepareBusiness, runScan, groupBySeverity } from "@maicro/core/scanner";
+import type { Db } from "@vidalo/core/db";
+import type { CriteriumId, Engine, EngineStip, Finding, ScanReport } from "@vidalo/core/types";
+import { ABSENT_LABEL, NOT_FOUND_LABEL } from "@vidalo/core/types";
+import { prepareBusiness, runScan, groupBySeverity, createMockEngine } from "@vidalo/core/scanner";
+import { ENGINES } from "@vidalo/core/types";
 import type { SourceRowData } from "./report";
+import type { CopyShape } from "@vidalo/core/copy";
 
 export const DEMO_OWNER_EMAIL = "eigenaar@bakkerijdevries.nl";
 export const DEMO_SLUG = "bakkerij-de-vries-haarlem";
@@ -37,20 +39,20 @@ export const demoEngineStips: EngineStip[] = [
 ];
 
 export const demoCorrect: ScanReport["correct"] = [
-  { prompt: "Is Bakkerij De Vries in Haarlem op zondag open?", engine: "google_ai", value: "zondag gesloten", factKey: "hours", subject: "6" },
-  { prompt: "Is Bakkerij De Vries in Haarlem op zondag open?", engine: "copilot", value: "zondag gesloten", factKey: "hours", subject: "6" },
+  { prompt: "Is Bakkerij De Vries in Haarlem op zondag open?", engine: "google_ai", value: "zondag gesloten", raw: "closed", factKey: "hours", subject: "6" },
+  { prompt: "Is Bakkerij De Vries in Haarlem op zondag open?", engine: "copilot", value: "zondag gesloten", raw: "closed", factKey: "hours", subject: "6" },
   { prompt: "Wat is het telefoonnummer van Bakkerij De Vries in Haarlem?", engine: "chatgpt", value: "023 535 22 18", factKey: "phone", subject: null },
   { prompt: "Wat is het telefoonnummer van Bakkerij De Vries in Haarlem?", engine: "google_ai", value: "023 535 22 18", factKey: "phone", subject: null },
-  { prompt: "Kan ik pinnen bij Bakkerij De Vries in Haarlem?", engine: "chatgpt", value: "ja", factKey: "payment", subject: "pin" },
-  { prompt: "Kan ik pinnen bij Bakkerij De Vries in Haarlem?", engine: "copilot", value: "ja", factKey: "payment", subject: "pin" },
-  { prompt: "Bestaat Bakkerij De Vries in Haarlem nog?", engine: "google_ai", value: "open", factKey: "existence", subject: null },
-  { prompt: "Bestaat Bakkerij De Vries in Haarlem nog?", engine: "copilot", value: "open", factKey: "existence", subject: null },
+  { prompt: "Kan ik pinnen bij Bakkerij De Vries in Haarlem?", engine: "chatgpt", value: "ja", raw: "yes", factKey: "payment", subject: "pin" },
+  { prompt: "Kan ik pinnen bij Bakkerij De Vries in Haarlem?", engine: "copilot", value: "ja", raw: "yes", factKey: "payment", subject: "pin" },
+  { prompt: "Bestaat Bakkerij De Vries in Haarlem nog?", engine: "google_ai", value: "open", raw: "open", factKey: "existence", subject: null },
+  { prompt: "Bestaat Bakkerij De Vries in Haarlem nog?", engine: "copilot", value: "open", raw: "open", factKey: "existence", subject: null },
   { prompt: "Wat is het adres van Bakkerij De Vries in Haarlem?", engine: "chatgpt", value: "Grote Houtstraat 112", factKey: "address", subject: null },
   { prompt: "Wat is het adres van Bakkerij De Vries in Haarlem?", engine: "google_ai", value: "Grote Houtstraat 112", factKey: "address", subject: null },
   { prompt: "Wat is het adres van Bakkerij De Vries in Haarlem?", engine: "copilot", value: "Grote Houtstraat 112", factKey: "address", subject: null },
-  { prompt: "Kan ik bij Bakkerij De Vries in Haarlem taarten bestellen?", engine: "chatgpt", value: "ja", factKey: "service", subject: "taarten op bestelling" },
-  { prompt: "Kan ik bij Bakkerij De Vries in Haarlem taarten bestellen?", engine: "google_ai", value: "ja", factKey: "service", subject: "taarten op bestelling" },
-  { prompt: "Kan ik bij Bakkerij De Vries in Haarlem taarten bestellen?", engine: "copilot", value: "ja", factKey: "service", subject: "taarten op bestelling" },
+  { prompt: "Kan ik bij Bakkerij De Vries in Haarlem taarten bestellen?", engine: "chatgpt", value: "ja", raw: "yes", factKey: "service", subject: "taarten op bestelling" },
+  { prompt: "Kan ik bij Bakkerij De Vries in Haarlem taarten bestellen?", engine: "google_ai", value: "ja", raw: "yes", factKey: "service", subject: "taarten op bestelling" },
+  { prompt: "Kan ik bij Bakkerij De Vries in Haarlem taarten bestellen?", engine: "copilot", value: "ja", raw: "yes", factKey: "service", subject: "taarten op bestelling" },
 ];
 
 export function demoReport(): ScanReport {
@@ -154,20 +156,85 @@ export function demoGreyReport(): ScanReport {
 export const DEMO_GREY_DOMAIN = "polyvale.nl";
 
 /** Source audit rows for the grey demo (ResultGGrey board). Real scans use the facts/business instead. */
-export const demoGreySources: SourceRowData[] = [
-  { label: "Eigen website", status: "1 pagina, geen adres, geen diensten", tone: "muted" },
-  { label: "Google-bedrijfsprofiel", status: "niet geclaimd", tone: "rood" },
-  { label: "Bing, Apple", status: "ontbreekt", tone: "rood" },
-  { label: "Nederlandse gidsen (12)", status: "in 1 van 12, zonder diensten", tone: "muted" },
-  { label: "KvK", status: "klopt", tone: "groen" },
+export function demoGreySources(copy: CopyShape): SourceRowData[] {
+  const S = copy.result.sources;
+  return [
+    { label: S.rows.website, status: S.demoWebsite, tone: "muted" },
+    { label: S.rows.gbp, status: S.unclaimed, tone: "rood" },
+    { label: S.rows.bingApple, status: S.missing, tone: "rood" },
+    { label: S.rows.directories(12), status: S.demoDirectories, tone: "muted" },
+    { label: S.rows.kvk, status: S.ok, tone: "groen" },
+  ];
+}
+
+/**
+ * Seven months of checks for the progress view: the free check, the first
+ * full check, then monthly checks in which fewer answers are wrong, as
+ * sources get fixed. The mock decides per question whether it is wrong, so a
+ * lower rate only takes wrong questions away and the line really improves.
+ */
+const DEMO_HISTORY: { monthsAgo: number; kind: "free" | "baseline" | "monthly"; wrongPairRate: number }[] = [
+  { monthsAgo: 7, kind: "free", wrongPairRate: 0.35 },
+  { monthsAgo: 6, kind: "baseline", wrongPairRate: 0.35 },
+  { monthsAgo: 5, kind: "monthly", wrongPairRate: 0.3 },
+  { monthsAgo: 4, kind: "monthly", wrongPairRate: 0.24 },
+  { monthsAgo: 3, kind: "monthly", wrongPairRate: 0.2 },
+  { monthsAgo: 2, kind: "monthly", wrongPairRate: 0.12 },
+  { monthsAgo: 1, kind: "monthly", wrongPairRate: 0.06 },
+  { monthsAgo: 0, kind: "monthly", wrongPairRate: 0.02 },
 ];
 
-/** Mock-mode owner business with one finished free scan. Idempotent. */
+function monthsBack(n: number, now = new Date()): string {
+  const d = new Date(now);
+  d.setUTCMonth(d.getUTCMonth() - n);
+  d.setUTCDate(7);
+  d.setUTCHours(6, 0, 0, 0);
+  return (d > now ? now : d).toISOString();
+}
+
+/** Mock-mode owner business with seven months of finished checks. Idempotent. */
 export async function seedDemo(db: Db): Promise<void> {
   if (await db.getBusiness(DEMO_SLUG)) return;
   const { business } = await prepareBusiness({ name: "Bakkerij De Vries", place: "Haarlem", db });
   await db.upsertBusiness({ id: business.id, slug: business.slug, name: business.name, place: business.place, ownerEmail: DEMO_OWNER_EMAIL, ownerUserId: "mock-user-1", plan: "monitor", status: "trial", anniversaryDay: 7 });
-  await runScan({ businessId: business.id, kind: "free", db });
+  const runDates = new Map<string, string>();
+  const dated = new Set<string>();
+  const resolvedDated = new Set<string>();
+  for (const h of DEMO_HISTORY) {
+    const engines = h.kind === "free" ? undefined : ENGINES;
+    const clients = (engines ?? ["chatgpt", "google_ai", "copilot"]).map((e) => createMockEngine(e, { wrongPairRate: h.wrongPairRate }));
+    const report = await runScan({ businessId: business.id, kind: h.kind, engines, samplesPerPrompt: 3, clients, db });
+    const at = monthsBack(h.monthsAgo);
+    await db.updateScanRun(report.scanRunId, { startedAt: at, finishedAt: at });
+    runDates.set(report.scanRunId, at);
+    // MemDb hands out its own rows, so the demo can date the findings like the checks (mock only).
+    if (db.kind === "mem") {
+      for (const f of await db.listFindings(business.id)) {
+        if (!dated.has(f.id)) {
+          f.firstSeenAt = at;
+          dated.add(f.id);
+        }
+        // The scan itself resolves a finding it now sees answered right; date that to this check.
+        if (f.status === "resolved" && !resolvedDated.has(f.id)) {
+          f.resolvedAt = at;
+          resolvedDated.add(f.id);
+        }
+      }
+    }
+  }
+  if (db.kind === "mem") {
+    // A finding the latest check no longer saw was fixed at the next check after the last one it was in.
+    const order = [...runDates.entries()].sort((a, b) => a[1].localeCompare(b[1]));
+    const latestRun = order[order.length - 1]![0];
+    const open = (await db.listFindings(business.id)).filter((f) => f.status !== "resolved");
+    for (const f of open) {
+      if (f.scanRunId === latestRun) continue;
+      const i = order.findIndex(([id]) => id === f.scanRunId);
+      f.status = "resolved";
+      f.resolvedAt = order[i + 1]?.[1] ?? order[order.length - 1]![1];
+    }
+    for (const f of open.filter((x) => x.scanRunId === latestRun && x.verdict === "wrong").slice(0, 2)) f.status = "fixing";
+  }
   await db.upsertChannel({ businessId: business.id, type: "facts_page", name: "Feitenpagina", externalId: null, url: `https://feiten.${business.domain ?? "bakkerijdevries.nl"}`, status: "pending" });
   await db.upsertChannel({ businessId: business.id, type: "gbp", name: "Google Bedrijfsprofiel", externalId: null, url: null, status: "pending" });
   await db.upsertChannel({ businessId: business.id, type: "bing", name: "Bing Places", externalId: null, url: null, status: "synced", lastSyncedAt: new Date().toISOString() });

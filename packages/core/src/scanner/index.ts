@@ -4,11 +4,12 @@
  *
  *   const report = await runScan({ businessId, kind: "free" });
  *
- * Mock mode (MAICRO_MOCK=1 or no keys) runs the whole pipeline offline with
+ * Mock mode (VIDALO_MOCK=1 or no keys) runs the whole pipeline offline with
  * deterministic synthetic answers.
  */
 import { ENGINES, visibilityFor, type Engine, type Facts, type Finding, type InstableFinding, type Prompt, type ScanKind, type ScanReport, type Sample, type SectorSlug } from "../types";
-import { db as defaultDb, type Db, type FindingInput } from "../db";
+import { type Db, type FindingInput } from "../db";
+import { getDb } from "../shared/db.js";
 import { generatePrompts, promptsForFullScan, selectFreeScanPrompts } from "../prompts";
 import { attributeAll, type AttributionContext } from "./attribute";
 import { compare, groupKey, type ComparableSample, type CompareResult } from "./compare";
@@ -19,6 +20,7 @@ import { defaultExtractMode, extractClaims } from "./extract";
 import { normalizeWebsite } from "./normalize";
 import { createLimiter, retry, withTimeout } from "./util";
 import { promotionCandidates, summarizeRecommendations } from "./recommendations";
+import { cellsFromSamples, type ScanSnapshot } from "../progress";
 
 export * from "./compare";
 export * from "./attribute";
@@ -30,6 +32,7 @@ export * from "./resolve";
 export * from "./onboard";
 export * from "./stip";
 export * from "./recommendations";
+export * from "./progress";
 
 /** Defaults per scan kind (ARCHITECTURE.md workflows A and C). */
 export const SCAN_DEFAULTS: Record<ScanKind, { engines: Engine[]; samplesPerPrompt: number }> = {
@@ -49,7 +52,7 @@ export interface RunScanOptions {
   promptIds?: string[];
   /** Engine clients to use instead of the registry (tests, worker-injected adapters). */
   clients?: EngineClient[];
-  /** Parallel engine calls (default MAICRO_CONCURRENCY or 4). */
+  /** Parallel engine calls (default VIDALO_CONCURRENCY or 4). */
   concurrency?: number;
   db?: Db;
   /** Progress callback: which prompt is being asked (result page shows this). */
@@ -135,7 +138,7 @@ async function sampleAll(
 }
 
 function attributionContext(business: { domain: string | null; slug: string; name: string; factsHost?: string | null }, facts: Facts): AttributionContext {
-  const suffix = process.env.FACTS_HOST_SUFFIX ?? "maicro.nl";
+  const suffix = process.env.FACTS_HOST_SUFFIX ?? "vidalo.io";
   return {
     business,
     factsHost: business.factsHost ?? `${business.slug}.feiten.${suffix}`,
@@ -163,11 +166,11 @@ function engineStats(engines: Engine[], samples: Pick<Sample, "id" | "engine">[]
 
 /** Run a scan end-to-end and persist everything. */
 export async function runScan(opts: RunScanOptions): Promise<ScanReport> {
-  const db = opts.db ?? defaultDb;
+  const db = opts.db ?? getDb();
   const defaults = SCAN_DEFAULTS[opts.kind];
   const engines = opts.engines?.length ? opts.engines : defaults.engines;
-  const samplesPerPrompt = opts.samplesPerPrompt ?? Number(process.env.MAICRO_SAMPLES ?? defaults.samplesPerPrompt);
-  const concurrency = opts.concurrency ?? Number(process.env.MAICRO_CONCURRENCY ?? 4);
+  const samplesPerPrompt = opts.samplesPerPrompt ?? Number(process.env.VIDALO_SAMPLES ?? defaults.samplesPerPrompt);
+  const concurrency = opts.concurrency ?? Number(process.env.VIDALO_CONCURRENCY ?? 4);
 
   const business = await db.getBusiness(opts.businessId);
   if (!business) throw new Error(`business ${opts.businessId} not found`);
@@ -323,7 +326,7 @@ function assembleReport(args: {
     visibility: visibilityFor(samples.length, notFoundAnswers),
     engines: engineStats(engines, samples, result.verdicts, unavailable),
     findings,
-    correct: result.correct.map(({ prompt, engine, value, factKey, subject }) => ({ prompt, engine, value, factKey, subject })),
+    correct: result.correct.map(({ prompt, engine, value, raw, factKey, subject }) => ({ prompt, engine, value, raw, factKey, subject })),
     stip,
     engineStips,
     findingsBySeverity: groupBySeverity(findings),
@@ -333,9 +336,44 @@ function assembleReport(args: {
   };
 }
 
+/**
+ * A stored scan as a progress snapshot (the owner's "Voortgang" view): per
+ * (question, AI system) the verdict most samples carried, and the colour of
+ * the dot. The colour uses the findings the comparison produced for this run
+ * itself, so an older run keeps its own colour after later scans moved the
+ * finding rows on. Judged against the current facts, like buildReport.
+ */
+export async function buildSnapshot(scanRunId: string, dbOverride?: Db): Promise<ScanSnapshot | null> {
+  const db = dbOverride ?? getDb();
+  const scanRun = await db.getScanRun(scanRunId);
+  if (!scanRun || scanRun.status !== "done") return null;
+  const facts = await db.latestFacts(scanRun.businessId);
+  if (!facts) return null;
+  const samples = await db.listSamples(scanRunId);
+  const claims = await db.listClaims(samples.map((s) => s.id));
+  const prompts = await db.listPrompts(scanRun.businessId);
+  const promptById = new Map(prompts.map((p) => [p.id, p]));
+  const comparable: ComparableSample[] = samples
+    .filter((s) => promptById.has(s.promptId))
+    .map((s) => ({ sampleId: s.id, engine: s.engine, prompt: promptById.get(s.promptId)!, claims: claims.filter((c) => c.sampleId === s.id), citations: s.citations }));
+  const result = compare(comparable, facts);
+  const unavailable = new Set(scanRun.engines.filter((e) => !samples.some((s) => s.engine === e)));
+  const ownFindings = result.findings.map((c) => ({ ...c, status: "open" as const })) as unknown as Finding[];
+  const { stip, engineStips } = computeStip({ engines: scanRun.engines, samples, verdicts: result.verdicts, findings: ownFindings, instable: result.instable, criteriaNotFound: result.criteriaNotFound, unavailable });
+  return {
+    scanRunId,
+    kind: scanRun.kind,
+    checkedAt: scanRun.finishedAt ?? scanRun.startedAt,
+    engines: scanRun.engines.filter((e) => !unavailable.has(e)),
+    stip,
+    engineStips: engineStips.filter((e) => !unavailable.has(e.engine)),
+    cells: cellsFromSamples(samples, result.verdicts, prompts),
+  };
+}
+
 /** Rebuild the ScanReport for a stored scan run (result page, emails). */
 export async function buildReport(scanRunId: string, dbOverride?: Db): Promise<ScanReport> {
-  const db = dbOverride ?? defaultDb;
+  const db = dbOverride ?? getDb();
   const scanRun = await db.getScanRun(scanRunId);
   if (!scanRun) throw new Error(`scan_run ${scanRunId} not found`);
   const business = await db.getBusiness(scanRun.businessId);

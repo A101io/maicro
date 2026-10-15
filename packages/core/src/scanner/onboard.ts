@@ -3,7 +3,8 @@
  * facts + prompts, ready for runScan. Used by the CLI and by apps/web.
  */
 import type { Prompt } from "../types";
-import { db as defaultDb, type BusinessRecord, type Db } from "../db";
+import { type BusinessRecord, type Db } from "../db";
+import { getDb } from "../shared/db.js";
 import { generatePrompts } from "../prompts";
 import { normalizeWebsite, slugify } from "./normalize";
 import { draftProvisionalFacts, resolveBusiness, sectorForCandidate, type BusinessCandidate } from "./resolve";
@@ -29,7 +30,7 @@ export interface Prepared {
  * a new one gets provisional facts (v1) and the full prompt set.
  */
 export async function prepareBusiness(opts: PrepareOptions): Promise<Prepared> {
-  const db = opts.db ?? defaultDb;
+  const db = opts.db ?? getDb();
   const slug = slugify(opts.name, opts.place);
   const existing = await db.getBusiness(slug);
   const candidate = opts.candidate ?? (await resolveBusiness(opts.name, opts.place))[0]!;

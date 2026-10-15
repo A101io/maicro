@@ -1,5 +1,5 @@
 /**
- * Own-website check: can the assistants Maicro checks read the owner's site,
+ * Own-website check: can the assistants Vidalo checks read the owner's site,
  * and does the homepage carry the business data in a form they read directly?
  *
  *   robots.txt  — is the search robot of an engine we check shut out of "/"?
@@ -11,7 +11,7 @@
  * Only robots that answer questions are checked, not training crawlers: a
  * blocked GPTBot does not stop ChatGPT search, a blocked OAI-SearchBot does.
  * Nothing here changes the site; the owner gets the exact change to make
- * (sitecheckEmail). In MAICRO_MOCK=1 without an injected fetch no request is
+ * (sitecheckEmail). In VIDALO_MOCK=1 without an injected fetch no request is
  * made and the site reads as clean.
  */
 import type { Engine, Facts } from "../types.js";
@@ -22,9 +22,9 @@ import { formatPhoneNl, normalizePhone } from "../scanner/normalize.js";
 import { dashboardUrl } from "../reporter/links.js";
 import { bareDomain, defaultFactsHost } from "./host.js";
 
-export const SITECHECK_USER_AGENT = "Maicro-Sitecheck/1.0 (+https://maicro.nl)";
+export const SITECHECK_USER_AGENT = "Vidalo-Sitecheck/1.0 (+https://vidalo.io)";
 
-/** Robots that fetch pages to answer a question, per engine Maicro checks. */
+/** Robots that fetch pages to answer a question, per engine Vidalo checks. */
 export const ANSWER_ROBOTS: { token: string; engines: Engine[] }[] = [
   { token: "OAI-SearchBot", engines: ["chatgpt"] },
   { token: "ChatGPT-User", engines: ["chatgpt"] },
@@ -339,7 +339,7 @@ Lukt het niet zelf? Stuur deze mail door naar wie je website bouwt, dit is alles
 Je overzicht: ${links.dashboardUrl}
 
 Groet,
-Maicro
+Vidalo
 `;
   return { subject, text };
 }

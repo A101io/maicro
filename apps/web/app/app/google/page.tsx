@@ -1,5 +1,5 @@
-import { copy } from "@maicro/core/copy";
-import { isVerifiedOwner } from "@maicro/core/shared";
+import { getI18n } from "@/lib/i18n";
+import { isVerifiedOwner } from "@vidalo/core/shared";
 import { Stip } from "@/components/Stip";
 import { requireOwner } from "@/lib/owner";
 import { loadDashboard } from "@/lib/reads";
@@ -12,6 +12,7 @@ export default async function GooglePage({ searchParams }: { searchParams: Promi
   const { channels } = await loadDashboard(business.id);
   const gbp = channels.find((c) => c.type === "gbp");
   const verified = isVerifiedOwner(business, session.userId);
+  const { copy } = await getI18n();
   const G = copy.google;
   return (
     <div className="space-y-6">

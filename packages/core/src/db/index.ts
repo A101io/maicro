@@ -1,13 +1,13 @@
 /**
  * Database entry point.
  *
- *   import { db } from "@maicro/core/db";
+ *   import { db } from "@vidalo/core/db";
  *   const b = await db.getBusiness("bakkerij-de-vries-haarlem");
  *
  * `db` is chosen at import time:
- *   - MAICRO_MOCK=1 or no DATABASE_URL  -> MemDb (in-memory, zero infrastructure)
+ *   - VIDALO_MOCK=1 or no DATABASE_URL  -> MemDb (in-memory, zero infrastructure)
  *   - otherwise                          -> PgDb (postgres.js against DATABASE_URL)
- *   - MAICRO_DB=pg forces PgDb even under MAICRO_MOCK=1, so the mock engines
+ *   - VIDALO_DB=pg forces PgDb even under VIDALO_MOCK=1, so the mock engines
  *     can drive a real Postgres (`pnpm e2e:pg`).
  *
  * `withMockDb()` returns a fresh MemDb regardless of env (tests, dry runs).
@@ -23,7 +23,7 @@ export { PgDb } from "./pg";
 
 /** True when the process should avoid all external infrastructure. */
 export function isMockMode(): boolean {
-  return process.env.MAICRO_MOCK === "1" || !process.env.DATABASE_URL;
+  return process.env.VIDALO_MOCK === "1" || !process.env.DATABASE_URL;
 }
 
 /** A fresh in-memory database with the same interface as the real one. */
@@ -31,13 +31,13 @@ export function withMockDb(): MemDb {
   return new MemDb();
 }
 
-export function createDb(databaseUrl: string): PgDb {
-  return new PgDb(databaseUrl);
+export function createDb(databaseUrl: string, opts?: { max?: number; idleTimeout?: number }): PgDb {
+  return new PgDb(databaseUrl, opts);
 }
 
 function pickDb(): Db {
-  if (process.env.MAICRO_DB === "pg") {
-    if (!process.env.DATABASE_URL) throw new Error("MAICRO_DB=pg needs DATABASE_URL");
+  if (process.env.VIDALO_DB === "pg") {
+    if (!process.env.DATABASE_URL) throw new Error("VIDALO_DB=pg needs DATABASE_URL");
     return new PgDb(process.env.DATABASE_URL);
   }
   if (isMockMode()) return new MemDb();

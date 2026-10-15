@@ -1,7 +1,7 @@
 import { mkdir, appendFile } from "node:fs/promises";
 import path from "node:path";
-import { checkGoogleIndex, publishFactsPage, runSiteCheck, syncAllChannels } from "@maicro/core/publisher";
-import { openFixesForScan, runRecheck, directoryCorrectionEmail } from "@maicro/core/fixer";
+import { checkGoogleIndex, publishFactsPage, runSiteCheck, syncAllChannels } from "@vidalo/core/publisher";
+import { openFixesForScan, runRecheck, directoryCorrectionEmail } from "@vidalo/core/fixer";
 import {
   sendMail,
   sendBaselineSummary,
@@ -11,7 +11,7 @@ import {
   sendUnfixableNotice,
   sendWelcome,
   factsPageUrl,
-} from "@maicro/core/reporter";
+} from "@vidalo/core/reporter";
 import { getDb, runScan } from "../compat.js";
 import { log } from "../log.js";
 import type { Handler } from "./types.js";
@@ -98,11 +98,19 @@ export const email: Handler<"email"> = async (p) => {
  * event, so the dashboard/admin can list them later.
  */
 export const operatorTask: Handler<"operator_task"> = async (p, job) => {
-  const dir = path.resolve(process.env.MAICRO_OUT_DIR ?? "out", "operator");
+  await getDb().logEvent(p.businessId ?? null, "operator_task", { jobId: job.id, reason: p.reason, payload: p });
+  log.info("operator_task.queued", { jobId: job.id, reason: p.reason, businessId: p.businessId ?? null });
+  // The event is the record. The file is a convenience on a machine with a
+  // disk; a Cloudflare Worker has none that outlives the invocation.
+  if (onCloudflare()) return { event: "operator_task" };
+  const dir = path.resolve(process.env.VIDALO_OUT_DIR ?? "out", "operator");
   await mkdir(dir, { recursive: true });
   const row = { id: job.id, at: new Date().toISOString(), ...p };
   await appendFile(path.join(dir, "queue.jsonl"), `${JSON.stringify(row)}\n`, "utf8");
-  await getDb().logEvent(p.businessId ?? null, "operator_task", { jobId: job.id, reason: p.reason, payload: p });
-  log.info("operator_task.queued", { jobId: job.id, reason: p.reason, businessId: p.businessId ?? null });
   return { file: path.join(dir, "queue.jsonl") };
 };
+
+/** True inside a Cloudflare Worker (workerd sets this user agent). */
+export function onCloudflare(): boolean {
+  return (globalThis as { navigator?: { userAgent?: string } }).navigator?.userAgent === "Cloudflare-Workers";
+}

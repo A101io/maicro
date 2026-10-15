@@ -1,6 +1,6 @@
 import type { Metadata } from "next";
 import { notFound } from "next/navigation";
-import { copy } from "@maicro/core/copy";
+import { getI18n } from "@/lib/i18n";
 import { ready } from "@/lib/db";
 import { factsPageBody } from "@/lib/factsPage";
 import { getSession, getOwnedBusiness } from "@/lib/session";
@@ -14,7 +14,7 @@ export const metadata: Metadata = { robots: { index: false } };
  * feiten.{domain}, wrapped in a thin preview bar.
  *
  * Only the signed-in owner sees it. It renders whatever facts were last saved,
- * confirmed or not, and it is served from Maicro's own domain: open to anyone,
+ * confirmed or not, and it is served from Vidalo's own domain: open to anyone,
  * it would let whoever last claimed a business show their version of it here.
  */
 export default async function FactsPreviewPage({ params }: { params: Promise<{ slug: string }> }) {
@@ -28,12 +28,13 @@ export default async function FactsPreviewPage({ params }: { params: Promise<{ s
   const facts = await db.latestFacts(business.id);
   if (!facts) notFound();
   const body = factsPageBody(facts, business);
+  const { copy, href } = await getI18n();
   return (
     <>
       <div className="border-b-[1.5px] border-line bg-panel-2">
         <div className="wrap flex h-12 items-center justify-between text-[13px] text-muted">
           <span>{copy.factsPage.preview}</span>
-          <a href="/app" className="font-semibold text-ink">
+          <a href={href("/app")} className="font-semibold text-ink">
             {copy.nav.dashboard}
           </a>
         </div>

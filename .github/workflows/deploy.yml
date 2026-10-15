@@ -1,0 +1,119 @@
+name: Deploy to Cloudflare
+
+# Deploys are MANUAL (Actions tab → Deploy to Cloudflare → Run workflow), never
+# on push: merging and shipping are separate decisions, as for Sitty and
+# Sonable. main can therefore be ahead of what is live.
+#
+#   preview     vidalo-web-preview: the site on mock data (no database, no keys)
+#   production  vidalo-worker (jobs, cron, scan queue, facts pages) and
+#               vidalo-web; refuses to serve without its database (worker.ts)
+#
+# DO NOT CONNECT CLOUDFLARE "WORKERS BUILDS": it deploys on every push.
+
+on:
+  workflow_dispatch:
+    inputs:
+      target:
+        description: "What to deploy"
+        type: choice
+        options: [preview, production]
+        default: preview
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    # Credentials live on the GitHub ENVIRONMENT (Settings → Environments →
+    # preview / production → secrets), so no other workflow can borrow them.
+    environment:
+      name: ${{ inputs.target }}
+      # Literals, not a repository variable: a variable outside the repo can
+      # name a dead host for weeks (Sitty's DEPLOY_URL did).
+      url: ${{ inputs.target == 'production' && 'https://vidalo.io' || 'https://vidalo-web-preview.julian-devriend.workers.dev' }}
+    permissions:
+      contents: read
+      deployments: write
+    env:
+      SITE: ${{ inputs.target == 'production' && 'https://vidalo.io' || 'https://vidalo-web-preview.julian-devriend.workers.dev' }}
+      WRANGLER_ENV: ${{ inputs.target == 'production' && '' || 'preview' }}
+    steps:
+      - uses: actions/checkout@v4
+      - uses: pnpm/action-setup@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: pnpm
+      - run: pnpm install --frozen-lockfile
+
+      # Cheap gates before anything ships.
+      - run: pnpm scan:secrets
+      - run: pnpm -r typecheck
+      - run: pnpm -r test
+
+      # A secret that is missing or misnamed expands to "" and every later
+      # step fails somewhere unhelpful. Sitty lost 17 runs to
+      # CLOUDFLARE_API_SECRET vs CLOUDFLARE_API_TOKEN; what ended it was
+      # printing the NAMES the job can see. Names only, never values.
+      - name: Require the Cloudflare credentials
+        env:
+          TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+          ACCOUNT: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
+          ALL_SECRETS: ${{ toJSON(secrets) }}
+        run: |
+          missing=""
+          [ -n "$TOKEN" ]   || missing="$missing CLOUDFLARE_API_TOKEN"
+          [ -n "$ACCOUNT" ] || missing="$missing CLOUDFLARE_ACCOUNT_ID"
+          if [ -n "$missing" ]; then
+            echo "::error::Missing in the '${{ inputs.target }}' environment:$missing"
+            echo "Secret names this job can see:"
+            echo "$ALL_SECRETS" | jq -r 'keys[]' | sed 's/^/  - /'
+            echo "Set them under Settings → Environments → ${{ inputs.target }} → Environment secrets."
+            exit 1
+          fi
+          echo "Cloudflare credentials present."
+
+      # The web build. PUBLIC_BASE_URL is read at build time by next.config
+      # (CSP upgrade-insecure-requests only on https) and at run time from
+      # wrangler.jsonc vars.
+      - name: Build the web Worker (OpenNext)
+        working-directory: apps/web
+        env:
+          PUBLIC_BASE_URL: ${{ env.SITE }}
+          VIDALO_MOCK: ${{ inputs.target == 'production' && '0' || '1' }}
+        run: pnpm cf:build
+
+      # Production only: the queue the website sends free scans to, then the
+      # worker that consumes it. Creating a queue that exists is an error, so
+      # it is looked up first.
+      - name: Scan queue
+        if: inputs.target == 'production'
+        working-directory: apps/web
+        env:
+          CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+          CLOUDFLARE_ACCOUNT_ID: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
+        run: pnpm exec wrangler queues info vidalo-scans >/dev/null 2>&1 || pnpm exec wrangler queues create vidalo-scans
+
+      - name: Deploy the background worker
+        if: inputs.target == 'production'
+        working-directory: apps/worker
+        env:
+          CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+          CLOUDFLARE_ACCOUNT_ID: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
+        run: ../web/node_modules/.bin/wrangler deploy
+
+      - name: Deploy the web Worker
+        working-directory: apps/web
+        env:
+          CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+          CLOUDFLARE_ACCOUNT_ID: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
+        run: pnpm exec wrangler deploy --env "$WRANGLER_ENV"
+
+      # The last step is a check: fetch what actually shipped and say what it
+      # SAW (status, bytes, language), not just what it wanted.
+      - name: Verify what is live
+        run: node scripts/verify-deploy.mjs "$SITE"
+
+      # Production only: www must send visitors to vidalo.io, same path,
+      # permanently.
+      - name: Verify the redirect to vidalo.io
+        if: inputs.target == 'production'
+        run: node scripts/verify-deploy.mjs --redirects https://vidalo.io www.vidalo.io

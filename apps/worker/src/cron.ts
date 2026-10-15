@@ -10,9 +10,9 @@
  *   6. own-website check every 30 days for paying businesses
  *   7. Google index check of the facts page: daily until Google has it, then weekly
  */
-import { pollFactsHost } from "@maicro/core/publisher";
-import { getDb as sharedDb, listBusinessesByStatus, setBusinessStatus, UNSUBSCRIBED_EVENT } from "@maicro/core/shared";
-import type { BusinessRecord, EventRow } from "@maicro/core/db";
+import { pollFactsHost } from "@vidalo/core/publisher";
+import { getDb as sharedDb, listBusinessesByStatus, setBusinessStatus, UNSUBSCRIBED_EVENT } from "@vidalo/core/shared";
+import type { BusinessRecord, EventRow } from "@vidalo/core/db";
 import { getDb } from "./compat.js";
 import { errorMessage, log } from "./log.js";
 
