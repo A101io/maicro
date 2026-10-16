@@ -56,7 +56,11 @@ function meta(o: Record<string, unknown>): Record<string, string> {
 
 async function findBusiness(o: Record<string, unknown>): Promise<BusinessRecord | null> {
   const db = getDb();
-  const byMeta = meta(o).businessId ?? (o.subscription_details as { metadata?: Record<string, string> } | undefined)?.metadata?.businessId;
+  // An invoice carries the subscription's metadata under subscription_details,
+  // or, from API version 2025-03-31 on, under parent.subscription_details.
+  type Details = { metadata?: Record<string, string> } | undefined;
+  const parent = o.parent as { subscription_details?: Details } | null | undefined;
+  const byMeta = meta(o).businessId ?? (o.subscription_details as Details)?.metadata?.businessId ?? parent?.subscription_details?.metadata?.businessId;
   if (byMeta) {
     const b = await db.getBusiness(byMeta);
     if (b) return b;
