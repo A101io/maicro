@@ -25,7 +25,7 @@ Production refuses to serve without `DATABASE_URL` or a Hyperdrive binding (503,
 | `GOOGLE_OAUTH_CLIENT_ID/SECRET` | Google Cloud OAuth client | Web env | Verification sets `owner_verified_at` |
 | `STRIPE_SECRET_KEY` | Vidalo's own Stripe account (not Sitty `acct_1UA8rHEGTq7D30VV`, not Sonable `acct_1TyIM8EQK4LIWEDd`) | Web env; GitHub environment secret for setup | `pnpm stripe:setup` prints the account id; pin it as `VIDALO_STRIPE_ACCOUNT` |
 | `STRIPE_WEBHOOK_SECRET` | Printed once by `pnpm stripe:setup --apply` | Web env | A test event reaches `/api/stripe/webhook` with 200 |
-| `STRIPE_PRICE_SETUP/MONITOR`, `STRIPE_TAX_RATE_ID` | `pnpm stripe:setup` output | Web env | Checkout opens with €149 + 21% btw |
+| `STRIPE_PRICE_SETUP/MONITOR`, `STRIPE_TAX_RATE_ID`, `STRIPE_PORTAL_CONFIGURATION` | `pnpm stripe:setup` output | Web env | Checkout opens with €149 + 21% btw |
 | `RESEND_API_KEY` | Resend | Worker + web env | A report mail arrives |
 | `UNSUBSCRIBE_SECRET` | `openssl rand -hex 32` | Worker + web env | Unsubscribe link works; without it follow-ups are not sent |
 | `CLOUDFLARE_API_TOKEN`, `CLOUDFLARE_ZONE_ID` | Cloudflare | Worker env | A facts host verifies |
