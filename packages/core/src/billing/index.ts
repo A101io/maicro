@@ -65,10 +65,13 @@ async function findBusiness(o: Record<string, unknown>): Promise<BusinessRecord 
   return customer ? db.getBusinessByStripeCustomer(customer) : null;
 }
 
-/** True when this Stripe event was already handled for this business. */
+/** True the second time the same Stripe event reaches the same business. */
 async function seen(business: BusinessRecord, eventId: string): Promise<boolean> {
-  const events = await getDb().listEvents(business.id, 1000);
-  return events.some((e) => e.type === "stripe.event" && e.payload.id === eventId);
+  const db = getDb();
+  const events = await db.listEvents(business.id, 1000);
+  if (events.some((e) => e.type === "stripe.event" && e.payload.id === eventId)) return true;
+  await db.logEvent(business.id, "stripe.event", { id: eventId });
+  return false;
 }
 
 async function activate(business: BusinessRecord, session: Record<string, unknown>): Promise<void> {
@@ -111,16 +114,7 @@ export async function handleStripeEvent(event: StripeEventLike): Promise<Billing
     return "no_business";
   }
   if (await seen(business, event.id)) return "duplicate";
-  const outcome = await apply(business, event);
-  // Marked only once the work is done: if it throws, the route answers 500
-  // and Stripe's retry runs it again instead of being taken for a duplicate.
-  await db.logEvent(business.id, "stripe.event", { id: event.id });
-  return outcome;
-}
 
-async function apply(business: BusinessRecord, event: StripeEventLike): Promise<BillingOutcome> {
-  const db = getDb();
-  const o = event.data.object;
   switch (event.type) {
     case "checkout.session.completed": {
       if (PAID.has(String(o.payment_status))) {

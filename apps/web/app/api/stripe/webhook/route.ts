@@ -19,10 +19,7 @@ export async function POST(req: Request) {
   const payload = await req.text();
   let event;
   try {
-    // Async: on Workers the Stripe SDK verifies with Web Crypto, and the
-    // synchronous constructEvent throws there, which read as "bad signature"
-    // on every event. The async form works on Node as well.
-    event = await stripe.webhooks.constructEventAsync(payload, sig, env.stripeWebhookSecret);
+    event = stripe.webhooks.constructEvent(payload, sig, env.stripeWebhookSecret);
   } catch {
     return NextResponse.json({ ok: false, error: "bad signature" }, { status: 400 });
   }
