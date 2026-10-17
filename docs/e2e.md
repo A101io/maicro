@@ -23,7 +23,7 @@ Found and fixed on the way:
 - `/feiten` had a `<main>` inside its `<main>` (the publisher's whole page embedded).
 - An invoice in the newer Stripe API shape (`parent.subscription_details.metadata`) arriving before `checkout.session.completed` could not be placed (`billing.no_business`). Harmless for the first invoice, which is ignored; now read, with a test that fails without it.
 
-Open: colour contrast below WCAG AA (4.5:1), a design-token decision:
+Colour contrast below WCAG AA (4.5:1). **Applied 17 Oct 2026** (Julian): the tokens below, `.fine` on `--muted`, the light blue on the blue pricing block `#EFF6FF`, sources on the dark panel `text-grijs`, and ink text on the orange and grey status circles (white on `#f59e0b` was 2.1:1; the status colours themselves stay). After: `pnpm e2e` 73/73.
 
 | Colour | On | Ratio | Closest that passes |
 |---|---|---|---|

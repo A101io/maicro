@@ -221,7 +221,8 @@ describe("runRecheck", () => {
       return report(db, opts.businessId, [], run.id);
     });
 
-    const out = await runRecheck(opened.fix.id, { runScan, now: () => new Date("2026-11-07T10:00:00Z") });
+    const threeWeeksOn = new Date(new Date(finding.firstSeenAt).getTime() + 21 * 24 * 60 * 60 * 1000);
+    const out = await runRecheck(opened.fix.id, { runScan, now: () => threeWeeksOn });
     expect(runScan).toHaveBeenCalledWith(expect.objectContaining({ kind: "recheck", engines: ["chatgpt"], samplesPerPrompt: 10, promptIds: [prompts[0]!.id] }));
     expect(out.result).toBe("resolved");
     const f = (await db.getFinding(finding.id))!;
@@ -260,7 +261,10 @@ describe("runRecheck", () => {
       const run = await db.createScanRun({ businessId: opts.businessId, kind: "recheck", engines: ["chatgpt"], samplesPerPrompt: 10, status: "done" });
       return report(db, opts.businessId, [{ ...finding, status: "fixing" }], run.id);
     });
-    const out = await runRecheck(opened.fix.id, { runScan, now: () => new Date("2026-12-01T10:00:00Z") });
+    // Relative to when the finding was first seen (the real clock at seed time), not a fixed date: a fixed
+    // 1 December fell inside the 45-day window from 17 Oct 2026 on, and the test flipped to still_wrong.
+    const afterWindow = new Date(new Date(finding.firstSeenAt).getTime() + 120 * 24 * 60 * 60 * 1000);
+    const out = await runRecheck(opened.fix.id, { runScan, now: () => afterWindow });
     expect(out.result).toBe("unfixable");
     expect((await db.getFinding(finding.id))!.status).toBe("unfixable");
     const mail = [...db.jobs.values()].find((j) => j.kind === "email")!;
